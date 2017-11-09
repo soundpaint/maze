@@ -1,0 +1,19 @@
+* Limit velocity, such that ball moves at most 1 pixel per time step.
+* Overhoul concept when passing position (x, y) as double or integer.
+* Move velocity correction code from class Balls to class Ball.
+* Create template class for handling matrices.
+* Consider geometry of holes.
+* Create window icon / splash screen programmatically.
+* Enhance accurateness of collision detection.
+* Enhance accurateness of reflection and frictional resistance.
+* Create sound output.
+* Support perspective drawing of walls.
+* Support multiple levels.
+* Support multiple games.
+* Create fast booting framework, maybe something similar to BerryBoot.
+
+Done:
+* Complete 1st version of collision detection.
+* Let ball geometry support left/right and up/down extension.
+* Fix memory leaks when using Point_3D.
+* Consider geometry of balls.

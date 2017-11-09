@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<config>
+  <balls>
+    <ball>
+      <position>
+	<x>0.2</x>
+	<y>0.2</y>
+      </position>
+      <velocity>
+	<x>0.0</x>
+	<y>0.0</y>
+      </velocity>
+    </ball>
+  </balls>
+  <background>
+    <pixmap>
+      <file>cracked.png</file>
+    </pixmap>
+  </background>
+  <block id="corridor">
+    <alias>╳</alias>
+    <!-- default background: transparent -->
+    <!-- default foreground: transparent -->
+    <shape>
+      <implicit-curve>x*x+1</implicit-curve> <!-- empty curve -->
+    </shape>
+  </block>
+  <block id="circle">
+    <alias>o</alias>
+    <!-- default background: transparent -->
+    <foreground>
+      <pixmap>
+	<file>sm_squares.png</file>
+      </pixmap>
+    </foreground>
+    <shape>
+      <implicit-curve>x*x+y*y-0.9</implicit-curve>
+    </shape>
+  </block>
+  <block id="hole">
+    <alias>o</alias>
+    <!-- default background: transparent -->
+    <foreground>
+      <pixmap>
+	<file>sm_squares.png</file>
+      </pixmap>
+    </foreground>
+    <shape>
+      <not>
+        <implicit-curve>x*x+y*y-0.9</implicit-curve>
+      </not>
+    </shape>
+  </block>
+  <block id="wall-solid">
+    <alias>┼</alias>
+    <!-- default background: transparent -->
+    <foreground>
+      <pixmap>
+	<file>sm_squares.png</file>
+      </pixmap>
+    </foreground>
+    <shape>
+      <implicit-curve>x*x+0.1</implicit-curve> <!-- solid block -->
+    </shape>
+  </block>
+  <block id="wall-rounded-upper-left">
+    <alias>╭</alias>
+    <!-- default background: transparent -->
+    <foreground>
+      <pixmap>
+	<file>sm_squares.png</file>
+      </pixmap>
+    </foreground>
+    <shape>
+      <or>
+	<!-- solid block without upper left edge -->
+	<implicit-curve>x-y-0.75</implicit-curve>
+
+	<!-- circle in upper left corner -->
+	<implicit-curve>(x+0.75)*(x+0.75)+(y+0.75)*(y+0.75)-0.25</implicit-curve>
+      </or>
+    </shape>
+  </block>
+  <block id="wall-rounded-upper-right">
+    <alias>╮</alias>
+    <!-- default background: transparent -->
+    <foreground>
+      <pixmap>
+	<file>sm_squares.png</file>
+      </pixmap>
+    </foreground>
+    <shape>
+      <or>
+	<!-- solid block without upper right edge -->
+	<implicit-curve>-x-y+0.75</implicit-curve>
+
+	<!-- circle in upper right corner -->
+	<implicit-curve>(x-0.75)*(x-0.75)+(y+0.75)*(y+0.75)-0.25</implicit-curve>
+      </or>
+    </shape>
+  </block>
+  <block id="wall-rounded-lower-left">
+    <alias>╰</alias>
+    <!-- default background: transparent -->
+    <foreground>
+      <pixmap>
+	<file>sm_squares.png</file>
+      </pixmap>
+    </foreground>
+    <shape>
+      <or>
+	<!-- solid block without lower left edge -->
+	<implicit-curve>x+y+0.75</implicit-curve>
+
+	<!-- circle in lower left corner -->
+	<implicit-curve>(x+0.75)*(x+0.75)+(y-0.75)*(y-0.75)-0.25</implicit-curve>
+      </or>
+    </shape>
+  </block>
+  <block id="wall-rounded-lower-right">
+    <alias>╯</alias>
+    <!-- default background: transparent -->
+    <foreground>
+      <pixmap>
+	<file>sm_squares.png</file>
+      </pixmap>
+    </foreground>
+    <shape>
+      <or>
+	<!-- solid block without lower right edge -->
+	<implicit-curve>y-x-0.75</implicit-curve>
+
+	<!-- circle in lower right corner -->
+	<implicit-curve>(x-0.75)*(x-0.75)+(y-0.75)*(y-0.75)-0.25</implicit-curve>
+      </or>
+    </shape>
+  </block>
+  <field>
+    <columns>8</columns>
+    <rows>8</rows>
+    <ignore>&#x09;</ignore>
+    <ignore>&#x0a;</ignore>
+    <ignore>&#x0d;</ignore>
+    <ignore>&#x20;</ignore>
+    <contents>
+      ┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼
+      ┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼
+      ┼┼╳╳╳╳╳╳╳╳╳╳╳╳┼┼
+      ┼┼╳╳╳╳╳╳╳╳╳╳╳╳┼┼
+      ┼┼┼┼┼╮╳╳╭╮╳╳╳╳┼┼
+      ┼┼┼┼┼┼╳╳┼┼╳╳╳╳┼┼
+      ┼┼╳╳┼┼╳╳┼┼┼┼┼┼┼┼
+      ┼┼╳╳╰╯╳╳╰┼┼┼┼┼┼┼
+      ┼┼╳╳╳╳╳╳╳╳╳╳╳╳┼┼
+      ┼┼╳╳╳╳╳╳╳╳╳╳╳╳┼┼
+      ┼┼╳╳╭┼┼┼┼┼┼╮╳╳┼┼
+      ┼┼╳╳╰┼┼┼┼┼┼╯╳╳┼┼
+      ┼┼╳╳╳╳┼┼╳╳╳╳╳╳┼┼
+      ┼┼╳╳╳╳┼┼╳╳╳╳╳╳┼┼
+      ┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼
+      ┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼
+    </contents>
+  </field>
+</config>
