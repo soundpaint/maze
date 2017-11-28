@@ -1,0 +1,84 @@
+/*
+ * Maze -- A maze / flipper game implementation for RPi with Sense Hat
+ * Copyright (C) 2016, 2017  Jürgen Reuter
+ *
+ * This program is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see
+ * <https://www.gnu.org/licenses/>.
+ *
+ * For updates and more info or contacting the author, visit:
+ * <https://github.com/soundpaint/maze>
+ *
+ * Author's web site: www.juergen-reuter.de
+ */
+
+#ifndef IMPLICIT_CURVE_AST_HH
+#define IMPLICIT_CURVE_AST_HH
+
+#include <vector>
+
+/*
+ * Abstract syntax tree for implicit curves.  Actually, due to the (by
+ * now) highly restricted syntax of implicit curves, the syntax tree
+ * is degenerated to a vector of flat term expressions.  It may grow
+ * to a fully-fledged tree structure some time later.  Rather than
+ * implementing a fully-fledged visitor design pattern for tree walks,
+ * for now we simply iterate over the linear structure of the vector,
+ * where appropriate.
+ */
+class Implicit_curve_ast
+{
+public:
+  class Term {
+  public:
+    enum Sign {
+      PLUS, MINUS, SIGN_UNINITIALIZED
+    };
+    enum Variable {
+      VAR_CONST, VAR_X, VAR_Y, VAR_XX, VAR_XY, VAR_YY, VAR_UNINITIALIZED
+    };
+    Term(const Sign sign, const double weight);
+    virtual ~Term();
+    const Sign get_sign() const;
+    const double get_weight() const;
+  private:
+    const Sign _sign;
+    const double _weight;
+    Variable _variable;
+  };
+
+  class Implicit_curve {
+  public:
+    Implicit_curve();
+    virtual ~Implicit_curve();
+    std::vector<Term *> *get_terms();
+  private:
+    std::vector<Term *> _terms;
+  };
+
+  Implicit_curve_ast();
+  virtual ~Implicit_curve_ast();
+  Implicit_curve *get_implicit_curve();
+
+private:
+  Implicit_curve _implicit_curve;
+};
+
+#endif /* IMPLICIT_CURVE_AST_HH */
+
+/*
+ * Local variables:
+ *   mode: c++
+ *   coding: utf-8
+ * End:
+ */

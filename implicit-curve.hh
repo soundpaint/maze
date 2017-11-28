@@ -25,40 +25,23 @@
 #ifndef IMPLICIT_CURVE_HH
 #define IMPLICIT_CURVE_HH
 
-/**
- * implicit_curve ::= weighted_term { add_op weighted_term } .
- * add_op ::= plus | minus .
- * plus ::= '+' .
- * minus ::= '-' .
- * weighted_term ::= weight mul variable_term | const_term .
- * mul ::= '*'
- * weight ::= [ sign ] <non-negative-double> .
- * sign ::= plus | minus .
- * variable_term ::= quad_term | linear_term .
- * quad_term ::= term_yy | term_xy | term_xx .
- * linear_term ::= term_y | term_x .
- * term_yy ::= var_y mul var_y .
- * term_xy ::= var_x mul var_y | var_y mul var_x .
- * term_xx ::= var_x mul var_x .
- * term_y ::= var_y .
- * term_x ::= var_x .
- * var_x ::= 'x' .
- * var_y ::= 'y' .
- * const_term ::= <double> .
- */
 class Implicit_curve
 {
 public:
-  Implicit_curve(const char *expression);
+  Implicit_curve(const double weight_term_yy,
+                 const double weight_term_xy,
+                 const double weight_term_xx,
+                 const double weight_term_y,
+                 const double weight_term_x,
+                 const double weight_term_const);
   virtual ~Implicit_curve();
 private:
-  double _weight_term_yy;
-  double _weight_term_xy;
-  double _weight_term_xx;
-  double _weight_term_y;
-  double _weight_term_x;
-  double _weight_term_const;
-  void parse(const char *expression);
+  const double _weight_term_yy;
+  const double _weight_term_xy;
+  const double _weight_term_xx;
+  const double _weight_term_y;
+  const double _weight_term_x;
+  const double _weight_term_const;
 };
 
 #endif /* IMPLICIT_CURVE_HH */

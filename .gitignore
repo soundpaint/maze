@@ -1,0 +1,8 @@
+# object files
+*.o
+ABOUT.h
+COPYING.h
+maze
+
+# emacs backup files
+*~

@@ -71,7 +71,7 @@ Config::fatal(const XMLCh *msg) {
 void
 Config::debug(const char *msg) {
   std::stringstream full_msg;
-  full_msg << "while parsing XML config file: " << msg;
+  full_msg << "cfg: " << msg;
   Log::debug(full_msg.str());
 }
 

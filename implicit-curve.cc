@@ -26,31 +26,23 @@
 #include <string.h>
 #include <log.hh>
 
-Implicit_curve::Implicit_curve(const char *expression)
+Implicit_curve::Implicit_curve(const double weight_term_yy,
+                               const double weight_term_xy,
+                               const double weight_term_xx,
+                               const double weight_term_y,
+                               const double weight_term_x,
+                               const double weight_term_const) :
+  _weight_term_yy(weight_term_yy),
+  _weight_term_xy(weight_term_xy),
+  _weight_term_xx(weight_term_xx),
+  _weight_term_y(weight_term_y),
+  _weight_term_x(weight_term_x),
+  _weight_term_const(weight_term_const)
 {
-  _weight_term_yy = 0.0;
-  _weight_term_xy = 0.0;
-  _weight_term_xx = 0.0;
-  _weight_term_x = 0.0;
-  _weight_term_y = 0.0;
-  _weight_term_const = 0.0;
-  parse(expression);
 }
 
 Implicit_curve::~Implicit_curve()
 {
-  _weight_term_yy = 0.0;
-  _weight_term_xy = 0.0;
-  _weight_term_xx = 0.0;
-  _weight_term_y = 0.0;
-  _weight_term_x = 0.0;
-  _weight_term_const = 0.0;
-}
-
-void
-Implicit_curve::parse(const char *expression)
-{
-  // implicit_curve ::= weighted_term { add_op weighted_term } .
 }
 
 /*

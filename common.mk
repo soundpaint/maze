@@ -28,6 +28,9 @@ MY_LD_OPTS = $(LOCAL_LD_OPTS)
 %.o: %.cc
 	$(CPP) $(MY_INCLUDE_DIRS) $(MY_CXX_OPTS) -c -o $@ $<
 
+%.moc.cc: %.hh
+	moc -I. -o $@ $<
+
 $(MY_BIN_FILES): $(MY_OBJ_FILES) $(MY_MOC_FILES)
 	$(CPP) $(MY_CXX_OPTS) $(MY_INCLUDE_DIRS) $(LIB_OBJ_FILES) $(MY_OBJ_FILES) $(MY_LD_OPTS) $(MY_LIB_DIRS) $(MY_LIBS) -o $@
 

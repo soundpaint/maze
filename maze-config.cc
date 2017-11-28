@@ -369,7 +369,8 @@ Maze_config::load_prime(const xercesc::DOMElement *elem_prime)
   if (!str_prime) {
     fatal("not enough memory");
   }
-  Implicit_curve *implicit_curve = new Implicit_curve(str_prime);
+  const Implicit_curve *implicit_curve =
+    _implicit_curve_parser.parse(str_prime);
   if (!implicit_curve) {
     fatal("not enough memory");
   }

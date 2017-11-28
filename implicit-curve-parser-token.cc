@@ -43,6 +43,9 @@ Implicit_curve_parser_token::Var_x(VAR_X);
 Implicit_curve_parser_token
 Implicit_curve_parser_token::Var_y(VAR_Y);
 
+Implicit_curve_parser_token
+Implicit_curve_parser_token::Eof(STOP);
+
 Implicit_curve_parser_token::Implicit_curve_parser_token(const Type type)
 {
   _type = type;
@@ -50,8 +53,8 @@ Implicit_curve_parser_token::Implicit_curve_parser_token(const Type type)
 }
 
 Implicit_curve_parser_token::Implicit_curve_parser_token(const double value)
+  : Implicit_curve_parser_token(DOUBLE)
 {
-  _type = DOUBLE;
   _value_double = value;
 }
 
@@ -74,6 +77,52 @@ Implicit_curve_parser_token::get_double_value() const
     Log::fatal("symbol is not a double");
   }
   return _value_double;
+}
+
+const Implicit_curve_parser_token *
+Implicit_curve_parser_token::create_double_token(const double value)
+{
+  const Implicit_curve_parser_token *token =
+    new Implicit_curve_parser_token(value);
+  if (!token) {
+    Log::fatal("not enough memory");
+  }
+  return token;
+}
+
+const Implicit_curve_parser_token *
+Implicit_curve_parser_token::create_double_token(const std::string value)
+{
+  const char *str_value = value.c_str();
+  const double d_value = strtod(str_value, 0);
+  // TODO: free str_value?
+  return create_double_token(d_value);
+}
+
+std::string
+Implicit_curve_parser_token::to_string() const
+{
+  switch (_type) {
+  case NONE:
+    return std::string("[none]");
+  case ADD:
+    return std::string("+");
+  case MINUS:
+    return std::string("-");
+  case MUL:
+    return std::string("*");
+  case VAR_X:
+    return std::string("x");
+  case VAR_Y:
+    return std::string("y");
+  case DOUBLE:
+    return std::string("[double]");
+  case STOP:
+    return std::string("[stop]");
+  default:
+    Log::fatal("Implicit_curve_parser_token::to_string(): unexpected token type");
+    return 0;
+  }
 }
 
 /*

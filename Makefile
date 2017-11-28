@@ -37,7 +37,8 @@ MY_OBJ_FILES = \
   $(MY_GEN_SRC_FILES) \
   ball.o balls.o brush-field.o config.o shape-expression.o \
   force-field.o fractals-factory.o \
-  implicit-curve.o implicit-curve-parser-token.o implicit-curve-tokenizer.o \
+  implicit-curve.o implicit-curve-ast.o implicit-curve-parser.o \
+  implicit-curve-parser-token.o implicit-curve-tokenizer.o \
   log.o maze-config.o maze-config-block.o maze-config-blocks-store.o \
   point-3d.o rounded-square-shape.o sensors.o sobel.o \
   square-shape.o tubes.o xml-document.o xml-utils.o \
@@ -61,9 +62,6 @@ LOCAL_LD_OPTS = \
   -fPIC $(MY_MOC_FILES)
 
 all: $(MY_BIN_FILES)
-
-%.moc.cc: %.hh
-	moc -I. -o $@ $<
 
 ABOUT.h: ABOUT.html
 	xxd -i $< > $@

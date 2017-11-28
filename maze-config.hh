@@ -30,6 +30,7 @@
 #include <config.hh>
 #include <maze-config-blocks-store.hh>
 #include <shape-expression.hh>
+#include <implicit-curve-parser.hh>
 
 class Maze_config : Config
 {
@@ -42,6 +43,7 @@ protected:
 private:
   XMLCh *_node_name_any, *_node_name_block, *_node_name_id;
   QBrush _background;
+  Implicit_curve_parser _implicit_curve_parser;
   Maze_config_blocks_store *_blocks;
   void reload_brush(const xercesc::DOMElement *elem_config,
 		    QBrush *background);

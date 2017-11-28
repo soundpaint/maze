@@ -30,6 +30,9 @@ Maze_config_blocks_store::Maze_config_blocks_store()
   //_blocks = new std::vector<const Maze_config_block *>();
   _blocks = new std::unordered_map<const std::string *,
                                    const Maze_config_block *>();
+  if (!_blocks) {
+    Log::fatal("not enough memory");
+  }
 }
 
 Maze_config_blocks_store::~Maze_config_blocks_store()

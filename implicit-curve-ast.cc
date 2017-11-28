@@ -22,41 +22,57 @@
  * Author's web site: www.juergen-reuter.de
  */
 
-#ifndef IMPLICIT_CURVE_PARSER_TOKEN_HH
-#define IMPLICIT_CURVE_PARSER_TOKEN_HH
+#include <implicit-curve-ast.hh>
+#include <log.hh>
 
-#include <string>
-
-class Implicit_curve_parser_token
+Implicit_curve_ast::Implicit_curve_ast()
 {
-public:
-  enum Type {
-    NONE = 0,
-    ADD,
-    MINUS,
-    MUL,
-    VAR_X,
-    VAR_Y,
-    DOUBLE,
-    STOP
-  };
-  static Implicit_curve_parser_token None, Add, Minus, Mul, Var_x, Var_y, Eof;
-  virtual ~Implicit_curve_parser_token();
-  const Type get_type() const;
-  const double get_double_value() const;
-  static const Implicit_curve_parser_token *
-  create_double_token(const double value);
-  static const Implicit_curve_parser_token *
-  create_double_token(const std::string value);
-  std::string to_string() const;
-private:
-  Implicit_curve_parser_token(const Type type);
-  Implicit_curve_parser_token(const double value);
-  Type _type;
-  double _value_double;
-};
+}
 
-#endif /* IMPLICIT_CURVE_PARSER_TOKEN_HH */
+Implicit_curve_ast::~Implicit_curve_ast()
+{
+}
+
+Implicit_curve_ast::Implicit_curve *
+Implicit_curve_ast::get_implicit_curve()
+{
+  return &_implicit_curve;
+}
+
+Implicit_curve_ast::Term::Term(const Sign sign, const double weight) :
+  _sign(sign), _weight(weight)
+{
+}
+
+Implicit_curve_ast::Term::~Term()
+{
+}
+
+const Implicit_curve_ast::Term::Sign
+Implicit_curve_ast::Term::get_sign() const
+{
+  return _sign;
+}
+
+const double
+Implicit_curve_ast::Term::get_weight() const
+{
+  return _weight;
+}
+
+Implicit_curve_ast::Implicit_curve::Implicit_curve()
+{
+}
+
+Implicit_curve_ast::Implicit_curve::~Implicit_curve()
+{
+}
+
+std::vector<Implicit_curve_ast::Term *> *
+Implicit_curve_ast::Implicit_curve::get_terms()
+{
+  return &_terms;
+}
 
 /*
  * Local variables:
