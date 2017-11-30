@@ -33,19 +33,82 @@ Implicit_curve_ast::~Implicit_curve_ast()
 {
 }
 
+void
+Implicit_curve_ast::clear()
+{
+  get_implicit_curve()->clear();
+}
+
 Implicit_curve_ast::Implicit_curve *
 Implicit_curve_ast::get_implicit_curve()
 {
   return &_implicit_curve;
 }
 
-Implicit_curve_ast::Term::Term(const Sign sign, const double weight) :
-  _sign(sign), _weight(weight)
+void
+Implicit_curve_ast::add_term(const Term::Sign sign,
+                             const double weight,
+                             const Term::Variable variable)
+{
+  _implicit_curve.add_term(sign, weight, variable);
+}
+
+Implicit_curve_ast::Term::Term(const Sign sign, const double weight,
+                               const Variable variable) :
+  _sign(sign), _weight(weight), _variable(variable)
 {
 }
 
 Implicit_curve_ast::Term::~Term()
 {
+}
+
+const std::string
+Implicit_curve_ast::Term::to_string() const
+{
+  std::stringstream str;
+  str << "{Term: ";
+  switch (_sign) {
+  case PLUS:
+    str << "+";
+    break;
+  case MINUS:
+    str << "-";
+    break;
+  case SIGN_UNINITIALIZED:
+    Log::fatal("uninitialzed term sign");
+  default:
+    Log::fatal("programming error: unknown term sign");
+    break;
+  }
+  str << _weight;
+  switch (_variable) {
+  case VAR_CONST:
+    break;
+  case VAR_X:
+    str << "x";
+    break;
+  case VAR_Y:
+    str << "y";
+    break;
+  case VAR_XX:
+    str << "x*x";
+    break;
+  case VAR_XY:
+    str << "x*y";
+    break;
+  case VAR_YY:
+    str << "y*y";
+    break;
+  case VAR_UNINITIALIZED:
+    str << "";
+    break;
+  default:
+    Log::fatal("programming error: unknown term variable");
+    break;
+  }
+  str << "}";
+  return std::string(str.str());
 }
 
 const Implicit_curve_ast::Term::Sign
@@ -60,12 +123,41 @@ Implicit_curve_ast::Term::get_weight() const
   return _weight;
 }
 
+const std::string
+Implicit_curve_ast::Implicit_curve::to_string() const
+{
+  std::stringstream str;
+  str << "{Implicit_curve: ";
+  for (size_t i = 0; i < _terms.size(); i++) {
+    Term *term = _terms[i];
+    if (i > 0) str << ", ";
+    str << term->to_string();
+  }
+  str << "}";
+  return std::string(str.str());
+}
+
 Implicit_curve_ast::Implicit_curve::Implicit_curve()
 {
 }
 
 Implicit_curve_ast::Implicit_curve::~Implicit_curve()
 {
+}
+
+void
+Implicit_curve_ast::Implicit_curve::clear()
+{
+  _terms.clear();
+}
+
+void
+Implicit_curve_ast::Implicit_curve::add_term(const Term::Sign sign,
+                                             const double weight,
+                                             const Term::Variable variable)
+{
+  Term *term = new Term(sign, weight, variable);
+  _terms.push_back(term);
 }
 
 std::vector<Implicit_curve_ast::Term *> *

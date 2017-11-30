@@ -315,6 +315,9 @@ Implicit_curve_tokenizer::Implicit_curve_tokenizer(const std::string expression)
 
 Implicit_curve_tokenizer::~Implicit_curve_tokenizer()
 {
+  if (!_saved_positions.empty()) {
+    Log::error("programming error: saved positions left upon destruction of tokenizer");
+  }
   _token_start_pos = 0;
   _current_pos = 0;
   delete _expression;
@@ -325,6 +328,37 @@ const bool
 Implicit_curve_tokenizer::eof() const
 {
   return _current_pos >= _expression->length();
+}
+
+void
+Implicit_curve_tokenizer::save_position()
+{
+  _saved_positions.push(_current_pos);
+}
+
+// TODO: Performance issue: Cache the least, say 5-10 (assuming a
+// grammar with left look-ahead < 10), recently scanned token (e.g. in
+// a hashtable as pairs (_current_pos, token)), such that after
+// calling drop_saved_position() or reset_to_saved_position(),
+// recently scanned tokens do not need to be scanned again.
+
+void
+Implicit_curve_tokenizer::drop_saved_position()
+{
+  if (_saved_positions.empty()) {
+    Log::fatal("tokenizer: no position left to reset");
+  }
+  _saved_positions.pop();
+}
+
+void
+Implicit_curve_tokenizer::reset_to_saved_position()
+{
+  if (_saved_positions.empty()) {
+    Log::fatal("tokenizer: no position left to reset");
+  }
+  _current_pos = _saved_positions.top();
+  _saved_positions.pop();
 }
 
 const int

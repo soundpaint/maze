@@ -28,6 +28,7 @@
 #include <string>
 #include <exception>
 #include <unordered_map>
+#include <stack>
 #include <implicit-curve-parser-token.hh>
 
 class Implicit_curve_tokenizer
@@ -59,6 +60,9 @@ public:
   Implicit_curve_tokenizer(const std::string expression);
   virtual ~Implicit_curve_tokenizer();
   const bool eof() const;
+  void save_position();
+  void drop_saved_position();
+  void reset_to_saved_position();
   const int get_display_position() const;
   const Implicit_curve_parser_token *get_next_token();
   void release_token(const Implicit_curve_parser_token *token) const;
@@ -149,6 +153,7 @@ private:
 
   std::string *_expression;
   uint64_t _token_start_pos, _current_pos;
+  std::stack<int> _saved_positions;
   static const bool is_white_space_char(const char);
   void mark_token_start();
   const char look_ahead() const;

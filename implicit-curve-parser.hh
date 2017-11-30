@@ -53,14 +53,14 @@ public:
   const Implicit_curve *parse(const char *expression);
 private:
   Implicit_curve_tokenizer *_tokenizer;
-  const Implicit_curve_parser_token *_look_ahead;
+  int _display_position;
   int _rule_depth;
   Implicit_curve_ast _ast;
   void reset();
   const bool eof() const;
   const int get_display_position() const;
   const Implicit_curve_parser_token *look_ahead();
-  void accept_token();
+  const Implicit_curve_parser_token *consume_token();
   static std::string create_indent(const int count);
   void open_rule(const char *lhs);
   const bool close_rule(const bool result);
@@ -68,15 +68,25 @@ private:
   const bool parse_mul();
   const bool parse_var_x();
   const bool parse_var_y();
-  const bool parse_linear_term();
-  const bool parse_variable_term();
-  const bool parse_weighted_term(double *weight);
-  const bool parse_unsigned_term(double *weight);
+  const bool parse_linear_term(Implicit_curve_ast::Term::Variable *variable);
+  static Implicit_curve_ast::Term::Variable
+  combine_variables(Implicit_curve_ast::Term::Variable variable1,
+                    Implicit_curve_ast::Term::Variable variable2);
+  const bool parse_variable_term(Implicit_curve_ast::Term::Variable *variable);
+  const bool parse_weighted_term(double *weight,
+                                 Implicit_curve_ast::Term::Variable *variable);
+  const bool parse_unsigned_term(double *weight,
+                                 Implicit_curve_ast::Term::Variable *variable);
   const bool parse_sign(Implicit_curve_ast::Term::Sign *sign);
-  const bool parse_term();
+  const bool parse_term(Implicit_curve_ast::Term::Sign *sign,
+                        double *weight,
+                        Implicit_curve_ast::Term::Variable *variable);
   const bool parse_plus();
   const bool parse_minus();
-  const bool parse_add_op();
+  const bool parse_add_op(Implicit_curve_ast::Term::Sign *sign);
+  const Implicit_curve_ast::Term::Sign
+  combine_signs(const Implicit_curve_ast::Term::Sign sign1,
+                const Implicit_curve_ast::Term::Sign sign2);
   const bool parse_implicit_curve();
 };
 

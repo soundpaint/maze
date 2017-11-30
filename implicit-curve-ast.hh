@@ -25,6 +25,7 @@
 #ifndef IMPLICIT_CURVE_AST_HH
 #define IMPLICIT_CURVE_AST_HH
 
+#include <string>
 #include <vector>
 
 /*
@@ -47,27 +48,37 @@ public:
     enum Variable {
       VAR_CONST, VAR_X, VAR_Y, VAR_XX, VAR_XY, VAR_YY, VAR_UNINITIALIZED
     };
-    Term(const Sign sign, const double weight);
+    Term(const Sign sign, const double weight, const Variable variable);
     virtual ~Term();
     const Sign get_sign() const;
     const double get_weight() const;
+    const std::string to_string() const;
   private:
     const Sign _sign;
     const double _weight;
-    Variable _variable;
+    const Variable _variable;
   };
 
   class Implicit_curve {
   public:
     Implicit_curve();
     virtual ~Implicit_curve();
+    void clear();
+    void add_term(const Term::Sign sign,
+                  const double weight,
+                  const Term::Variable variable);
     std::vector<Term *> *get_terms();
+    const std::string to_string() const;
   private:
     std::vector<Term *> _terms;
   };
 
   Implicit_curve_ast();
   virtual ~Implicit_curve_ast();
+  void clear();
+  void add_term(const Term::Sign sign,
+                const double weight,
+                const Term::Variable variable);
   Implicit_curve *get_implicit_curve();
 
 private:

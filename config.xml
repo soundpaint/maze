@@ -76,8 +76,11 @@
 	<!-- solid block without upper left edge -->
 	<implicit-curve>x-y-0.75</implicit-curve>
 
+	<!-- solid block without upper left edge -->
+	<implicit-curve>x-+y-y-0.75</implicit-curve>
+
 	<!-- circle in upper left corner -->
-	<implicit-curve>(x+0.75)*(x+0.75)+(y+0.75)*(y+0.75)-0.25</implicit-curve>
+	<!--<implicit-curve>(x+0.75)*(x+0.75)+(y+0.75)*(y+0.75)-0.25</implicit-curve>-->
       </or>
     </shape>
   </block>
@@ -95,7 +98,7 @@
 	<implicit-curve>-x-y+0.75</implicit-curve>
 
 	<!-- circle in upper right corner -->
-	<implicit-curve>(x-0.75)*(x-0.75)+(y+0.75)*(y+0.75)-0.25</implicit-curve>
+	<!--<implicit-curve>(x-0.75)*(x-0.75)+(y+0.75)*(y+0.75)-0.25</implicit-curve>-->
       </or>
     </shape>
   </block>
@@ -113,7 +116,7 @@
 	<implicit-curve>x+y+0.75</implicit-curve>
 
 	<!-- circle in lower left corner -->
-	<implicit-curve>(x+0.75)*(x+0.75)+(y-0.75)*(y-0.75)-0.25</implicit-curve>
+	<!--<implicit-curve>(x+0.75)*(x+0.75)+(y-0.75)*(y-0.75)-0.25</implicit-curve>-->
       </or>
     </shape>
   </block>
@@ -131,7 +134,7 @@
 	<implicit-curve>y-x-0.75</implicit-curve>
 
 	<!-- circle in lower right corner -->
-	<implicit-curve>(x-0.75)*(x-0.75)+(y-0.75)*(y-0.75)-0.25</implicit-curve>
+	<!--<implicit-curve>(x-0.75)*(x-0.75)+(y-0.75)*(y-0.75)-0.25</implicit-curve>-->
       </or>
     </shape>
   </block>

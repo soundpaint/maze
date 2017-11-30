@@ -29,7 +29,7 @@
 Implicit_curve_parser::Implicit_curve_parser()
 {
   _tokenizer = 0;
-  _look_ahead = 0;
+  _display_position = 0;
   reset();
 }
 
@@ -42,14 +42,11 @@ void
 Implicit_curve_parser::reset()
 {
   _rule_depth = 0;
-  if (_look_ahead) {
-    _tokenizer->release_token(_look_ahead);
-    _look_ahead = 0;
-  }
   if (_tokenizer) {
     delete _tokenizer;
     _tokenizer = 0;
   }
+  _ast.clear();
 }
 
 const bool
@@ -67,21 +64,16 @@ Implicit_curve_parser::get_display_position() const
 const Implicit_curve_parser_token *
 Implicit_curve_parser::look_ahead()
 {
-  if (!_look_ahead) {
-    _look_ahead = _tokenizer->get_next_token();
-  }
-  return _look_ahead;
+  _tokenizer->save_position();
+  const Implicit_curve_parser_token *token = _tokenizer->get_next_token();
+  _tokenizer->reset_to_saved_position();
+  return token;
 }
 
-void
-Implicit_curve_parser::accept_token()
+const Implicit_curve_parser_token *
+Implicit_curve_parser::consume_token()
 {
-  if (!_look_ahead) {
-    Log::warn("accepting token without looking at it");
-    _look_ahead = _tokenizer->get_next_token();
-  }
-  _tokenizer->release_token(_look_ahead);
-  _look_ahead = 0;
+  return _tokenizer->get_next_token();
 }
 
 std::string
@@ -95,9 +87,11 @@ Implicit_curve_parser::create_indent(const int count)
 void
 Implicit_curve_parser::open_rule(const char *lhs)
 {
+  _tokenizer->save_position();
   _rule_depth++;
   std::stringstream msg;
-  msg << create_indent(2 * _rule_depth) << "{" << lhs << ":";
+  msg << create_indent(2 * _rule_depth) << "{" << lhs << "@" <<
+    get_display_position() << ":";
   Log::debug(msg.str());
 }
 
@@ -108,6 +102,11 @@ Implicit_curve_parser::close_rule(const bool result)
   msg << create_indent(2 * _rule_depth) << (result ? "ok" : "err") << "}";
   Log::debug(msg.str());
   _rule_depth--;
+  if (result) {
+    _tokenizer->drop_saved_position();
+  } else {
+    _tokenizer->reset_to_saved_position();
+  }
   return result;
 }
 
@@ -118,8 +117,7 @@ Implicit_curve_parser::parse_const_term(double *value)
   open_rule("const_term");
   bool result;
   if (look_ahead()->get_type() == Implicit_curve_parser_token::DOUBLE) {
-    *value = look_ahead()->get_double_value();
-    accept_token();
+    *value = consume_token()->get_double_value();
     result = true;
   } else {
     //*value = nan(0);
@@ -136,7 +134,7 @@ Implicit_curve_parser::parse_mul()
   open_rule("mul");
   bool result;
   if (look_ahead()->get_type() == Implicit_curve_parser_token::MUL) {
-    accept_token();
+    consume_token();
     result = true;
   } else {
     result = false;
@@ -151,7 +149,7 @@ Implicit_curve_parser::parse_var_x()
   open_rule("var_x");
   bool result;
   if (look_ahead()->get_type() == Implicit_curve_parser_token::VAR_X) {
-    accept_token();
+    consume_token();
     result = true;
   } else {
     result = false;
@@ -166,7 +164,7 @@ Implicit_curve_parser::parse_var_y()
   open_rule("var_y");
   bool result;
   if (look_ahead()->get_type() == Implicit_curve_parser_token::VAR_Y) {
-    accept_token();
+    consume_token();
     result = true;
   } else {
     result = false;
@@ -176,27 +174,62 @@ Implicit_curve_parser::parse_var_y()
 
 // linear_term ::= var_x | var_y .
 const bool
-Implicit_curve_parser::parse_linear_term()
+Implicit_curve_parser::parse_linear_term(Implicit_curve_ast::Term::Variable *variable)
 {
   open_rule("linear_term");
   bool result;
-  result = parse_var_x() || parse_var_y();
+  if (parse_var_x()) {
+    *variable = Implicit_curve_ast::Term::VAR_X;
+    result = true;
+  } else if (parse_var_y()) {
+    *variable = Implicit_curve_ast::Term::VAR_Y;
+    result = true;
+  } else {
+    *variable = Implicit_curve_ast::Term::VAR_UNINITIALIZED;
+    result = false;
+  }
   return close_rule(result);
+}
+
+Implicit_curve_ast::Term::Variable
+Implicit_curve_parser::combine_variables(Implicit_curve_ast::Term::Variable variable1,
+                                         Implicit_curve_ast::Term::Variable variable2)
+{
+  if ((variable1 == Implicit_curve_ast::Term::VAR_X) &&
+      (variable2 == Implicit_curve_ast::Term::VAR_X)) {
+    return Implicit_curve_ast::Term::VAR_XX;
+  } else if ((variable1 == Implicit_curve_ast::Term::VAR_X) &&
+             (variable2 == Implicit_curve_ast::Term::VAR_Y)) {
+    return Implicit_curve_ast::Term::VAR_XY;
+  } else if ((variable1 == Implicit_curve_ast::Term::VAR_Y) &&
+             (variable2 == Implicit_curve_ast::Term::VAR_X)) {
+    return Implicit_curve_ast::Term::VAR_XY;
+  } else if ((variable1 == Implicit_curve_ast::Term::VAR_Y) &&
+             (variable2 == Implicit_curve_ast::Term::VAR_Y)) {
+    return Implicit_curve_ast::Term::VAR_YY;
+  } else {
+    Log::fatal("programming error: unexpected combination of variables");
+    return Implicit_curve_ast::Term::VAR_UNINITIALIZED;
+  }
 }
 
 // variable_term ::= linear_term [ mul linear_term ] .
 const bool
-Implicit_curve_parser::parse_variable_term()
+Implicit_curve_parser::parse_variable_term(Implicit_curve_ast::Term::Variable *variable)
 {
   open_rule("variable_term");
   bool result;
-  if (!parse_linear_term()) {
+  Implicit_curve_ast::Term::Variable variable1;
+  if (!parse_linear_term(&variable1)) {
     result = false;
   } else {
     if (parse_mul()) {
-      result = parse_linear_term();
+      Implicit_curve_ast::Term::Variable variable2;
+      result = parse_linear_term(&variable2);
+      *variable = combine_variables(variable1, variable2);
     } else {
-      return true;
+      *variable = variable1;
+      result = true;
     }
   }
   return close_rule(result);
@@ -204,7 +237,8 @@ Implicit_curve_parser::parse_variable_term()
 
 // weighted_term ::= const_term [ mul variable_term ] .
 const bool
-Implicit_curve_parser::parse_weighted_term(double *weight)
+Implicit_curve_parser::parse_weighted_term(double *weight,
+                                           Implicit_curve_ast::Term::Variable *variable)
 {
   open_rule("weighted_term");
   bool result;
@@ -212,7 +246,9 @@ Implicit_curve_parser::parse_weighted_term(double *weight)
     result = false;
   } else {
     if (parse_mul()) {
-      result = parse_variable_term();
+      result = parse_variable_term(variable);
+    } else {
+      *variable = Implicit_curve_ast::Term::Variable::VAR_UNINITIALIZED;
     }
     result = true;
   }
@@ -221,17 +257,18 @@ Implicit_curve_parser::parse_weighted_term(double *weight)
 
 // unsigned_term ::= weighted_term | variable_term .
 const bool
-Implicit_curve_parser::parse_unsigned_term(double *weight)
+Implicit_curve_parser::parse_unsigned_term(double *weight,
+                                           Implicit_curve_ast::Term::Variable *variable)
 {
   open_rule("unsigned_term");
   bool result;
   Implicit_curve_parser_token::Type type = look_ahead()->get_type();
   if ((type == Implicit_curve_parser_token::VAR_X) ||
       (type == Implicit_curve_parser_token::VAR_Y)) {
-    result = parse_variable_term();
+    result = parse_variable_term(variable);
     *weight = 1.0;
   } else if (type == Implicit_curve_parser_token::DOUBLE) {
-    result = parse_weighted_term(weight);
+    result = parse_weighted_term(weight, variable);
   } else {
     result = false;
   }
@@ -259,22 +296,17 @@ Implicit_curve_parser::parse_sign(Implicit_curve_ast::Term::Sign *sign)
 
 // term ::= [ sign ] unsigned_term .
 const bool
-Implicit_curve_parser::parse_term()
+Implicit_curve_parser::parse_term(Implicit_curve_ast::Term::Sign *sign,
+                                  double *weight,
+                                  Implicit_curve_ast::Term::Variable *variable)
 {
   open_rule("term");
   bool result;
-  Implicit_curve_ast::Term::Sign sign;
-  double weight;
-  if (parse_sign(&sign)) {
+  if (parse_sign(sign)) {
   } else {
-    sign = Implicit_curve_ast::Term::Sign::PLUS;
+    *sign = Implicit_curve_ast::Term::Sign::PLUS;
   }
-  result = parse_unsigned_term(&weight);
-  if (result) {
-    Implicit_curve_ast::Term *term =
-      new Implicit_curve_ast::Term(sign, weight);
-    _ast.get_implicit_curve()->get_terms()->push_back(term);
-  }
+  result = parse_unsigned_term(weight, variable);
   return close_rule(result);
 }
 
@@ -285,7 +317,7 @@ Implicit_curve_parser::parse_plus()
   open_rule("plus");
   bool result;
   if (look_ahead()->get_type() == Implicit_curve_parser_token::ADD) {
-    accept_token();
+    consume_token();
     result = true;
   } else {
     result = false;
@@ -300,7 +332,7 @@ Implicit_curve_parser::parse_minus()
   open_rule("minus");
   bool result;
   if (look_ahead()->get_type() == Implicit_curve_parser_token::MINUS) {
-    accept_token();
+    consume_token();
     result = true;
   } else {
     result = false;
@@ -310,11 +342,36 @@ Implicit_curve_parser::parse_minus()
 
 // add_op ::= plus | minus .
 const bool
-Implicit_curve_parser::parse_add_op()
+Implicit_curve_parser::parse_add_op(Implicit_curve_ast::Term::Sign *sign)
 {
   open_rule("add_op");
-  bool result = parse_plus() || parse_minus();
+  bool result;
+  if (parse_plus()) {
+    *sign = Implicit_curve_ast::Term::PLUS;
+    result = true;
+  } else if (parse_minus()) {
+    *sign = Implicit_curve_ast::Term::MINUS;
+    result = true;
+  } else {
+    *sign = Implicit_curve_ast::Term::SIGN_UNINITIALIZED;
+    result = false;
+  }
   return close_rule(result);
+}
+
+const Implicit_curve_ast::Term::Sign
+Implicit_curve_parser::combine_signs(const Implicit_curve_ast::Term::Sign sign1,
+                                     const Implicit_curve_ast::Term::Sign sign2)
+{
+  if (sign1 == Implicit_curve_ast::Term::SIGN_UNINITIALIZED) {
+    return sign2;
+  }
+  if (sign2 == Implicit_curve_ast::Term::SIGN_UNINITIALIZED) {
+    return sign1;
+  }
+  return sign1 == sign2 ?
+    Implicit_curve_ast::Term::PLUS :
+    Implicit_curve_ast::Term::MINUS;
 }
 
 // implicit_curve ::= term { add_op term } .
@@ -323,13 +380,22 @@ Implicit_curve_parser::parse_implicit_curve()
 {
   open_rule("implicit_curve");
   bool result;
-  if (!parse_term()) {
+  Implicit_curve_ast::Term::Sign add_op;
+  Implicit_curve_ast::Term::Sign sign;
+  double weight;
+  Implicit_curve_ast::Term::Variable variable;
+  if (!parse_term(&sign, &weight, &variable)) {
     result = false;
   } else {
-    while (parse_add_op()) {
-      parse_term();
-    }
+    _ast.add_term(sign, weight, variable);
     result = true;
+    while (result && parse_add_op(&add_op)) {
+      if (!parse_term(&sign, &weight, &variable)) {
+        result = false;
+      } else {
+        _ast.add_term(combine_signs(add_op, sign), weight, variable);
+      }
+    }
   }
   return close_rule(result);
 }
@@ -360,7 +426,7 @@ Implicit_curve_parser::parse(const char *expression)
     // TODO: fetch weight parameters from AST
     {
       std::stringstream msg;
-      msg << "implicit_curve terms: " << _ast.get_implicit_curve()->get_terms();
+      msg << "parsed implicit_curve: " << _ast.get_implicit_curve()->to_string();
       Log::debug(msg.str());
     }
     implicit_curve =
