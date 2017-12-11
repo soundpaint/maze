@@ -25,12 +25,14 @@
 #ifndef MAZE_CONFIG_HH
 #define MAZE_CONFIG_HH
 
+#include <set>
 #include <xercesc/dom/DOM.hpp>
 #include <QtGui/QBrush>
 #include <config.hh>
 #include <maze-config-blocks-store.hh>
 #include <shape-expression.hh>
-#include <implicit-curve-parser.hh>
+#include <implicit-curve-compiler.hh>
+#include <shape.hh>
 
 class Maze_config : Config
 {
@@ -41,18 +43,28 @@ protected:
   virtual void reload(const xercesc::DOMElement *elem_config);
   virtual void print_config();
 private:
-  XMLCh *_node_name_any, *_node_name_block, *_node_name_id;
+  XMLCh *_node_name_any;
+  XMLCh *_node_name_ignore;
+  XMLCh *_node_name_field;
+  XMLCh *_node_name_block;
+  XMLCh *_node_name_id;
   QBrush _background;
-  Implicit_curve_parser _implicit_curve_parser;
+  Implicit_curve_compiler _implicit_curve_compiler;
   Maze_config_blocks_store *_blocks;
+  std::vector<const Shape *> _field;
   void reload_brush(const xercesc::DOMElement *elem_config,
 		    QBrush *background);
   void reload_blocks(const xercesc::DOMElement *elem_config);
+  void reload_field(const xercesc::DOMElement *elem_config);
+  static const size_t text_content_as_size_t(const xercesc::DOMElement *elem);
+  void load_field_ignore_chars(const xercesc::DOMElement *elem_field,
+                               std::set<char> *chars) const;
+  void load_field(const xercesc::DOMElement *elem_field);
   Maze_config_block *load_block(const xercesc::DOMElement *elem_block);
   void load_block_id(const XMLCh *attr_id,
                      Maze_config_block *block);
-  void load_block_alias(const xercesc::DOMElement *elem_alias,
-                        Maze_config_block *block);
+  void load_block_alias_char(const xercesc::DOMElement *elem_alias_char,
+                             Maze_config_block *block);
   void load_block_shape(const xercesc::DOMElement *elem_shape,
                         Maze_config_block *block);
   Shape_terms *load_shape_expression(const xercesc::DOMElement *elem_expression);

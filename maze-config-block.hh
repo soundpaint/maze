@@ -35,8 +35,8 @@ public:
   virtual ~Maze_config_block();
   void set_id(char *id);
   const char *get_id();
-  void set_alias(char *alias);
-  const char *get_alias();
+  void set_alias_char(const char alias_char);
+  const char get_alias_char();
   void set_foreground(QBrush foreground);
   QBrush get_foreground();
   void set_background(QBrush background);
@@ -45,7 +45,7 @@ public:
   Shape_terms *get_terms();
 private:
   char *_id;
-  char *_alias;
+  char _alias_char;
   QBrush _foreground;
   QBrush _background;
   Shape_terms *_terms;

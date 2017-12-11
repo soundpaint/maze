@@ -326,14 +326,16 @@ Config::get_single_child_element(const xercesc::DOMElement *parent,
   const XMLSize_t length = node_list->getLength();
   if (length > 1) {
     std::stringstream msg;
-    msg << "expected single node '" << name << "', got " << length <<
+    msg << "expected single node '" << name << "' beneath node '" <<
+      parent->getNodeName() << "', but got " << length <<
       " nodes instead";
     fatal(msg.str());
   }
   if (required) {
     if (length < 1) {
       std::stringstream msg;
-      msg << "missing node '" << name << "'";
+      msg << "missing node '" << name << "' beneath node '" <<
+      parent->getNodeName() << "'";
       fatal(msg.str());
     }
   }

@@ -31,7 +31,7 @@ class IShape
 {
 public:
   virtual const double get_potential(const double x, const double y) const = 0;
-  virtual QBrush *get_brush(const double x, const double y) const = 0;
+  virtual const QBrush *get_brush(const double x, const double y) const = 0;
   virtual const double get_avg_tan(const double block_offset_x,
 				   const double block_offset_y,
 				   const double dx,

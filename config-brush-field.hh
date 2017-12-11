@@ -22,82 +22,39 @@
  * Author's web site: www.juergen-reuter.de
  */
 
-#include <maze-config-block.hh>
-#include <stdlib.h>
+#ifndef CONFIG_BRUSH_FIELD_HH
+#define CONFIG_BRUSH_FIELD_HH
 
-Maze_config_block::Maze_config_block()
-{
-  _terms = 0;
-}
+#include <inttypes.h>
+#include <QtGui/QPixmap>
+#include <QtGui/QBrush>
+#include <ishape.hh>
 
-Maze_config_block::~Maze_config_block()
+class Config_brush_field
 {
-  free(_id);
-  _id = 0;
-  _alias_char = '\000';
-  delete _terms;
-  _terms = 0;
-}
+public:
+  Config_brush_field(const uint16_t width,
+                     const uint16_t height,
+                     const IShape **field);
+  virtual ~Config_brush_field();
+  const uint16_t get_width() const;
+  const uint16_t get_height() const;
+  const QBrush *get_brush(const double x, const double y) const;
+  const double get_potential(const double x, const double y) const;
+  const double get_avg_tan(const double x0, const double y0,
+			   const double dx, const double dy) const;
+  const bool matches_goal(const double x, const double y) const;
 
-void
-Maze_config_block::set_id(char *id)
-{
-  _id = id;
-}
+private:
+  const uint16_t _width;
+  const uint16_t _height;
+  const IShape **_field;
+  const IShape *get_block(const double x, const double y,
+			  double *block_offset_x,
+			  double *block_offset_y) const;
+};
 
-const char *
-Maze_config_block::get_id()
-{
-  return _id;
-}
-
-void
-Maze_config_block::set_alias_char(const char alias_char)
-{
-  _alias_char = alias_char;
-}
-
-const char
-Maze_config_block::get_alias_char()
-{
-  return _alias_char;
-}
-
-void
-Maze_config_block::set_foreground(QBrush foreground)
-{
-  _foreground = foreground;
-}
-
-QBrush
-Maze_config_block::get_foreground()
-{
-  return _foreground;
-}
-
-void
-Maze_config_block::set_background(QBrush background)
-{
-  _background = background;
-}
-
-QBrush
-Maze_config_block::get_background()
-{
-  return _background;
-}
-
-void
-Maze_config_block::set_terms(Shape_terms *terms)
-{
-  _terms = terms;
-}
-
-Shape_terms *
-Maze_config_block::get_terms()
-{
-  return _terms;
-}
+#endif /* CONFIG_BRUSH_FIELD_HH */
 
 /*
  * Local variables:

@@ -36,12 +36,16 @@ public:
   virtual ~Maze_config_blocks_store();
   void add(Maze_config_block *block);
   const bool exists(const char *id) const;
+  const bool exists(const char alias_char) const;
   const Maze_config_block *lookup(const char *id) const;
+  const Maze_config_block *lookup(const char alias_char) const;
   void dump() const;
 private:
   //std::vector<const Maze_config_block *> *_blocks;
   std::unordered_map<const std::string *,
-                     const Maze_config_block *> *_blocks;
+                     const Maze_config_block *> *_id_to_block;
+  std::unordered_map<const std::string *,
+                     const Maze_config_block *> *_alias_char_to_block;
 };
 
 #endif /* MAZE_CONFIG_BLOCKS_STORE_HH */

@@ -46,7 +46,6 @@ Implicit_curve_parser::reset()
     delete _tokenizer;
     _tokenizer = 0;
   }
-  _ast.clear();
 }
 
 const bool
@@ -376,7 +375,7 @@ Implicit_curve_parser::combine_signs(const Implicit_curve_ast::Term::Sign sign1,
 
 // implicit_curve ::= term { add_op term } .
 const bool
-Implicit_curve_parser::parse_implicit_curve()
+Implicit_curve_parser::parse_implicit_curve(Implicit_curve_ast *ast)
 {
   open_rule("implicit_curve");
   bool result;
@@ -387,20 +386,20 @@ Implicit_curve_parser::parse_implicit_curve()
   if (!parse_term(&sign, &weight, &variable)) {
     result = false;
   } else {
-    _ast.add_term(sign, weight, variable);
+    ast->add_term(sign, weight, variable);
     result = true;
     while (result && parse_add_op(&add_op)) {
       if (!parse_term(&sign, &weight, &variable)) {
         result = false;
       } else {
-        _ast.add_term(combine_signs(add_op, sign), weight, variable);
+        ast->add_term(combine_signs(add_op, sign), weight, variable);
       }
     }
   }
   return close_rule(result);
 }
 
-const Implicit_curve *
+Implicit_curve_ast
 Implicit_curve_parser::parse(const char *expression)
 {
   reset();
@@ -413,8 +412,8 @@ Implicit_curve_parser::parse(const char *expression)
     msg << "(raw=" << expression << ")";
     Log::debug(msg.str());
   }
-  const Implicit_curve *implicit_curve;
-  if (parse_implicit_curve()) {
+  Implicit_curve_ast implicit_curve_ast;
+  if (parse_implicit_curve(&implicit_curve_ast)) {
     if (!_tokenizer->eof()) {
       std::stringstream msg;
       msg << "syntax error in expression '" << expression <<
@@ -422,18 +421,11 @@ Implicit_curve_parser::parse(const char *expression)
         get_display_position();
       Log::fatal(msg.str());
     }
-
-    // TODO: fetch weight parameters from AST
     {
       std::stringstream msg;
-      msg << "parsed implicit_curve: " << _ast.get_implicit_curve()->to_string();
+      msg << "parsed implicit_curve: " <<
+        implicit_curve_ast.get_implicit_curve()->to_string();
       Log::debug(msg.str());
-    }
-    implicit_curve =
-      new Implicit_curve(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-
-    if (!implicit_curve) {
-      Log::fatal("not enough memory");
     }
   } else {
     std::stringstream msg;
@@ -442,7 +434,7 @@ Implicit_curve_parser::parse(const char *expression)
       get_display_position();
     Log::fatal(msg.str());
   }
-  return implicit_curve;
+  return implicit_curve_ast;
 }
 
 /*

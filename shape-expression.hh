@@ -49,6 +49,7 @@ public:
   virtual ~Shape_unary_expression();
   const bool is_negated() const;
   void set_negated(const bool negated);
+  virtual const bool is_inside(const double x, const double y) const = 0;
 private:
   bool _negated;
 };
@@ -59,6 +60,7 @@ public:
   Shape_prime(const Implicit_curve *implicit_curve);
   virtual ~Shape_prime();
   const Implicit_curve *get_implicit_curve() const;
+  const bool is_inside(const double x, const double y) const;
 private:
   const Implicit_curve *_implicit_curve;
 };
@@ -74,6 +76,7 @@ public:
   const int size() const;
   virtual void clear();
   //virtual const Iterator<Shape_unary_expression> *create_iterator() const;
+  const bool is_inside(const double x, const double y) const;
 private:
   std::vector<const Shape_unary_expression *> *_factors;
 };
@@ -87,6 +90,7 @@ public:
   const int size() const;
   virtual void clear();
   //virtual const Iterator<Shape_factors> *create_iterator() const;
+  const bool is_inside(const double x, const double y) const;
 private:
   std::vector<const Shape_factors *> *_terms;
 };

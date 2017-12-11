@@ -27,6 +27,7 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 /*
  * Abstract syntax tree for implicit curves.  Actually, due to the (by
@@ -42,6 +43,7 @@ class Implicit_curve_ast
 public:
   class Term {
   public:
+    // syntactical structure
     enum Sign {
       PLUS, MINUS, SIGN_UNINITIALIZED
     };
@@ -52,6 +54,7 @@ public:
     virtual ~Term();
     const Sign get_sign() const;
     const double get_weight() const;
+    const Variable get_variable() const;
     const std::string to_string() const;
   private:
     const Sign _sign;
@@ -61,18 +64,33 @@ public:
 
   class Implicit_curve {
   public:
+    // syntactical structure
     Implicit_curve();
     virtual ~Implicit_curve();
     void clear();
     void add_term(const Term::Sign sign,
                   const double weight,
                   const Term::Variable variable);
-    std::vector<Term *> *get_terms();
+    const std::vector<Term *> *get_terms() const;
     const std::string to_string() const;
+
+    // semantic attributes
+    const bool has_summarized_term_weight(const Term::Variable variable) const;
+    const double get_summarized_term_weight(const Term::Variable variable);
+    const double try_get_summarized_term_weight_with_default(const Term::Variable variable,
+                                                             const double default_value);
+    void set_summarized_term_weight(const Term::Variable variable,
+                                    const double weight);
   private:
+    // syntactical structure
     std::vector<Term *> _terms;
+
+    // semantic attributes
+    std::unordered_map<const Implicit_curve_ast::Term::Variable *, double>
+    _summarized_term_weights;
   };
 
+  // syntactical structure
   Implicit_curve_ast();
   virtual ~Implicit_curve_ast();
   void clear();

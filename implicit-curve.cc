@@ -45,6 +45,18 @@ Implicit_curve::~Implicit_curve()
 {
 }
 
+const bool
+Implicit_curve::is_inside(const double x, const double y) const
+{
+  return
+    _weight_term_yy * y * y +
+    _weight_term_xy * x * y +
+    _weight_term_xx * x * x +
+    _weight_term_y * y +
+    _weight_term_x * x +
+    _weight_term_const <= 0.0;
+}
+
 /*
  * Local variables:
  *   mode: c++

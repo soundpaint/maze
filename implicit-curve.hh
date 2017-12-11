@@ -35,6 +35,7 @@ public:
                  const double weight_term_x,
                  const double weight_term_const);
   virtual ~Implicit_curve();
+  const bool is_inside(const double x, const double y) const;
 private:
   const double _weight_term_yy;
   const double _weight_term_xy;

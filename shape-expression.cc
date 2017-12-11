@@ -43,6 +43,12 @@ Shape_prime::get_implicit_curve() const
   return _implicit_curve;
 }
 
+const bool
+Shape_prime::is_inside(const double x, const double y) const
+{
+  return _implicit_curve->is_inside(x, y) ^ is_negated();
+}
+
 Shape_unary_expression::~Shape_unary_expression() {
 }
 
@@ -94,6 +100,16 @@ Shape_factors::clear()
   _factors->clear();
 }
 
+const bool
+Shape_factors::is_inside(const double x, const double y) const
+{
+  for (const Shape_unary_expression *factor : *_factors) {
+    if (!(factor->is_inside(x, y)))
+      return false;
+  }
+  return true;
+}
+
 Shape_terms::Shape_terms()
 {
   _terms =
@@ -129,6 +145,16 @@ void
 Shape_terms::clear()
 {
   _terms->clear();
+}
+
+const bool
+Shape_terms::is_inside(const double x, const double y) const
+{
+  for (const Shape_factors *term : *_terms) {
+    if (term->is_inside(x, y))
+      return true;
+  }
+  return false;
 }
 
 /*

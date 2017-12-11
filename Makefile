@@ -35,13 +35,14 @@ MY_MOC_FILES = $(patsubst %.o,%.moc.o,$(MY_QT5_OBJ_FILES))
 
 MY_OBJ_FILES = \
   $(MY_GEN_SRC_FILES) \
-  ball.o balls.o brush-field.o config.o shape-expression.o \
+  ball.o balls.o brush-field.o config.o config-brush-field.o \
   force-field.o fractals-factory.o \
-  implicit-curve.o implicit-curve-ast.o implicit-curve-parser.o \
-  implicit-curve-parser-token.o implicit-curve-tokenizer.o \
+  implicit-curve.o implicit-curve-compiler.o implicit-curve-ast.o \
+  implicit-curve-parser.o implicit-curve-parser-token.o \
+  implicit-curve-tokenizer.o \
   log.o maze-config.o maze-config-block.o maze-config-blocks-store.o \
-  point-3d.o rounded-square-shape.o sensors.o sobel.o \
-  square-shape.o tubes.o xml-document.o xml-utils.o \
+  point-3d.o shape.o rounded-square-shape.o sensors.o shape-expression.o \
+  sobel.o square-shape.o tubes.o xml-document.o xml-utils.o \
   $(MY_QT5_OBJ_FILES)
 
 LIB_OBJ_FILES =

@@ -50,12 +50,11 @@ class Implicit_curve_parser
 public:
   Implicit_curve_parser();
   virtual ~Implicit_curve_parser();
-  const Implicit_curve *parse(const char *expression);
+  Implicit_curve_ast parse(const char *expression);
 private:
   Implicit_curve_tokenizer *_tokenizer;
   int _display_position;
   int _rule_depth;
-  Implicit_curve_ast _ast;
   void reset();
   const bool eof() const;
   const int get_display_position() const;
@@ -87,7 +86,7 @@ private:
   const Implicit_curve_ast::Term::Sign
   combine_signs(const Implicit_curve_ast::Term::Sign sign1,
                 const Implicit_curve_ast::Term::Sign sign2);
-  const bool parse_implicit_curve();
+  const bool parse_implicit_curve(Implicit_curve_ast *ast);
 };
 
 #endif /* IMPLICIT_CURVE_PARSER_HH */

@@ -22,82 +22,36 @@
  * Author's web site: www.juergen-reuter.de
  */
 
-#include <maze-config-block.hh>
-#include <stdlib.h>
+#ifndef SHAPE_HH
+#define SHAPE_HH
 
-Maze_config_block::Maze_config_block()
-{
-  _terms = 0;
-}
+#include <ishape.hh>
+#include <shape-expression.hh>
 
-Maze_config_block::~Maze_config_block()
+class Shape : public IShape
 {
-  free(_id);
-  _id = 0;
-  _alias_char = '\000';
-  delete _terms;
-  _terms = 0;
-}
+public:
+  Shape(const Shape_terms *shape_expression,
+        const QBrush *foreground,
+        const double foreground_potential,
+        const QBrush *background,
+        const double background_potential);
+  virtual ~Shape();
+  virtual const double get_potential(const double x, const double y) const;
+  virtual const QBrush *get_brush(const double x, const double y) const;
+  virtual const double get_avg_tan(const double block_offset_x,
+                                   const double block_offset_y,
+                                   const double dx,
+                                   const double dy) const;
+private:
+  const Shape_terms *_shape_expression;
+  const QBrush *_foreground;
+  const double _foreground_potential;
+  const QBrush *_background;
+  const double _background_potential;
+};
 
-void
-Maze_config_block::set_id(char *id)
-{
-  _id = id;
-}
-
-const char *
-Maze_config_block::get_id()
-{
-  return _id;
-}
-
-void
-Maze_config_block::set_alias_char(const char alias_char)
-{
-  _alias_char = alias_char;
-}
-
-const char
-Maze_config_block::get_alias_char()
-{
-  return _alias_char;
-}
-
-void
-Maze_config_block::set_foreground(QBrush foreground)
-{
-  _foreground = foreground;
-}
-
-QBrush
-Maze_config_block::get_foreground()
-{
-  return _foreground;
-}
-
-void
-Maze_config_block::set_background(QBrush background)
-{
-  _background = background;
-}
-
-QBrush
-Maze_config_block::get_background()
-{
-  return _background;
-}
-
-void
-Maze_config_block::set_terms(Shape_terms *terms)
-{
-  _terms = terms;
-}
-
-Shape_terms *
-Maze_config_block::get_terms()
-{
-  return _terms;
-}
+#endif /* SHAPE_HH */
 
 /*
  * Local variables:

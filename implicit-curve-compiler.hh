@@ -22,82 +22,26 @@
  * Author's web site: www.juergen-reuter.de
  */
 
-#include <maze-config-block.hh>
-#include <stdlib.h>
+#ifndef IMPLICIT_CURVE_COMPILER_HH
+#define IMPLICIT_CURVE_COMPILER_HH
 
-Maze_config_block::Maze_config_block()
-{
-  _terms = 0;
-}
+#endif /* IMPLICIT_CURVE_COMPILER_HH */
 
-Maze_config_block::~Maze_config_block()
-{
-  free(_id);
-  _id = 0;
-  _alias_char = '\000';
-  delete _terms;
-  _terms = 0;
-}
+#include <implicit-curve-parser.hh>
 
-void
-Maze_config_block::set_id(char *id)
+class Implicit_curve_compiler
 {
-  _id = id;
-}
-
-const char *
-Maze_config_block::get_id()
-{
-  return _id;
-}
-
-void
-Maze_config_block::set_alias_char(const char alias_char)
-{
-  _alias_char = alias_char;
-}
-
-const char
-Maze_config_block::get_alias_char()
-{
-  return _alias_char;
-}
-
-void
-Maze_config_block::set_foreground(QBrush foreground)
-{
-  _foreground = foreground;
-}
-
-QBrush
-Maze_config_block::get_foreground()
-{
-  return _foreground;
-}
-
-void
-Maze_config_block::set_background(QBrush background)
-{
-  _background = background;
-}
-
-QBrush
-Maze_config_block::get_background()
-{
-  return _background;
-}
-
-void
-Maze_config_block::set_terms(Shape_terms *terms)
-{
-  _terms = terms;
-}
-
-Shape_terms *
-Maze_config_block::get_terms()
-{
-  return _terms;
-}
+public:
+  Implicit_curve_compiler();
+  virtual ~Implicit_curve_compiler();
+  const Implicit_curve *compile(const char *expression);
+private:
+  Implicit_curve_parser _implicit_curve_parser;
+  static void summarize_terms_by_variables(Implicit_curve_ast *implicit_curve_ast);
+  static void optimize(Implicit_curve_ast *implicit_curve_ast);
+  static const Implicit_curve *
+  generate_code(Implicit_curve_ast *implicit_curve_ast);
+};
 
 /*
  * Local variables:
