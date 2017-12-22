@@ -185,13 +185,13 @@ Implicit_curve_ast::Implicit_curve::get_terms() const
 const bool
 Implicit_curve_ast::Implicit_curve::has_summarized_term_weight(const Term::Variable variable) const
 {
-  return _summarized_term_weights.count(&variable) > 0;
+  return _summarized_term_weights.count((int)variable) > 0;
 }
 
 const double
 Implicit_curve_ast::Implicit_curve::get_summarized_term_weight(const Term::Variable variable)
 {
-  return _summarized_term_weights[&variable];
+  return _summarized_term_weights[(int)variable];
 }
 
 const double
@@ -200,14 +200,19 @@ try_get_summarized_term_weight_with_default(const Term::Variable variable,
                                             const double default_value)
 {
   return has_summarized_term_weight(variable) ?
-    _summarized_term_weights[&variable] : default_value;
+    _summarized_term_weights[(int)variable] : default_value;
 }
 
 void
 Implicit_curve_ast::Implicit_curve::set_summarized_term_weight(const Term::Variable variable,
                                                                const double weight)
 {
-  _summarized_term_weights[&variable] = weight;
+  {
+    std::stringstream str;
+    str << "set_summarized_term_weight(" << variable << ", " << weight << ")";
+    Log::debug(str.str());
+  }
+  _summarized_term_weights[(int)variable] = weight;
 }
 
 /*

@@ -25,11 +25,13 @@
 #ifndef ISHAPE_HH
 #define ISHAPE_HH
 
+#include <string>
 #include <QtGui/QBrush>
 
 class IShape
 {
 public:
+  virtual const std::string to_string() const = 0;
   virtual const double get_potential(const double x, const double y) const = 0;
   virtual const QBrush *get_brush(const double x, const double y) const = 0;
   virtual const double get_avg_tan(const double block_offset_x,

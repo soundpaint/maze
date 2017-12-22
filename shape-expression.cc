@@ -46,7 +46,7 @@ Shape_prime::get_implicit_curve() const
 const bool
 Shape_prime::is_inside(const double x, const double y) const
 {
-  return _implicit_curve->is_inside(x, y) ^ is_negated();
+  return _implicit_curve->is_inside(x, y) != is_negated();
 }
 
 Shape_unary_expression::~Shape_unary_expression() {

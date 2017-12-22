@@ -51,6 +51,16 @@ Shape::~Shape()
 {
 }
 
+const std::string
+Shape::to_string() const
+{
+  std::stringstream str;
+  str << "Shape{";
+  // TODO
+  str <<"}";
+  return std::string(str.str());
+}
+
 const double
 Shape::get_potential(const double x, const double y) const
 {

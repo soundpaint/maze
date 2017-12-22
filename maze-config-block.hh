@@ -25,30 +25,43 @@
 #ifndef MAZE_CONFIG_BLOCK_HH
 #define MAZE_CONFIG_BLOCK_HH
 
+#include <xercesc/dom/DOM.hpp>
 #include <QtGui/QBrush>
+#include <xml-string.hh>
+#include <ishape.hh>
 #include <shape-expression.hh>
 
-class Maze_config_block
+class Maze_config_block : public IShape
 {
 public:
-  Maze_config_block();
+  Maze_config_block(const Xml_string *id,
+                    const Xml_string *alias_char,
+                    const QBrush foreground,
+                    const QBrush background,
+                    const double foreground_potential,
+                    const double background_potential,
+                    const Shape_terms *terms);
   virtual ~Maze_config_block();
-  void set_id(char *id);
-  const char *get_id();
-  void set_alias_char(const char alias_char);
-  const char get_alias_char();
-  void set_foreground(QBrush foreground);
-  QBrush get_foreground();
-  void set_background(QBrush background);
-  QBrush get_background();
-  void set_terms(Shape_terms *terms);
-  Shape_terms *get_terms();
+  virtual const std::string to_string() const;
+  virtual const double get_potential(const double x, const double y) const;
+  virtual const QBrush *get_brush(const double x, const double y) const;
+  virtual const double get_avg_tan(const double block_offset_x,
+                                   const double block_offset_y,
+                                   const double dx,
+                                   const double dy) const;
+  const Xml_string *get_id() const;
+  const Xml_string *get_alias_char() const;
+  const QBrush get_foreground() const;
+  const QBrush get_background() const;
+  const Shape_terms *get_terms() const;
 private:
-  char *_id;
-  char _alias_char;
-  QBrush _foreground;
-  QBrush _background;
-  Shape_terms *_terms;
+  const Xml_string *_id;
+  const Xml_string *_alias_char;
+  const QBrush _foreground;
+  const QBrush _background;
+  const double _foreground_potential;
+  const double _background_potential;
+  const Shape_terms *_shape_expression;
 };
 
 #endif /* MAZE_CONFIG_BLOCK_HH */

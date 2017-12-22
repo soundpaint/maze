@@ -39,7 +39,7 @@ void
 Implicit_curve_compiler::summarize_terms_by_variables(Implicit_curve_ast *implicit_curve_ast)
 {
   /*
-  std::unordered_map<const Implicit_curve_ast::Term::Variable *, double>
+  std::unordered_map<const Implicit_curve_ast::Term::Variable, double>
     summarized_term_weights;
   */
   Implicit_curve_ast::Implicit_curve *implicit_curve =
@@ -54,7 +54,8 @@ Implicit_curve_compiler::summarize_terms_by_variables(Implicit_curve_ast *implic
     const Implicit_curve_ast::Term::Variable variable = term->get_variable();
     double summarized_term_weight;
     if (implicit_curve->has_summarized_term_weight(variable)) {
-      implicit_curve->get_summarized_term_weight(variable);
+      summarized_term_weight =
+        implicit_curve->get_summarized_term_weight(variable);
     } else {
       summarized_term_weight = 0.0;
     };

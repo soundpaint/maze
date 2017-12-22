@@ -37,6 +37,7 @@ public:
         const QBrush *background,
         const double background_potential);
   virtual ~Shape();
+  virtual const std::string to_string() const;
   virtual const double get_potential(const double x, const double y) const;
   virtual const QBrush *get_brush(const double x, const double y) const;
   virtual const double get_avg_tan(const double block_offset_x,

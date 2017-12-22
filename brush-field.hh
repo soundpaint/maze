@@ -25,6 +25,8 @@
 #ifndef BRUSH_FIELD_HH
 #define BRUSH_FIELD_HH
 
+#include <vector>
+#include <string>
 #include <inttypes.h>
 #include <QtGui/QPixmap>
 #include <QtGui/QBrush>
@@ -33,8 +35,11 @@
 class Brush_field
 {
 public:
-  Brush_field();
+  Brush_field(const uint16_t width,
+              const uint16_t height,
+              const std::vector<const IShape *> field);
   virtual ~Brush_field();
+  const std::string to_string() const;
   const uint16_t get_width() const;
   const uint16_t get_height() const;
   const QBrush *get_brush(const double x, const double y) const;
@@ -44,15 +49,9 @@ public:
   const bool matches_goal(const double x, const double y) const;
 
 private:
-  QPixmap _corridor_pixmap, _wall_pixmap, _hole_pixmap;
-  QBrush _corridor_brush, _wall_brush, _hole_brush;
-  IShape *_c;
-  IShape *_w;
-  IShape *_h;
-  IShape *_x;
-  uint16_t _width;
-  uint16_t _height;
-  IShape **_field;
+  const uint16_t _width;
+  const uint16_t _height;
+  const std::vector<const IShape *> _field;
   const IShape *get_block(const double x, const double y,
 			  double *block_offset_x,
 			  double *block_offset_y) const;

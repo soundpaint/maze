@@ -24,79 +24,115 @@
 
 #include <maze-config-block.hh>
 #include <stdlib.h>
+#include <log.hh>
 
-Maze_config_block::Maze_config_block()
+Maze_config_block::Maze_config_block(const Xml_string *id,
+                                     const Xml_string *alias_char,
+                                     const QBrush foreground,
+                                     const QBrush background,
+                                     const double foreground_potential,
+                                     const double background_potential,
+                                     const Shape_terms *shape_expression) :
+  _id(id),
+  _alias_char(alias_char),
+  _foreground(QBrush(foreground)),
+  _background(QBrush(background)),
+  _foreground_potential(foreground_potential),
+  _background_potential(background_potential),
+  _shape_expression(shape_expression)
 {
-  _terms = 0;
+  if (!id) {
+    Log::fatal("id is null");
+  }
+  if (!shape_expression) {
+    Log::fatal("shape_expression is null");
+  }
 }
 
 Maze_config_block::~Maze_config_block()
 {
-  free(_id);
+  //free(_id); // TODO
   _id = 0;
-  _alias_char = '\000';
-  delete _terms;
-  _terms = 0;
+  delete _shape_expression;
+  _shape_expression = 0;
 }
 
-void
-Maze_config_block::set_id(char *id)
+const std::string
+Maze_config_block::to_string() const
 {
-  _id = id;
+  std::stringstream str;
+  str << "Maze_config_block{";
+  str << "id=" << _id;
+  str << ", alias_char=" << _alias_char;
+  str << ", foreground=" << &_foreground;
+  str << ", background=" << &_background;
+  str << ", foreground_potential=" << _foreground_potential;
+  str << ", background_potential=" << _background_potential;
+  str << ", shape_expression=" << _shape_expression;
+  str <<"}";
+  return std::string(str.str());
 }
 
-const char *
-Maze_config_block::get_id()
+const double
+Maze_config_block::get_potential(const double x, const double y) const
+{
+  if (_shape_expression->is_inside(x, y)) {
+    return _foreground_potential;
+  } else {
+    return _background_potential;
+  }
+}
+
+const QBrush *
+Maze_config_block::get_brush(const double x, const double y) const
+{
+  const QBrush *brush;
+  if (_shape_expression->is_inside(x, y)) {
+    brush = &_foreground;
+  } else {
+    brush = &_background;
+  }
+return brush;
+}
+
+const double
+Maze_config_block::get_avg_tan(const double block_offset_x,
+                               const double block_offset_y,
+                               const double dx,
+                               const double dy) const
+{
+  // TODO
+  return 0.0;
+}
+
+const Xml_string *
+Maze_config_block::get_id() const
 {
   return _id;
 }
 
-void
-Maze_config_block::set_alias_char(const char alias_char)
-{
-  _alias_char = alias_char;
-}
-
-const char
-Maze_config_block::get_alias_char()
+const Xml_string *
+Maze_config_block::get_alias_char() const
 {
   return _alias_char;
 }
 
-void
-Maze_config_block::set_foreground(QBrush foreground)
-{
-  _foreground = foreground;
-}
-
-QBrush
-Maze_config_block::get_foreground()
+const QBrush
+Maze_config_block::get_foreground() const
 {
   return _foreground;
 }
 
-void
-Maze_config_block::set_background(QBrush background)
-{
-  _background = background;
-}
-
-QBrush
-Maze_config_block::get_background()
+const QBrush
+Maze_config_block::get_background() const
 {
   return _background;
 }
 
-void
-Maze_config_block::set_terms(Shape_terms *terms)
+const Shape_terms *
+Maze_config_block::get_terms() const
 {
-  _terms = terms;
-}
-
-Shape_terms *
-Maze_config_block::get_terms()
-{
-  return _terms;
+  return _shape_expression;
 }
 
 /*

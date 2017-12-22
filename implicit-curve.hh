@@ -25,6 +25,8 @@
 #ifndef IMPLICIT_CURVE_HH
 #define IMPLICIT_CURVE_HH
 
+#include <string>
+
 class Implicit_curve
 {
 public:
@@ -36,6 +38,7 @@ public:
                  const double weight_term_const);
   virtual ~Implicit_curve();
   const bool is_inside(const double x, const double y) const;
+  const std::string to_string() const;
 private:
   const double _weight_term_yy;
   const double _weight_term_xy;

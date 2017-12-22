@@ -313,46 +313,82 @@ Config::parse_long_double(const XMLCh *token)
 
 xercesc::DOMElement *
 Config::get_single_child_element(const xercesc::DOMElement *parent,
-				 const char *name, const bool required)
+				 const char *single_child_name_as_c_star,
+                                 const bool required)
 {
-  XMLCh *utf8_name = xercesc::XMLString::transcode(name);
+  XMLCh *single_child_name =
+    xercesc::XMLString::transcode(single_child_name_as_c_star);
+  xercesc::DOMElement *single_child_element =
+    get_single_child_element(parent, single_child_name, required);
+  xercesc::XMLString::release(&single_child_name);
+  return single_child_element;
+}
+
+xercesc::DOMElement *
+Config::get_single_child_element(const xercesc::DOMElement *parent,
+				 const XMLCh *single_child_name,
+                                 const bool required)
+{
+  int64_t matching_node_index = -1;
   const xercesc::DOMNodeList *node_list =
-    parent->getElementsByTagName(utf8_name);
-  xercesc::XMLString::release(&utf8_name);
-  utf8_name = 0;
-  if (!node_list) {
-    fatal("unexpected null node list");
-  }
-  const XMLSize_t length = node_list->getLength();
-  if (length > 1) {
-    std::stringstream msg;
-    msg << "expected single node '" << name << "' beneath node '" <<
-      parent->getNodeName() << "', but got " << length <<
-      " nodes instead";
-    fatal(msg.str());
+    parent->getChildNodes();
+  if (node_list) {
+    const XMLSize_t length = node_list->getLength();
+    for (uint32_t node_index = 0; node_index < length; node_index++) {
+      xercesc::DOMNode *node = node_list->item(node_index);
+      xercesc::DOMElement *elem =
+        dynamic_cast<xercesc::DOMElement *>(node);
+      if (!elem) {
+        // not an element, but e.g. text node => skip
+        continue;
+      }
+      const XMLCh *elem_name = elem->getNodeName();
+      if (xercesc::XMLString::equals(elem_name, single_child_name)) {
+        if (matching_node_index >= 0) {
+          std::stringstream msg;
+          char *single_child_name_as_c_star =
+            xercesc::XMLString::transcode(single_child_name);
+          char *parent_name_as_c_star =
+            xercesc::XMLString::transcode(parent->getNodeName());
+          msg << "expected single node '" << single_child_name_as_c_star <<
+            "' beneath node '" << parent_name_as_c_star <<
+            "', but got " << length << " nodes instead";
+          xercesc::XMLString::release(&single_child_name_as_c_star);
+          xercesc::XMLString::release(&parent_name_as_c_star);
+          fatal(msg.str());
+        }
+        matching_node_index = node_index;
+      }
+    }
   }
   if (required) {
-    if (length < 1) {
+    if (matching_node_index < 0) {
       std::stringstream msg;
-      msg << "missing node '" << name << "' beneath node '" <<
-      parent->getNodeName() << "'";
+      char *single_child_name_as_c_star =
+        xercesc::XMLString::transcode(single_child_name);
+      char *parent_name_as_c_star =
+        xercesc::XMLString::transcode(parent->getNodeName());
+      msg << "missing node '" << single_child_name_as_c_star <<
+        "' beneath node '" << parent_name_as_c_star << "'";
+      xercesc::XMLString::release(&single_child_name_as_c_star);
+      xercesc::XMLString::release(&parent_name_as_c_star);
       fatal(msg.str());
     }
   }
-  xercesc::DOMElement *element;
-  if (length > 0) {
-    xercesc::DOMNode *node = node_list->item(0);
+  xercesc::DOMElement *single_child_element;
+  if (matching_node_index >= 0) {
+    xercesc::DOMNode *node = node_list->item(matching_node_index);
     if (!node) {
       fatal("unexpected null node");
     }
-    element = dynamic_cast<xercesc::DOMElement *>(node);
-    if (!element) {
+    single_child_element = dynamic_cast<xercesc::DOMElement *>(node);
+    if (!single_child_element) {
       fatal("unexpected null element");
     }
   } else {
-    element = 0;
+    single_child_element = 0;
   }
-  return element;
+  return single_child_element;
 }
 
 const Xml_document *

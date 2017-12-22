@@ -75,7 +75,12 @@ protected:
   static long double parse_long_double(const XMLCh *token);
   static xercesc::DOMElement *
   get_single_child_element(const xercesc::DOMElement *parent,
-			   const char *name, const bool required = false);
+                           const char *single_child_name_as_c_star,
+                           const bool required = false);
+  static xercesc::DOMElement *
+  get_single_child_element(const xercesc::DOMElement *parent,
+                           const XMLCh *single_child_name,
+                           const bool required = false);
   virtual void reload(const xercesc::DOMElement *doc_elem) = 0;
   virtual void print_config() = 0;
 private:

@@ -57,6 +57,21 @@ Implicit_curve::is_inside(const double x, const double y) const
     _weight_term_const <= 0.0;
 }
 
+const std::string
+Implicit_curve::to_string() const
+{
+  std::stringstream str;
+  str << "(";
+  str << _weight_term_yy << "y² + ";
+  str << _weight_term_xy << "xy + ";
+  str << _weight_term_xx << "x² + ";
+  str << _weight_term_y << "y + ";
+  str << _weight_term_x << "x + ";
+  str << _weight_term_const;
+  str << " <= 0.0)";
+  return std::string(str.str());
+}
+
 /*
  * Local variables:
  *   mode: c++

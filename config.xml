@@ -18,28 +18,48 @@
     </pixmap>
   </background>
   <block id="corridor">
-    <alias>╳</alias>
+    <alias-char>╳</alias-char>
     <!-- default background: transparent -->
+    <background>
+      <pixmap>
+        <file>cracked.png</file>
+      </pixmap>
+    </background>
     <!-- default foreground: transparent -->
-    <shape>
-      <implicit-curve>x*x+1</implicit-curve> <!-- empty curve -->
-    </shape>
-  </block>
-  <block id="circle">
-    <alias>o</alias>
-    <!-- default background: transparent -->
     <foreground>
       <pixmap>
 	<file>sm_squares.png</file>
       </pixmap>
     </foreground>
     <shape>
-      <implicit-curve>x*x+y*y-0.9</implicit-curve>
+      <implicit-curve>1</implicit-curve> <!-- empty curve -->
+    </shape>
+  </block>
+  <block id="circle">
+    <alias-char>o</alias-char>
+    <!-- default background: transparent -->
+    <background>
+      <pixmap>
+        <file>cracked.png</file>
+      </pixmap>
+    </background>
+    <foreground>
+      <pixmap>
+	<file>sm_squares.png</file>
+      </pixmap>
+    </foreground>
+    <shape>
+      <implicit-curve>x*x+y*y-0.7</implicit-curve>
     </shape>
   </block>
   <block id="hole">
-    <alias>o</alias>
+    <alias-char>0</alias-char> <!-- o -->
     <!-- default background: transparent -->
+    <background>
+      <pixmap>
+        <file>cracked.png</file>
+      </pixmap>
+    </background>
     <foreground>
       <pixmap>
 	<file>sm_squares.png</file>
@@ -47,25 +67,35 @@
     </foreground>
     <shape>
       <not>
-        <implicit-curve>x*x+y*y-0.9</implicit-curve>
+        <implicit-curve>x*x+y*y-0.7</implicit-curve>
       </not>
     </shape>
   </block>
   <block id="wall-solid">
-    <alias>┼</alias>
+    <alias-char>┼</alias-char>
     <!-- default background: transparent -->
+    <background>
+      <pixmap>
+        <file>cracked.png</file>
+      </pixmap>
+    </background>
     <foreground>
       <pixmap>
 	<file>sm_squares.png</file>
       </pixmap>
     </foreground>
     <shape>
-      <implicit-curve>x*x+0.1</implicit-curve> <!-- solid block -->
+      <implicit-curve>-1</implicit-curve> <!-- solid block -->
     </shape>
   </block>
   <block id="wall-rounded-upper-left">
-    <alias>╭</alias>
+    <alias-char>╭</alias-char>
     <!-- default background: transparent -->
+    <background>
+      <pixmap>
+        <file>cracked.png</file>
+      </pixmap>
+    </background>
     <foreground>
       <pixmap>
 	<file>sm_squares.png</file>
@@ -74,19 +104,25 @@
     <shape>
       <or>
 	<!-- solid block without upper left edge -->
-	<implicit-curve>x-y-0.75</implicit-curve>
+	<!--<implicit-curve>x-y-0.75</implicit-curve>-->
 
 	<!-- solid block without upper left edge -->
-	<implicit-curve>x-+y-y-0.75</implicit-curve>
+	<!--<implicit-curve>x-+y-y-0.75</implicit-curve>-->
 
 	<!-- circle in upper left corner -->
-	<!--<implicit-curve>(x+0.75)*(x+0.75)+(y+0.75)*(y+0.75)-0.25</implicit-curve>-->
+	<!--<implicit-curve>(-x+0.5)²+(-y+0.5)²-2</implicit-curve>-->
+	<implicit-curve>x*x-x+0.25+y*y-y+0.25-2</implicit-curve>
       </or>
     </shape>
   </block>
   <block id="wall-rounded-upper-right">
-    <alias>╮</alias>
+    <alias-char>╮</alias-char>
     <!-- default background: transparent -->
+    <background>
+      <pixmap>
+        <file>cracked.png</file>
+      </pixmap>
+    </background>
     <foreground>
       <pixmap>
 	<file>sm_squares.png</file>
@@ -95,16 +131,22 @@
     <shape>
       <or>
 	<!-- solid block without upper right edge -->
-	<implicit-curve>-x-y+0.75</implicit-curve>
+	<!--<implicit-curve>-x-y+0.75</implicit-curve>-->
 
 	<!-- circle in upper right corner -->
-	<!--<implicit-curve>(x-0.75)*(x-0.75)+(y+0.75)*(y+0.75)-0.25</implicit-curve>-->
+	<!--<implicit-curve>(x+0.5)²+(-y+0.5)²-2</implicit-curve>-->
+	<implicit-curve>x*x+x+0.25+y*y-y+0.25-2</implicit-curve>
       </or>
     </shape>
   </block>
   <block id="wall-rounded-lower-left">
-    <alias>╰</alias>
+    <alias-char>╰</alias-char>
     <!-- default background: transparent -->
+    <background>
+      <pixmap>
+        <file>cracked.png</file>
+      </pixmap>
+    </background>
     <foreground>
       <pixmap>
 	<file>sm_squares.png</file>
@@ -113,16 +155,22 @@
     <shape>
       <or>
 	<!-- solid block without lower left edge -->
-	<implicit-curve>x+y+0.75</implicit-curve>
+	<!--<implicit-curve>x+y+0.75</implicit-curve>-->
 
 	<!-- circle in lower left corner -->
-	<!--<implicit-curve>(x+0.75)*(x+0.75)+(y-0.75)*(y-0.75)-0.25</implicit-curve>-->
+	<!--<implicit-curve>(x-0.5)²+(y+0.5)²-2</implicit-curve>-->
+	<implicit-curve>x*x-x+0.25+y*y+y+0.25-2</implicit-curve>
       </or>
     </shape>
   </block>
   <block id="wall-rounded-lower-right">
-    <alias>╯</alias>
+    <alias-char>╯</alias-char>
     <!-- default background: transparent -->
+    <background>
+      <pixmap>
+        <file>cracked.png</file>
+      </pixmap>
+    </background>
     <foreground>
       <pixmap>
 	<file>sm_squares.png</file>
@@ -131,20 +179,21 @@
     <shape>
       <or>
 	<!-- solid block without lower right edge -->
-	<implicit-curve>y-x-0.75</implicit-curve>
+	<!--<implicit-curve>y-x-0.75</implicit-curve>-->
 
 	<!-- circle in lower right corner -->
-	<!--<implicit-curve>(x-0.75)*(x-0.75)+(y-0.75)*(y-0.75)-0.25</implicit-curve>-->
+	<!--<implicit-curve>(x+0.5)²+(y+0.5)²-2</implicit-curve>-->
+	<implicit-curve>x*x+x+0.25+y*y+y+0.25-2</implicit-curve>
       </or>
     </shape>
   </block>
   <field>
-    <columns>8</columns>
-    <rows>8</rows>
     <ignore>&#x09;</ignore>
     <ignore>&#x0a;</ignore>
     <ignore>&#x0d;</ignore>
     <ignore>&#x20;</ignore>
+    <columns>16</columns>
+    <rows>16</rows>
     <contents>
       ┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼
       ┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼
@@ -155,7 +204,7 @@
       ┼┼╳╳┼┼╳╳┼┼┼┼┼┼┼┼
       ┼┼╳╳╰╯╳╳╰┼┼┼┼┼┼┼
       ┼┼╳╳╳╳╳╳╳╳╳╳╳╳┼┼
-      ┼┼╳╳╳╳╳╳╳╳╳╳╳╳┼┼
+      ┼┼╳╳╳╳╳╳╳╳╳o╳╳┼┼
       ┼┼╳╳╭┼┼┼┼┼┼╮╳╳┼┼
       ┼┼╳╳╰┼┼┼┼┼┼╯╳╳┼┼
       ┼┼╳╳╳╳┼┼╳╳╳╳╳╳┼┼

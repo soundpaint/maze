@@ -23,96 +23,34 @@
  */
 
 #include <brush-field.hh>
-#include <string>
 #include <log.hh>
-#include <square-shape.hh>
-#include <rounded-square-shape.hh>
-#include <tubes.hh>
-#include <fractals-factory.hh>
 
-Brush_field::Brush_field()
+Brush_field::Brush_field(const uint16_t width,
+                         const uint16_t height,
+                         const std::vector<const IShape *> field) :
+  _width(width),
+  _height(height),
+  _field(field)
 {
-  // corridor
-  /*
-  _corridor_pixmap = QPixmap("cracked.png");
-  _corridor_brush = QBrush(_corridor_pixmap);
-  */
-  /*
-  const QPixmap *fractal =
-    Fractals_factory::create_fractal(1280, 768,
-				     -2.0, +1.0,
-				     3.0 / 1280.0,
-				     -2.0 / 768.0);
-  */
-  const QPixmap *fractal =
-    Fractals_factory::create_fractal(1380, 768,
-				     -1.45, +0.125,
-				     0.25 / 1380.0,
-				     -0.25 / 768.0);
-  _corridor_brush = QBrush(*fractal);
-
-  _c = new Square_shape(&_corridor_brush, 0.0);
-  if (!_c) {
-    Log::fatal("Brush_field::Brush_field(): not enough memory");
-  }
-
-  // wall
-  _wall_pixmap = QPixmap("sm_squares.png");
-  _wall_brush = QBrush(_wall_pixmap);
-  _w =
-    new Rounded_square_shape(1.0, 1.0, 1.0, 1.0,
-			     &_wall_brush, 1.0,
-			     &_corridor_brush, 0.0);
-  if (!_w) {
-    Log::fatal("Brush_field::Brush_field(): not enough memory");
-  }
-
-  // half-cross
-  _x =
-    new Tubes(true, true, true, false, true, true, true, false,
-	      &_wall_brush, 1.0,
-	      &_corridor_brush, 0.0);
-
-  // hole
-  _hole_pixmap = QPixmap("hole.png");
-  _hole_brush = QBrush(_hole_pixmap);
-  _h = new Square_shape(&_hole_brush, 0.0);
-  if (!_h) {
-    Log::fatal("Brush_field::Brush_field(): not enough memory");
-  }
-
-  const uint16_t HEIGHT = 8;
-  const uint16_t WIDTH = 8;
-  IShape * const FIELD[HEIGHT][WIDTH] = {
-    {_w, _w, _w, _w, _w, _w, _w, _w},
-    {_w, _c, _c, _c, _c, _c, _c, _w},
-    {_w, _w, _w, _c, _w, _c, _c, _w},
-    {_w, _c, _w, _c, _w, _w, _w, _w},
-    {_w, _c, _c, _x, _c, _c, _c, _w},
-    {_w, _c, _w, _w, _w, _w, _h, _w},
-    {_w, _c, _c, _w, _c, _c, _c, _w},
-    {_w, _w, _w, _w, _w, _w, _w, _w}
-  };
-
-  _width = WIDTH;
-  _height = HEIGHT;
-  _field = new IShape *[_width * _height];
-  if (!_field) {
-    Log::fatal("Brush_field::Brush_field(): not enough memory");
-  }
-  for (uint16_t y = 0; y < _height; y++) {
-    for (uint16_t x = 0; x < _width; x++) {
-      _field[y * _width + x] = FIELD[y][x];
-    }
-  }
 }
 
 Brush_field::~Brush_field()
 {
-  delete [] _field;
-  _field = 0;
-  _width = 0;
-  _height = 0;
+}
+
+const std::string
+Brush_field::to_string() const
+{
+    std::stringstream str;
+    str << "Brush_field{" <<
+      "width=" << _width <<
+      ", height=" << _height <<
+      ", field={\r\n";
+    for (const IShape *shape : _field) {
+      str << "  " << shape->to_string() << "\r\n";
+    }
+    str << "}}";
+    return std::string(str.str());
 }
 
 const uint16_t
@@ -129,8 +67,8 @@ Brush_field::get_height() const
 
 const IShape *
 Brush_field::get_block(const double x, const double y,
-		       double *block_offset_x,
-		       double *block_offset_y) const
+                       double *block_offset_x,
+                       double *block_offset_y) const
 {
   if ((x < 0.0) || (x >= 1.0) || std::isnan(x) || std::isinf(x)) {
     std::stringstream msg;
@@ -179,7 +117,7 @@ Brush_field::get_potential(const double x, const double y) const
 
 const double
 Brush_field::get_avg_tan(const double x0, const double y0,
-			 const double dx, const double dy) const
+                         const double dx, const double dy) const
 {
   double block_offset_x;
   double block_offset_y;
@@ -214,18 +152,18 @@ Brush_field::get_brush(const double x, const double y) const
   const double pos_y = y * _height;
   const uint16_t field_index_x = (uint16_t)(pos_x);
   const uint16_t field_index_y = (uint16_t)(pos_y);
-  const double field_offset_x = pos_x - field_index_x;
-  const double field_offset_y = pos_y - field_index_y;
+  const double field_offset_x = (pos_x - field_index_x - 0.5) * 2.0;
+  const double field_offset_y = (pos_y - field_index_y - 0.5) * 2.0;
   if ((field_index_x < 0) || (field_index_x >= _width)) {
     Log::fatal("Brush_field::get_brush(): field index x out of range");
   }
   if ((field_index_y < 0) || (field_index_y >= _height)) {
     Log::fatal("Brush_field::get_brush(): field index y out of range");
   }
-  if ((field_offset_x < 0.0) || (field_offset_x >= 1.0)) {
+  if ((field_offset_x < -1.0) || (field_offset_x >= 1.0)) {
     Log::fatal("Brush_field::get_brush(): field offset x out of range");
   }
-  if ((field_offset_y < 0.0) || (field_offset_y >= 1.0)) {
+  if ((field_offset_y < -1.0) || (field_offset_y >= 1.0)) {
     Log::fatal("Brush_field::get_brush(): field offset y out of range");
   }
   const IShape *block = _field[field_index_y * _width + field_index_x];

@@ -49,7 +49,8 @@ Maze_config::~Maze_config()
 
   delete _blocks;
   _blocks = 0;
-  _field.clear();
+  delete _field;
+  _field = 0;
   xercesc::XMLString::release(&_node_name_any);
   _node_name_any = 0;
   xercesc::XMLString::release(&_node_name_block);
@@ -68,39 +69,41 @@ Maze_config::reload(const xercesc::DOMElement *elem_config)
   }
   xercesc::XMLString::release(&node_name_as_c_star);
   node_name_as_c_star = 0;
-  reload_brush(elem_config, &_background);
+
+  const xercesc::DOMElement *elem_background =
+    get_single_child_element(elem_config, "background", true);
+  reload_brush(elem_background, &_background);
+
   reload_blocks(elem_config);
   reload_field(elem_config);
-  //fatal("config parsed");
+  //fatal("config parsed"); // DEBUG
 }
 
 void
-Maze_config::reload_brush(const xercesc::DOMElement *elem_config,
+Maze_config::reload_brush(const xercesc::DOMElement *elem_background,
 			  QBrush *background)
 {
-  const xercesc::DOMElement *elem_background =
-    get_single_child_element(elem_config, "background");
-  if (elem_background) {
-    const xercesc::DOMElement *elem_pixmap =
-      get_single_child_element(elem_background, "pixmap");
-    if (elem_pixmap) {
-      const xercesc::DOMElement *elem_file =
-	get_single_child_element(elem_pixmap, "file");
-      if (elem_file) {
-	const XMLCh *node_value_file = elem_file->getTextContent();
-	char *str_file_path = xercesc::XMLString::transcode(node_value_file);
-	*background = QBrush(str_file_path);
-	xercesc::XMLString::release(&str_file_path);
-      } else {
-	fatal("for now, pixmap definition must contain file definition");
-      }
-    } else {
-      fatal("for now, background definition must contain pixmap definition");
-    }
-  } else {
-    // no background defined
-    *background = QBrush();
+  if (!elem_background) {
+    fatal("elem_background is null");
   }
+  const xercesc::DOMElement *elem_pixmap =
+    get_single_child_element(elem_background, "pixmap");
+  if (!elem_pixmap) {
+    fatal("for now, background definition must contain pixmap definition");
+  }
+  const xercesc::DOMElement *elem_file =
+    get_single_child_element(elem_pixmap, "file");
+  if (!elem_file) {
+    fatal("for now, pixmap definition must contain file definition");
+  }
+  const XMLCh *node_value_file = elem_file->getTextContent();
+  char *str_file_path = xercesc::XMLString::transcode(node_value_file);
+  QPixmap *pixmap = new QPixmap(str_file_path);
+  if (!pixmap) {
+    fatal ("not enough memory");
+  }
+  *background = QBrush(*pixmap);
+  xercesc::XMLString::release(&str_file_path);
 }
 
 void
@@ -160,7 +163,7 @@ Maze_config::text_content_as_size_t(const xercesc::DOMElement *elem)
 
 void
 Maze_config::load_field_ignore_chars(const xercesc::DOMElement *elem_field,
-                                     std::set<char> *chars) const
+                                     std::set<Xml_string> *chars) const
 {
   const xercesc::DOMNodeList *node_list =
     elem_field->getElementsByTagName(_node_name_ignore);
@@ -176,18 +179,26 @@ Maze_config::load_field_ignore_chars(const xercesc::DOMElement *elem_field,
       const XMLCh *node_value_ignore = elem_ignore->getTextContent();
       char *node_value_ignore_as_c_star =
         xercesc::XMLString::transcode(node_value_ignore);
-      if (strlen(node_value_ignore_as_c_star) != 1) {
+      if (xercesc::XMLString::stringLen(node_value_ignore) != 1) {
         std::stringstream msg;
         msg << "in text value of node '" << elem_ignore->getNodeName() <<
           "': ignore value must have exactly 1 character, but has " <<
-          strlen(node_value_ignore_as_c_star) << " characters: '" <<
-          node_value_ignore_as_c_star << "'";
+          xercesc::XMLString::stringLen(node_value_ignore_as_c_star) <<
+          " characters: '" << node_value_ignore_as_c_star << "'";
         fatal(msg.str());
       }
-      chars->insert(node_value_ignore_as_c_star[0]);
+      chars->insert(Xml_string(node_value_ignore));
       xercesc::XMLString::release(&node_value_ignore_as_c_star);
       node_value_ignore_as_c_star = 0;
     }
+    std::stringstream msg;
+    msg << "found brush field ignore characters:\r\n";
+    for (const Xml_string &str_ch : *chars) {
+      char *str_ch_as_c_star = str_ch.transcode();
+      msg << "'" << str_ch_as_c_star << "'\r\n";
+      str_ch.release(&str_ch_as_c_star);
+    }
+    debug(msg.str());
   } else {
     // no ignores => nothing to parse
   }
@@ -204,7 +215,7 @@ Maze_config::load_field(const xercesc::DOMElement *elem_field)
     get_single_child_element(elem_field, "rows", true);
   const size_t height = text_content_as_size_t(elem_rows);
 
-  std::set<char> chars;
+  std::set<Xml_string> chars;
   load_field_ignore_chars(elem_field, &chars);
 
   {
@@ -219,33 +230,49 @@ Maze_config::load_field(const xercesc::DOMElement *elem_field)
   char *node_value_contents_as_c_star =
     xercesc::XMLString::transcode(node_value_contents);
 
-  std::vector<const Shape *> field;
-  for (size_t i = 0; i < strlen(node_value_contents_as_c_star); i++) {
-    const char ch = node_value_contents_as_c_star[i];
-    auto search = chars.find(ch);
-    if (search != chars.end()) {
-      if (!_blocks->exists(ch)) {
+  std::vector<const IShape *> field;
+  int elems = 0;
+  for (XMLSize_t i = 0;
+       i < xercesc::XMLString::stringLen(node_value_contents); i++) {
+    XMLCh ch = node_value_contents[i];
+    XMLCh ch_star[2] = { ch, 0 };
+
+    // DEBUG:
+    /*
+    {
+      char *ch_as_c_star = xercesc::XMLString::transcode(ch_star);
+      std::stringstream msg;
+      msg << "pos " << i << ": '" << ch_as_c_star << "'";
+      xercesc::XMLString::release(&ch_as_c_star);
+      debug(msg.str());
+    }
+    */
+
+    //chars.begin();
+
+    Xml_string str_ch(ch_star);
+    auto search = chars.find(str_ch);
+    if (search == chars.end()) {
+      if (!_blocks->exists_alias_char(&str_ch)) {
+        _blocks->dump();
         std::stringstream msg;
+        char *ch_as_c_star = str_ch.transcode();
         msg << "in field contents: unresolved alias character: '" <<
-          ch << "'";
+          ch_as_c_star << "' at position " << i << "; contents:\r\n" <<
+          node_value_contents_as_c_star << "\r\n";
+        str_ch.release(&ch_as_c_star);
         fatal(msg.str());
       }
-      const Maze_config_block *block = _blocks->lookup(ch);
-
-      // TODO: Merge classes Maze_config_block and Shape into a single class.
-      //
-      // const Shape *shape = block->get_shape();
-      const Shape *shape = 0;
-
-      field.push_back(shape);
+      const Maze_config_block *block = _blocks->lookup_by_alias_char(&str_ch);
+      field.push_back(block);
     } else {
-      // ch to be ignored
+      // ch is in set of characters to be ignored
     }
   }
   if (field.size() != (width * height)) {
     std::stringstream msg;
     msg << "field dimensions mismatch: expected " << width << "×" << height <<
-      (width * height) << " elements, but found " << field.size() <<
+      "=" << (width * height) << " elements, but found " << field.size() <<
       " unignorable fields in this contents: '" <<
       node_value_contents_as_c_star << "'";
     fatal(msg.str());
@@ -254,7 +281,13 @@ Maze_config::load_field(const xercesc::DOMElement *elem_field)
   xercesc::XMLString::release(&node_value_contents_as_c_star);
   node_value_contents_as_c_star = 0;
 
-  _field = field;
+  _field = new Brush_field(width, height, field);
+}
+
+const Brush_field *
+Maze_config::get_brush_field() const
+{
+  return _field;
 }
 
 void
@@ -288,54 +321,92 @@ Maze_config::load_block(const xercesc::DOMElement *elem_block)
   if (!elem_block) {
     fatal("unexpected null element");
   }
-  Maze_config_block *block = new Maze_config_block();
-  if (!block) {
+
+  const XMLCh *attr_id = elem_block->getAttribute(_node_name_id);
+  const Xml_string *str_id = new Xml_string(attr_id);
+  if (!str_id) {
     fatal("not enough memory");
   }
-  const XMLCh *attr_id = elem_block->getAttribute(_node_name_id);
-  if (attr_id) {
-    load_block_id(attr_id, block);
+
+  /*
+  const char *id = attr_id ? load_block_id(attr_id) : 0;
+  {
+    std::stringstream msg;
+    msg << "id='" << id << "'";
+    debug(msg.str());
   }
+  */
+
   const xercesc::DOMElement *elem_alias_char =
     get_single_child_element(elem_block, "alias-char");
-  if (elem_alias_char) {
-    load_block_alias_char(elem_alias_char, block);
+  const Xml_string *alias_char =
+    elem_alias_char ? load_block_alias_char(elem_alias_char) : 0;
+  /*
+  {
+    std::stringstream msg;
+    char *alias_char_as_c_star = xercesc::XMLString::transcode(&alias_char);
+    msg << "alias char='" << alias_char_as_c_star;
+    xercesc::XMLString::release(&alias_char_as_c_star);
+    debug(msg.str());
   }
+  */
+
+  QBrush foreground;
   const xercesc::DOMElement *elem_foreground =
     get_single_child_element(elem_block, "foreground");
   if (elem_foreground) {
-    QBrush foreground;
     reload_brush(elem_foreground, &foreground);
-    block->set_foreground(foreground);
+  } else {
+    std::stringstream msg;
+    msg << "foreground on block '" << str_id <<
+      "': falling back to global foreground";
+    fatal(msg.str());
   }
+
+  QBrush background;
   const xercesc::DOMElement *elem_background =
     get_single_child_element(elem_block, "background");
   if (elem_background) {
-    QBrush background;
     reload_brush(elem_background, &background);
-    block->set_background(background);
-  }
-  const xercesc::DOMElement *elem_shape =
-    get_single_child_element(elem_block, "shape");
-  if (elem_shape) {
-    load_block_shape(elem_shape, block);
   } else {
+    std::stringstream msg;
+    msg << "background on block '" << str_id <<
+      "': falling back to global background";
+    fatal(msg.str());
+    //background = _background; // may not yet be initialized
+  }
+
+  const xercesc::DOMElement *elem_shape =
+    get_single_child_element(elem_block, "shape", true);
+  if (!elem_shape) {
     fatal("for now, block definition must contain shape definition");
   }
+  Shape_terms *terms = load_block_shape(elem_shape);
+
+  const double foreground_potential = 0.0; // TODO
+  const double background_potential = 0.0; // TODO
+
+  Maze_config_block *block =
+    new Maze_config_block(str_id,
+                          alias_char,
+                          foreground, background,
+                          foreground_potential, background_potential,
+                          terms);
+  if (!block) {
+    fatal("not enough memory");
+  }
+
   debug("')'");
+
   return block;
 }
 
-void
-Maze_config::load_block_id(const XMLCh *attr_id,
-                           Maze_config_block *block)
+const char *
+Maze_config::load_block_id(const XMLCh *attr_id)
 {
   debug("'id('");
   if (!attr_id) {
     fatal("unexpected null attribute");
-  }
-  if (!block) {
-    fatal("unexpected null block");
   }
   char *attr_id_as_c_star = xercesc::XMLString::transcode(attr_id);
   char *id = strdup(attr_id_as_c_star);
@@ -345,62 +416,59 @@ Maze_config::load_block_id(const XMLCh *attr_id,
     fatal("not enough memory");
   }
   debug(id);
-  block->set_id(id);
   debug("')'");
+  return id;
 }
 
-void
-Maze_config::load_block_alias_char(const xercesc::DOMElement *elem_alias_char,
-                                   Maze_config_block *block)
+const Xml_string *
+Maze_config::load_block_alias_char(const xercesc::DOMElement *elem_alias_char)
 {
   debug("'alias_char('");
   if (!elem_alias_char) {
     fatal("unexpected null element");
   }
-  if (!block) {
-    fatal("unexpected null block");
-  }
   const XMLCh *node_value_alias_char = elem_alias_char->getTextContent();
   char *node_value_alias_char_as_c_star =
     xercesc::XMLString::transcode(node_value_alias_char);
-  if (strlen(node_value_alias_char_as_c_star) != 1) {
+  if (xercesc::XMLString::stringLen(node_value_alias_char) != 1) {
     std::stringstream msg;
     msg << "in text value of node '" << elem_alias_char->getNodeName() <<
       "': alias-char value must have exactly 1 character, but has " <<
-      strlen(node_value_alias_char_as_c_star) << " characters: '" <<
-      node_value_alias_char_as_c_star << "'";
+      xercesc::XMLString::stringLen(node_value_alias_char) <<
+      " characters: '" << node_value_alias_char_as_c_star << "'";
     fatal(msg.str());
   }
-  const char alias_char = node_value_alias_char_as_c_star[0];
-  xercesc::XMLString::release(&node_value_alias_char_as_c_star);
-  node_value_alias_char_as_c_star = 0;
   {
     std::stringstream msg;
-    msg << alias_char;
+    msg << node_value_alias_char_as_c_star;
     debug(msg.str());
   }
-  block->set_alias_char(alias_char);
+  xercesc::XMLString::release(&node_value_alias_char_as_c_star);
+  node_value_alias_char_as_c_star = 0;
   debug("')'");
+
+  const Xml_string *alias_char = new Xml_string(node_value_alias_char);
+  if (!alias_char) {
+    fatal("not enough memory");
+  }
+  return alias_char;
 }
 
-void
-Maze_config::load_block_shape(const xercesc::DOMElement *elem_shape,
-                              Maze_config_block *block)
+Shape_terms *
+Maze_config::load_block_shape(const xercesc::DOMElement *elem_shape)
 {
   debug("'block-shape('");
   if (!elem_shape) {
     fatal("unexpected null element");
-  }
-  if (!block) {
-    fatal("unexpected null block");
   }
   if (elem_shape->getChildElementCount() != 1) {
     fatal("'shape' element must contain exactly one child element");
   }
   const xercesc::DOMElement *elem_expression =
     elem_shape->getFirstElementChild();
-  block->set_terms(load_shape_expression(elem_expression));
+  Shape_terms *terms = load_shape_expression(elem_expression);
   debug("')'");
+  return terms;
 }
 
 Shape_terms *
@@ -544,8 +612,14 @@ Maze_config::load_prime(const xercesc::DOMElement *elem_prime)
   if (!implicit_curve) {
     fatal("not enough memory");
   }
-  debug(str_prime);
   xercesc::XMLString::release(&str_prime);
+  {
+    std::stringstream msg;
+    msg << "normalized implicit curve: ";
+    msg << implicit_curve->to_string();
+    debug(msg.str());
+  }
+
   Shape_prime *prime = new Shape_prime(implicit_curve);
   if (!prime) {
     fatal("not enough memory");
@@ -567,7 +641,7 @@ Maze_config::print_config()
     msg << _client_id;
   } else {
     msg << "<use-host-name>";
-  } 
+  }
   msg << "\r\n";
   msg << "effective client id: " << _effective_client_id << "\r\n";
   msg << "range index: " << _range_index << "\r\n";

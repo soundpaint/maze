@@ -247,7 +247,7 @@ Implicit_curve_parser::parse_weighted_term(double *weight,
     if (parse_mul()) {
       result = parse_variable_term(variable);
     } else {
-      *variable = Implicit_curve_ast::Term::Variable::VAR_UNINITIALIZED;
+      *variable = Implicit_curve_ast::Term::Variable::VAR_CONST;
     }
     result = true;
   }

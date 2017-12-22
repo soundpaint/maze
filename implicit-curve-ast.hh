@@ -48,7 +48,13 @@ public:
       PLUS, MINUS, SIGN_UNINITIALIZED
     };
     enum Variable {
-      VAR_CONST, VAR_X, VAR_Y, VAR_XX, VAR_XY, VAR_YY, VAR_UNINITIALIZED
+      VAR_CONST = 0,
+      VAR_X,
+      VAR_Y,
+      VAR_XX,
+      VAR_XY,
+      VAR_YY,
+      VAR_UNINITIALIZED
     };
     Term(const Sign sign, const double weight, const Variable variable);
     virtual ~Term();
@@ -86,7 +92,7 @@ public:
     std::vector<Term *> _terms;
 
     // semantic attributes
-    std::unordered_map<const Implicit_curve_ast::Term::Variable *, double>
+    std::unordered_map</*const Implicit_curve_ast::Term::Variable*/ int, double>
     _summarized_term_weights;
   };
 

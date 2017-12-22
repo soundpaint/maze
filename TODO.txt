@@ -1,3 +1,23 @@
+* FIXME: White space handling in implicit curve parser.
+* FIXME: Double negation in shapes does not work.
+* <alias-char> not beneath <block>, but beneath <field> with reference
+  to block id:
+
+  <field>
+    <alias-char ref="wall-rounded-lower-right">J</alias-char>
+    ...
+  </field>
+
+* Make it possible to define shapes outside of blocks, such that the
+  same shape can be referenced from multiple blocks (with display
+  offsets x and y), rather than having to redefine the shape over and
+  over again.  Useful for shapes that are that large that they cover
+  multiple blocks.
+
+* Make global <background> work as fall-back when no <background> is
+  specified in a block.  Same for <foreground>.
+* Extend supported implicit curve syntax, e.g. expressions like:
+  (x + y)² - 1
 * Limit velocity, such that ball moves at most 1 pixel per time step.
 * Overhoul concept when passing position (x, y) as double or integer.
 * Move velocity correction code from class Balls to class Ball.

@@ -68,7 +68,7 @@ Maze::Maze(int &argc, char **argv)
   }
 
   setStyleSheet(STYLE_SHEET);
-  _main_window = new Main_window(_balls);
+  _main_window = new Main_window(_config, _balls);
   if (!_main_window) {
     Log::fatal("Maze(): not enough memory");
   }

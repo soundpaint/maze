@@ -27,7 +27,8 @@
 #include <QtGui/QIcon>
 #include <log.hh>
 
-Main_window::Main_window(Balls *balls, QWidget *parent)
+Main_window::Main_window(const Maze_config *config, Balls *balls,
+                         QWidget *parent)
   : QMainWindow(parent)
 {
   if (!balls) {
@@ -62,7 +63,10 @@ Main_window::Main_window(Balls *balls, QWidget *parent)
   uint16_t width = 1300;
   uint16_t height = 600;
 #endif
-  _playing_field = new Playing_field(width, height, balls, this);
+
+  const Brush_field *brush_field = config->get_brush_field();
+
+  _playing_field = new Playing_field(brush_field, width, height, balls, this);
   if (!_playing_field) {
     Log::fatal("Main_window::Main_window(): not enough memory");
   }

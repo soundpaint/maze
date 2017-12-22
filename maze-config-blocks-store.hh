@@ -26,8 +26,8 @@
 #define MAZE_CONFIG_BLOCKS_STORE_HH
 
 #include <unordered_map>
-//#include <vector>
 #include <maze-config-block.hh>
+#include <xml-string.hh>
 
 class Maze_config_blocks_store
 {
@@ -35,17 +35,22 @@ public:
   Maze_config_blocks_store();
   virtual ~Maze_config_blocks_store();
   void add(Maze_config_block *block);
-  const bool exists(const char *id) const;
-  const bool exists(const char alias_char) const;
-  const Maze_config_block *lookup(const char *id) const;
-  const Maze_config_block *lookup(const char alias_char) const;
+  const bool exists_id(const Xml_string *id) const;
+  const bool exists_alias_char(const Xml_string *alias_char) const;
+  const Maze_config_block *lookup_by_id(const Xml_string *id) const;
+  const Maze_config_block *lookup_by_alias_char(const Xml_string *alias_char) const;
   void dump() const;
 private:
-  //std::vector<const Maze_config_block *> *_blocks;
-  std::unordered_map<const std::string *,
-                     const Maze_config_block *> *_id_to_block;
-  std::unordered_map<const std::string *,
-                     const Maze_config_block *> *_alias_char_to_block;
+  typedef std::unordered_map<const Xml_string *,
+                             const Maze_config_block *,
+                             Xml_string::hashing_functor,
+                             Xml_string::equal_functor>
+  xml_string_to_block_t;
+
+  static const xml_string_to_block_t::size_type BUCKET_COUNT = 5;
+
+  xml_string_to_block_t *_id_to_block;
+  xml_string_to_block_t *_alias_char_to_block;
 };
 
 #endif /* MAZE_CONFIG_BLOCKS_STORE_HH */

@@ -29,11 +29,12 @@
 #include <ball.hh>
 #include <log.hh>
 
-Playing_field::Playing_field(const uint16_t minimum_width,
+Playing_field::Playing_field(const Brush_field *brush_field,
+			     const uint16_t minimum_width,
 			     const uint16_t minimum_height,
-			     IBalls *balls,
+                             IBalls *balls,
 			     QWidget *parent)
-  : QWidget(parent)
+  : QWidget(parent), _brush_field(brush_field)
 {
   _velocity_visible = false;
   _force_field_visible = false;
@@ -41,13 +42,12 @@ Playing_field::Playing_field(const uint16_t minimum_width,
   _minimum_width = minimum_width;
   _minimum_height = minimum_height;
   if (!balls) {
-    Log::fatal("Playing_field(): balls is null");
+    Log::fatal("Playing_field::Playing_field(): balls is null");
   }
   _balls = balls;
 
-  _brush_field = new Brush_field();
   if (!_brush_field) {
-    Log::fatal("Playing_field::Playing_field(): not enough memory");
+    Log::fatal("Playing_field::Playing_field(): brush_field is null");
   }
 
   _force_field = new Force_field();
@@ -104,18 +104,21 @@ Playing_field::create_background(const uint16_t width,
     Log::fatal("Playing_field::create_background(): height <= 0");
   }
 
+  {
+    std::stringstream msg;
+    msg << "[create_background]";
+    msg << " width=" << width;
+    msg << ", height=" << height;
+    msg << ", force_field_visible=" << force_field_visible;
+    Log::info(msg.str());
+  }
+
   QImage *image = new QImage(width, height, QImage::Format_RGB32);
   if (!image) {
     Log::fatal("Playing_field::create_background(): "
 	       "not enough memory");
   }
   QPainter painter(image);
-  {
-    std::stringstream msg;
-    msg << "[width=" << width << "]";
-    msg << "[height=" << height << "]";
-    Log::info(msg.str());
-  }
   for (uint16_t x = 0; x < width; x++) {
     const double field_x = ((double)x) / width;
     for (uint16_t y = 0; y < height; y++) {
@@ -165,11 +168,14 @@ Playing_field::draw_background(QPainter *painter, const QRect rect)
   const uint16_t current_height = height();
   if ((current_width != _background_std->width()) ||
       (current_height != _background_std->height())) {
+    Log::debug("loading force field");
     _force_field->load_field(_brush_field, current_width, current_height);
+    Log::debug("compute forces field onto ball");
     for (uint8_t i = 0; i < _balls->get_count(); i++) {
       Ball *ball = _balls->at(i);
       ball->precompute_forces(_force_field);
     }
+    Log::debug("(re-)create standard background");
     if (_background_std) {
       delete _background_std;
     }
@@ -177,6 +183,7 @@ Playing_field::draw_background(QPainter *painter, const QRect rect)
     if (!_background_std) {
       Log::fatal("Playing_field::paintEvent(): not enough memory");
     }
+    Log::debug("(re-)create background with forces display");
     if (_background_ff) {
       delete _background_ff;
     }

@@ -29,16 +29,19 @@
 #include <xercesc/dom/DOM.hpp>
 #include <QtGui/QBrush>
 #include <config.hh>
+#include <xml-string.hh>
 #include <maze-config-blocks-store.hh>
 #include <shape-expression.hh>
 #include <implicit-curve-compiler.hh>
 #include <shape.hh>
+#include <brush-field.hh>
 
 class Maze_config : Config
 {
 public:
   Maze_config(const char *path);
   virtual ~Maze_config();
+  const Brush_field *get_brush_field() const;
 protected:
   virtual void reload(const xercesc::DOMElement *elem_config);
   virtual void print_config();
@@ -51,22 +54,19 @@ private:
   QBrush _background;
   Implicit_curve_compiler _implicit_curve_compiler;
   Maze_config_blocks_store *_blocks;
-  std::vector<const Shape *> _field;
-  void reload_brush(const xercesc::DOMElement *elem_config,
+  Brush_field *_field;
+  void reload_brush(const xercesc::DOMElement *elem_background,
 		    QBrush *background);
   void reload_blocks(const xercesc::DOMElement *elem_config);
   void reload_field(const xercesc::DOMElement *elem_config);
   static const size_t text_content_as_size_t(const xercesc::DOMElement *elem);
   void load_field_ignore_chars(const xercesc::DOMElement *elem_field,
-                               std::set<char> *chars) const;
+                               std::set<Xml_string> *chars) const;
   void load_field(const xercesc::DOMElement *elem_field);
   Maze_config_block *load_block(const xercesc::DOMElement *elem_block);
-  void load_block_id(const XMLCh *attr_id,
-                     Maze_config_block *block);
-  void load_block_alias_char(const xercesc::DOMElement *elem_alias_char,
-                             Maze_config_block *block);
-  void load_block_shape(const xercesc::DOMElement *elem_shape,
-                        Maze_config_block *block);
+  const char *load_block_id(const XMLCh *attr_id);
+  const Xml_string *load_block_alias_char(const xercesc::DOMElement *elem_alias_char);
+  Shape_terms *load_block_shape(const xercesc::DOMElement *elem_shape);
   Shape_terms *load_shape_expression(const xercesc::DOMElement *elem_expression);
   Shape_factors *load_shape_term(const xercesc::DOMElement *elem_term);
   Shape_unary_expression *

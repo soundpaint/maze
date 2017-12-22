@@ -47,7 +47,8 @@ class Playing_field : public QWidget
 {
   Q_OBJECT
 public:
-  explicit Playing_field(const uint16_t minimum_width,
+  explicit Playing_field(const Brush_field *brush_field,
+                         const uint16_t minimum_width,
 			 const uint16_t minimum_height,
 			 IBalls *balls,
 			 QWidget *parent = 0);
@@ -73,7 +74,7 @@ protected:
   void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
 
 private:
-  Brush_field *_brush_field;
+  const Brush_field *_brush_field;
   Force_field *_force_field;
   uint16_t _minimum_width, _minimum_height;
   IBalls *_balls;
