@@ -46,6 +46,7 @@
 class Shape_unary_expression
 {
 public:
+  Shape_unary_expression();
   virtual ~Shape_unary_expression();
   const bool is_negated() const;
   void set_negated(const bool negated);
