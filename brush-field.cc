@@ -67,17 +67,20 @@ Brush_field::get_height() const
 
 const IShape *
 Brush_field::get_block(const double x, const double y,
-                       double *block_offset_x,
-                       double *block_offset_y) const
+                       double * const block_offset_x,
+                       double * const block_offset_y) const
 {
   if ((x < 0.0) || (x >= 1.0) || std::isnan(x) || std::isinf(x)) {
     std::stringstream msg;
+    msg << "Brush_field::get_potential(): x out of range: ";
     msg << "x=" << x;
-    Log::info(msg.str());
-    Log::fatal("Brush_field::get_potential(): x out of range");
+    Log::fatal(msg.str());
   }
   if ((y < 0.0) || (y >= 1.0) || std::isnan(y) || std::isinf(y)) {
-    Log::fatal("Brush_field::get_potential(): y out of range");
+    std::stringstream msg;
+    msg << "Brush_field::get_potential(): y out of range: ";
+    msg << "y=" << y;
+    Log::fatal(msg.str());
   }
   const double pos_x = x * _width;
   const double pos_y = y * _height;
@@ -106,6 +109,15 @@ Brush_field::get_block(const double x, const double y,
   return block;
 }
 
+const QBrush *
+Brush_field::get_brush(const double x, const double y) const
+{
+  double block_offset_x;
+  double block_offset_y;
+  const IShape *block = get_block(x, y, &block_offset_x, &block_offset_y);
+  return block->get_brush(block_offset_x, block_offset_y);
+}
+
 const double
 Brush_field::get_potential(const double x, const double y) const
 {
@@ -131,43 +143,6 @@ Brush_field::matches_goal(const double x, const double y) const
 {
   // TODO: Consider geometry (width, height) of the ball.
   return get_potential(x, y) < 0.0;
-}
-
-const QBrush *
-Brush_field::get_brush(const double x, const double y) const
-{
-  if ((x < 0.0) || (x >= 1.0) || std::isnan(x) || std::isinf(x)) {
-    std::stringstream msg;
-    msg << "x=" << x;
-    Log::info(msg.str());
-    Log::fatal("Brush_field::get_brush(): x out of range");
-  }
-  if ((y < 0.0) || (y >= 1.0) || std::isnan(y) || std::isinf(y)) {
-    std::stringstream msg;
-    msg << "y=" << y;
-    Log::info(msg.str());
-    Log::fatal("Brush_field::get_brush(): y out of range");
-  }
-  const double pos_x = x * _width;
-  const double pos_y = y * _height;
-  const uint16_t field_index_x = (uint16_t)(pos_x);
-  const uint16_t field_index_y = (uint16_t)(pos_y);
-  const double field_offset_x = (pos_x - field_index_x - 0.5) * 2.0;
-  const double field_offset_y = (pos_y - field_index_y - 0.5) * 2.0;
-  if ((field_index_x < 0) || (field_index_x >= _width)) {
-    Log::fatal("Brush_field::get_brush(): field index x out of range");
-  }
-  if ((field_index_y < 0) || (field_index_y >= _height)) {
-    Log::fatal("Brush_field::get_brush(): field index y out of range");
-  }
-  if ((field_offset_x < -1.0) || (field_offset_x >= 1.0)) {
-    Log::fatal("Brush_field::get_brush(): field offset x out of range");
-  }
-  if ((field_offset_y < -1.0) || (field_offset_y >= 1.0)) {
-    Log::fatal("Brush_field::get_brush(): field offset y out of range");
-  }
-  const IShape *block = _field[field_index_y * _width + field_index_x];
-  return block->get_brush(field_offset_x, field_offset_y);
 }
 
 /*

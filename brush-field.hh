@@ -53,8 +53,8 @@ private:
   const uint16_t _height;
   const std::vector<const IShape *> _field;
   const IShape *get_block(const double x, const double y,
-			  double *block_offset_x,
-			  double *block_offset_y) const;
+			  double * const block_offset_x,
+			  double * const block_offset_y) const;
 };
 
 #endif /* BRUSH_FIELD_HH */

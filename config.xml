@@ -31,8 +31,12 @@
 	<file>sm_squares.png</file>
       </pixmap>
     </foreground>
+    <!--
+        empty curve:
+        1 ≤ 0
+    -->
     <shape>
-      <implicit-curve>1</implicit-curve> <!-- empty curve -->
+      <implicit-curve>1</implicit-curve>
     </shape>
   </block>
   <block id="circle">
@@ -49,7 +53,11 @@
       </pixmap>
     </foreground>
     <shape>
-      <implicit-curve>x*x + y*y - 0.7</implicit-curve>
+      <!--
+          full small centered circle:
+          (x-½)² + (y-½)² - 1/4 ≤ 0
+      -->
+      <implicit-curve>x*x - x + 0.25 + y*y - y + 0.25 - 0.25</implicit-curve>
     </shape>
   </block>
   <block id="hole">
@@ -67,7 +75,11 @@
     </foreground>
     <shape>
       <not>
-        <implicit-curve>x*x + y*y - 0.7</implicit-curve>
+        <!--
+            full small centered circle:
+            (x-½)² + (y-½)² - 1/4 ≤ 0
+        -->
+        <implicit-curve>x*x - x + 0.25 + y*y - y + 0.25 - 0.25</implicit-curve>
       </not>
     </shape>
   </block>
@@ -85,7 +97,11 @@
       </pixmap>
     </foreground>
     <shape>
-      <implicit-curve>-1</implicit-curve> <!-- solid block -->
+      <!--
+          solid block:
+          - 1 ≤ 0
+      -->
+      <implicit-curve>-1</implicit-curve>
     </shape>
   </block>
   <block id="wall-rounded-upper-left">
@@ -103,15 +119,11 @@
     </foreground>
     <shape>
       <or>
-	<!-- solid block without upper left edge -->
-	<!--<implicit-curve>x - y - 0.75</implicit-curve>-->
-
-	<!-- solid block without upper left edge -->
-	<!--<implicit-curve>x -+ y - y - 0.75</implicit-curve>-->
-
-	<!-- circle in upper left corner -->
-	<!--<implicit-curve>(-x+0.5)² + (-y+0.5)² - 2</implicit-curve>-->
-	<implicit-curve>x*x - x + 0.25 + y*y - y + 0.25 - 2</implicit-curve>
+	<!--
+            circle in upper left corner:
+            (x-1)² + (y-1)² - 1 ≤ 0
+        -->
+	<implicit-curve>x*x - 2*x + 1 + y*y - 2*y + 1 - 1</implicit-curve>
       </or>
     </shape>
   </block>
@@ -130,12 +142,11 @@
     </foreground>
     <shape>
       <or>
-	<!-- solid block without upper right edge -->
-	<!--<implicit-curve>-x - y + 0.75</implicit-curve>-->
-
-	<!-- circle in upper right corner -->
-	<!--<implicit-curve>(x+0.5)² + (-y+0.5)² - 2</implicit-curve>-->
-	<implicit-curve>x*x + x + 0.25 + y*y - y + 0.25 - 2</implicit-curve>
+	<!--
+            circle in upper right corner:
+            x² + (y-1)² - 1 ≤ 0
+        -->
+	<implicit-curve>x*x + y*y - 2.0*y + 1.0 - 1.0</implicit-curve>
       </or>
     </shape>
   </block>
@@ -154,12 +165,11 @@
     </foreground>
     <shape>
       <or>
-	<!-- solid block without lower left edge -->
-	<!--<implicit-curve>x + y + 0.75</implicit-curve>-->
-
-	<!-- circle in lower left corner -->
-	<!--<implicit-curve>(x-0.5)² + (y+0.5)² - 2</implicit-curve>-->
-	<implicit-curve>x*x - x + 0.25 + y*y + y + 0.25 - 2</implicit-curve>
+	<!--
+            circle in lower left corner:
+            (x-1)² + y² - 1 ≤ 0
+        -->
+	<implicit-curve>x*x - 2.0*x + 1.0 + y*y - 1.0</implicit-curve>
       </or>
     </shape>
   </block>
@@ -178,12 +188,11 @@
     </foreground>
     <shape>
       <or>
-	<!-- solid block without lower right edge -->
-	<!--<implicit-curve>y - x - 0.75</implicit-curve>-->
-
-	<!-- circle in lower right corner -->
-	<!--<implicit-curve>(x+0.5)² + (y+0.5)² - 2</implicit-curve>-->
-	<implicit-curve>x*x + x + 0.25 + y*y + y + 0.25 - 2</implicit-curve>
+	<!--
+            circle in lower right corner:
+            x² + y² - 1 ≤ 0
+        -->
+	<implicit-curve>x*x + y*y - 1.0</implicit-curve>
       </or>
     </shape>
   </block>
