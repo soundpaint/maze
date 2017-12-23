@@ -371,6 +371,7 @@ const bool
 Implicit_curve_tokenizer::is_white_space_char(const char c)
 {
   switch (c) {
+  case ' ':
   case '\n':
   case '\r':
   case '\t':

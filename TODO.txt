@@ -1,5 +1,3 @@
-* FIXME: White space handling in implicit curve parser.
-* FIXME: Double negation in shapes does not work.
 * <alias-char> not beneath <block>, but beneath <field> with reference
   to block id:
 
@@ -18,6 +16,12 @@
   specified in a block.  Same for <foreground>.
 * Extend supported implicit curve syntax, e.g. expressions like:
   (x + y)² - 1
+* Optimize shape expressions in terms of evaluation performance cost.
+  Obvious optimization is elimination of duplicate negations:
+  not(not(x)) = x.  Note that conjuctive / disjunctive normal form
+  typically is *not* optimal in terms of evaluation cost.  Instead,
+  minimization based on prime implicants should be the right way
+  (e.g. Quine-McCluskey algorithm).
 * Limit velocity, such that ball moves at most 1 pixel per time step.
 * Overhoul concept when passing position (x, y) as double or integer.
 * Move velocity correction code from class Balls to class Ball.
