@@ -55,7 +55,7 @@
     <shape>
       <!--
           full small centered circle:
-          (x-½)² + (y-½)² - 1/4 ≤ 0
+          (x-½)² + (y-½)² ≤ 1/4
       -->
       <implicit-curve>x*x - x + 0.25 + y*y - y + 0.25 - 0.25</implicit-curve>
     </shape>
@@ -77,7 +77,7 @@
       <not>
         <!--
             full small centered circle:
-            (x-½)² + (y-½)² - 1/4 ≤ 0
+            (x-½)² + (y-½)² ≤ 1/4
         -->
         <implicit-curve>x*x - x + 0.25 + y*y - y + 0.25 - 0.25</implicit-curve>
       </not>
@@ -121,7 +121,7 @@
       <or>
 	<!--
             circle in upper left corner:
-            (x-1)² + (y-1)² - 1 ≤ 0
+            (x-1)² + (y-1)² ≤ 1
         -->
 	<implicit-curve>x*x - 2*x + 1 + y*y - 2*y + 1 - 1</implicit-curve>
       </or>
@@ -144,7 +144,7 @@
       <or>
 	<!--
             circle in upper right corner:
-            x² + (y-1)² - 1 ≤ 0
+            x² + (y-1)² ≤ 1
         -->
 	<implicit-curve>x*x + y*y - 2.0*y + 1.0 - 1.0</implicit-curve>
       </or>
@@ -167,7 +167,7 @@
       <or>
 	<!--
             circle in lower left corner:
-            (x-1)² + y² - 1 ≤ 0
+            (x-1)² + y² ≤ 1
         -->
 	<implicit-curve>x*x - 2.0*x + 1.0 + y*y - 1.0</implicit-curve>
       </or>
@@ -190,7 +190,7 @@
       <or>
 	<!--
             circle in lower right corner:
-            x² + y² - 1 ≤ 0
+            x² + y² ≤ 1
         -->
 	<implicit-curve>x*x + y*y - 1.0</implicit-curve>
       </or>

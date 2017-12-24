@@ -25,7 +25,7 @@
 #ifndef IMPLICIT_CURVE_HH
 #define IMPLICIT_CURVE_HH
 
-#include <string>
+#include <bivariate-quadratic-function.hh>
 
 class Implicit_curve
 {
@@ -40,12 +40,20 @@ public:
   const bool is_inside(const double x, const double y) const;
   const std::string to_string() const;
 private:
-  const double _weight_term_yy;
-  const double _weight_term_xy;
-  const double _weight_term_xx;
-  const double _weight_term_y;
-  const double _weight_term_x;
-  const double _weight_term_const;
+  const Bivariate_quadratic_function *_function;
+  const Bivariate_quadratic_function *_function_d_dx;
+  const Bivariate_quadratic_function *_function_d_dy;
+  Implicit_curve(const Bivariate_quadratic_function *function);
+  Implicit_curve(const Bivariate_quadratic_function *function,
+                 const Bivariate_quadratic_function *function_d_dx,
+                 const Bivariate_quadratic_function *function_d_dy);
+  const static Bivariate_quadratic_function *
+  create_bivariate_quadratic_function(const double weight_term_yy,
+                                      const double weight_term_xy,
+                                      const double weight_term_xx,
+                                      const double weight_term_y,
+                                      const double weight_term_x,
+                                      const double weight_term_const);
 };
 
 #endif /* IMPLICIT_CURVE_HH */

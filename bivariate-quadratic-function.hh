@@ -22,27 +22,35 @@
  * Author's web site: www.juergen-reuter.de
  */
 
-#ifndef IMPLICIT_CURVE_COMPILER_HH
-#define IMPLICIT_CURVE_COMPILER_HH
+#ifndef BIVARIATE_QUADRATIC_FUNCTION_HH
+#define BIVARIATE_QUADRATIC_FUNCTION_HH
 
-#endif /* IMPLICIT_CURVE_COMPILER_HH */
+#include <string>
 
-#include <implicit-curve-parser.hh>
-#include <implicit-curve.hh>
-
-class Implicit_curve_compiler
+class Bivariate_quadratic_function
 {
 public:
-  Implicit_curve_compiler();
-  virtual ~Implicit_curve_compiler();
-  const Implicit_curve *compile(const char *expression);
+  Bivariate_quadratic_function(const double weight_term_yy,
+                               const double weight_term_xy,
+                               const double weight_term_xx,
+                               const double weight_term_y,
+                               const double weight_term_x,
+                               const double weight_term_const);
+  virtual ~Bivariate_quadratic_function();
+  const bool is_inside(const double x, const double y) const;
+  const std::string to_string() const;
+  const Bivariate_quadratic_function *create_d_dx() const;
+  const Bivariate_quadratic_function *create_d_dy() const;
 private:
-  Implicit_curve_parser _implicit_curve_parser;
-  static void summarize_terms_by_variables(Implicit_curve_ast *implicit_curve_ast);
-  static void optimize(Implicit_curve_ast *implicit_curve_ast);
-  static const Implicit_curve *
-  generate_code(Implicit_curve_ast *implicit_curve_ast);
+  const double _weight_term_yy;
+  const double _weight_term_xy;
+  const double _weight_term_xx;
+  const double _weight_term_y;
+  const double _weight_term_x;
+  const double _weight_term_const;
 };
+
+#endif /* BIVARIATE_QUADRATIC_FUNCTION_HH */
 
 /*
  * Local variables:

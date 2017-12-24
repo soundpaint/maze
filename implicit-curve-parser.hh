@@ -25,7 +25,6 @@
 #ifndef IMPLICIT_CURVE_PARSER_HH
 #define IMPLICIT_CURVE_PARSER_HH
 
-#include <implicit-curve.hh>
 #include <implicit-curve-tokenizer.hh>
 #include <implicit-curve-ast.hh>
 

@@ -23,7 +23,6 @@
  */
 
 #include <implicit-curve.hh>
-#include <string.h>
 #include <log.hh>
 
 Implicit_curve::Implicit_curve(const double weight_term_yy,
@@ -32,44 +31,80 @@ Implicit_curve::Implicit_curve(const double weight_term_yy,
                                const double weight_term_y,
                                const double weight_term_x,
                                const double weight_term_const) :
-  _weight_term_yy(weight_term_yy),
-  _weight_term_xy(weight_term_xy),
-  _weight_term_xx(weight_term_xx),
-  _weight_term_y(weight_term_y),
-  _weight_term_x(weight_term_x),
-  _weight_term_const(weight_term_const)
+  Implicit_curve(create_bivariate_quadratic_function(weight_term_yy,
+                                                     weight_term_xy,
+                                                     weight_term_xx,
+                                                     weight_term_y,
+                                                     weight_term_x,
+                                                     weight_term_const))
 {
+}
+
+Implicit_curve::Implicit_curve(const Bivariate_quadratic_function *function)
+  : Implicit_curve(function,
+                   function->create_d_dx(),
+                   function->create_d_dy())
+{
+}
+
+Implicit_curve::Implicit_curve(const Bivariate_quadratic_function *function,
+                               const Bivariate_quadratic_function *function_d_dx,
+                               const Bivariate_quadratic_function *function_d_dy)
+{
+  if (!function) {
+    Log::fatal("function is null");
+  }
+  if (!function_d_dx) {
+    Log::fatal("function_d_dx is null");
+  }
+  if (!function_d_dy) {
+    Log::fatal("function_d_dy is null");
+  }
+  _function = function;
+  _function_d_dx = function_d_dx;
+  _function_d_dy = function_d_dy;
 }
 
 Implicit_curve::~Implicit_curve()
 {
+  _function = 0;
+  delete _function_d_dx;
+  _function_d_dx = 0;
+  delete _function_d_dy;
+  _function_d_dy = 0;
+}
+
+const Bivariate_quadratic_function *
+Implicit_curve::create_bivariate_quadratic_function(const double weight_term_yy,
+                                                    const double weight_term_xy,
+                                                    const double weight_term_xx,
+                                                    const double weight_term_y,
+                                                    const double weight_term_x,
+                                                    const double weight_term_const)
+{
+  Bivariate_quadratic_function *function =
+    new Bivariate_quadratic_function(weight_term_yy,
+                                     weight_term_xy,
+                                     weight_term_xx,
+                                     weight_term_y,
+                                     weight_term_x,
+                                     weight_term_const);
+  if (!function) {
+    Log::fatal("not enough memory");
+  }
+  return function;
 }
 
 const bool
 Implicit_curve::is_inside(const double x, const double y) const
 {
-  return
-    _weight_term_yy * y * y +
-    _weight_term_xy * x * y +
-    _weight_term_xx * x * x +
-    _weight_term_y * y +
-    _weight_term_x * x +
-    _weight_term_const <= 0.0;
+  return _function->is_inside(x, y);
 }
 
 const std::string
 Implicit_curve::to_string() const
 {
-  std::stringstream str;
-  str << "(";
-  str << _weight_term_yy << "y² + ";
-  str << _weight_term_xy << "xy + ";
-  str << _weight_term_xx << "x² + ";
-  str << _weight_term_y << "y + ";
-  str << _weight_term_x << "x + ";
-  str << _weight_term_const;
-  str << " <= 0.0)";
-  return std::string(str.str());
+  return _function->to_string();
 }
 
 /*
