@@ -22,8 +22,8 @@
  * Author's web site: www.juergen-reuter.de
  */
 
-#ifndef MAZE_CONFIG_BLOCK_HH
-#define MAZE_CONFIG_BLOCK_HH
+#ifndef TILE_HH
+#define TILE_HH
 
 #include <xercesc/dom/DOM.hpp>
 #include <QtGui/QBrush>
@@ -31,22 +31,22 @@
 #include <ishape.hh>
 #include <shape-expression.hh>
 
-class Maze_config_block : public IShape
+class Tile : public IShape
 {
 public:
-  Maze_config_block(const Xml_string *id,
-                    const Xml_string *alias_char,
-                    const QBrush foreground,
-                    const QBrush background,
-                    const double foreground_potential,
-                    const double background_potential,
-                    const Shape_terms *terms);
-  virtual ~Maze_config_block();
+  Tile(const Xml_string *id,
+       const Xml_string *alias_char,
+       const QBrush foreground,
+       const QBrush background,
+       const double foreground_potential,
+       const double background_potential,
+       const Shape_terms *terms);
+  virtual ~Tile();
   virtual const std::string to_string() const;
   virtual const double get_potential(const double x, const double y) const;
   virtual const QBrush *get_brush(const double x, const double y) const;
-  virtual const double get_avg_tan(const double block_offset_x,
-                                   const double block_offset_y,
+  virtual const double get_avg_tan(const double tile_offset_x,
+                                   const double tile_offset_y,
                                    const double dx,
                                    const double dy) const;
   const Xml_string *get_id() const;
@@ -64,7 +64,7 @@ private:
   const Shape_terms *_shape_expression;
 };
 
-#endif /* MAZE_CONFIG_BLOCK_HH */
+#endif /* TILE_HH */
 
 /*
  * Local variables:

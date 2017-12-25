@@ -17,7 +17,7 @@
       <file>cracked.png</file>
     </pixmap>
   </background>
-  <block id="corridor">
+  <tile id="corridor">
     <alias-char>╳</alias-char>
     <!-- default background: transparent -->
     <background>
@@ -38,8 +38,8 @@
     <shape>
       <implicit-curve>1</implicit-curve>
     </shape>
-  </block>
-  <block id="circle">
+  </tile>
+  <tile id="circle">
     <alias-char>o</alias-char>
     <!-- default background: transparent -->
     <background>
@@ -59,8 +59,8 @@
       -->
       <implicit-curve>x*x - x + 0.25 + y*y - y + 0.25 - 0.25</implicit-curve>
     </shape>
-  </block>
-  <block id="hole">
+  </tile>
+  <tile id="hole">
     <alias-char>0</alias-char> <!-- o -->
     <!-- default background: transparent -->
     <background>
@@ -82,8 +82,8 @@
         <implicit-curve>x*x - x + 0.25 + y*y - y + 0.25 - 0.25</implicit-curve>
       </not>
     </shape>
-  </block>
-  <block id="wall-solid">
+  </tile>
+  <tile id="wall-solid">
     <alias-char>┼</alias-char>
     <!-- default background: transparent -->
     <background>
@@ -98,13 +98,13 @@
     </foreground>
     <shape>
       <!--
-          solid block:
+          solid tile:
           - 1 ≤ 0
       -->
       <implicit-curve>-1</implicit-curve>
     </shape>
-  </block>
-  <block id="wall-rounded-upper-left">
+  </tile>
+  <tile id="wall-rounded-upper-left">
     <alias-char>╭</alias-char>
     <!-- default background: transparent -->
     <background>
@@ -126,8 +126,8 @@
 	<implicit-curve>x*x - 2*x + 1 + y*y - 2*y + 1 - 1</implicit-curve>
       </or>
     </shape>
-  </block>
-  <block id="wall-rounded-upper-right">
+  </tile>
+  <tile id="wall-rounded-upper-right">
     <alias-char>╮</alias-char>
     <!-- default background: transparent -->
     <background>
@@ -149,8 +149,8 @@
 	<implicit-curve>x*x + y*y - 2.0*y + 1.0 - 1.0</implicit-curve>
       </or>
     </shape>
-  </block>
-  <block id="wall-rounded-lower-left">
+  </tile>
+  <tile id="wall-rounded-lower-left">
     <alias-char>╰</alias-char>
     <!-- default background: transparent -->
     <background>
@@ -172,8 +172,8 @@
 	<implicit-curve>x*x - 2.0*x + 1.0 + y*y - 1.0</implicit-curve>
       </or>
     </shape>
-  </block>
-  <block id="wall-rounded-lower-right">
+  </tile>
+  <tile id="wall-rounded-lower-right">
     <alias-char>╯</alias-char>
     <!-- default background: transparent -->
     <background>
@@ -195,7 +195,7 @@
 	<implicit-curve>x*x + y*y - 1.0</implicit-curve>
       </or>
     </shape>
-  </block>
+  </tile>
   <field>
     <ignore>&#x09;</ignore>
     <ignore>&#x0a;</ignore>

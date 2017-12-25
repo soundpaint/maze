@@ -22,38 +22,38 @@
  * Author's web site: www.juergen-reuter.de
  */
 
-#ifndef MAZE_CONFIG_BLOCKS_STORE_HH
-#define MAZE_CONFIG_BLOCKS_STORE_HH
+#ifndef TILES_STORE_HH
+#define TILES_STORE_HH
 
 #include <unordered_map>
-#include <maze-config-block.hh>
+#include <tile.hh>
 #include <xml-string.hh>
 
-class Maze_config_blocks_store
+class Tiles_store
 {
 public:
-  Maze_config_blocks_store();
-  virtual ~Maze_config_blocks_store();
-  void add(Maze_config_block *block);
+  Tiles_store();
+  virtual ~Tiles_store();
+  void add(Tile *tile);
   const bool exists_id(const Xml_string *id) const;
   const bool exists_alias_char(const Xml_string *alias_char) const;
-  const Maze_config_block *lookup_by_id(const Xml_string *id) const;
-  const Maze_config_block *lookup_by_alias_char(const Xml_string *alias_char) const;
+  const Tile *lookup_by_id(const Xml_string *id) const;
+  const Tile *lookup_by_alias_char(const Xml_string *alias_char) const;
   void dump() const;
 private:
   typedef std::unordered_map<const Xml_string *,
-                             const Maze_config_block *,
+                             const Tile *,
                              Xml_string::hashing_functor,
                              Xml_string::equal_functor>
-  xml_string_to_block_t;
+  xml_string_to_tile_t;
 
-  static const xml_string_to_block_t::size_type BUCKET_COUNT = 5;
+  static const xml_string_to_tile_t::size_type BUCKET_COUNT = 5;
 
-  xml_string_to_block_t *_id_to_block;
-  xml_string_to_block_t *_alias_char_to_block;
+  xml_string_to_tile_t *_id_to_tile;
+  xml_string_to_tile_t *_alias_char_to_tile;
 };
 
-#endif /* MAZE_CONFIG_BLOCKS_STORE_HH */
+#endif /* TILES_STORE_HH */
 
 /*
  * Local variables:

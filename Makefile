@@ -39,9 +39,8 @@ MY_OBJ_FILES = \
   force-field.o fractals-factory.o implicit-curve.o \
   implicit-curve-compiler.o implicit-curve-ast.o implicit-curve-parser.o \
   implicit-curve-parser-token.o implicit-curve-tokenizer.o log.o \
-  maze-config.o maze-config-block.o maze-config-blocks-store.o point-3d.o \
-  sensors.o shape-expression.o sobel.o xml-document.o xml-string.o \
-  xml-utils.o \
+  maze-config.o point-3d.o sensors.o shape-expression.o sobel.o tile.o \
+  tiles-store.o xml-document.o xml-string.o xml-utils.o \
   $(MY_QT5_OBJ_FILES)
 
 LIB_OBJ_FILES =

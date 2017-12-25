@@ -35,10 +35,10 @@ Maze_config::Maze_config(const char *path) :
   _node_name_any(xercesc::XMLString::transcode("*")),
   _node_name_ignore(xercesc::XMLString::transcode("ignore")),
   _node_name_field(xercesc::XMLString::transcode("field")),
-  _node_name_block(xercesc::XMLString::transcode("block")),
+  _node_name_tile(xercesc::XMLString::transcode("tile")),
   _node_name_id(xercesc::XMLString::transcode("id"))
 {
-  _blocks = new Maze_config_blocks_store();
+  _tiles = new Tiles_store();
   Config::reload();
 }
 
@@ -46,14 +46,14 @@ Maze_config::~Maze_config()
 {
   // Q objects will be deleted by Qt, just set them to 0
 
-  delete _blocks;
-  _blocks = 0;
+  delete _tiles;
+  _tiles = 0;
   delete _field;
   _field = 0;
   xercesc::XMLString::release(&_node_name_any);
   _node_name_any = 0;
-  xercesc::XMLString::release(&_node_name_block);
-  _node_name_block = 0;
+  xercesc::XMLString::release(&_node_name_tile);
+  _node_name_tile = 0;
   xercesc::XMLString::release(&_node_name_id);
   _node_name_id = 0;
 }
@@ -73,7 +73,7 @@ Maze_config::reload(const xercesc::DOMElement *elem_config)
     get_single_child_element(elem_config, "background", true);
   reload_brush(elem_background, &_background);
 
-  reload_blocks(elem_config);
+  reload_tiles(elem_config);
   reload_field(elem_config);
   //fatal("config parsed"); // DEBUG
 }
@@ -252,8 +252,8 @@ Maze_config::load_field(const xercesc::DOMElement *elem_field)
     Xml_string str_ch(ch_star);
     auto search = chars.find(str_ch);
     if (search == chars.end()) {
-      if (!_blocks->exists_alias_char(&str_ch)) {
-        _blocks->dump();
+      if (!_tiles->exists_alias_char(&str_ch)) {
+        _tiles->dump();
         std::stringstream msg;
         char *ch_as_c_star = str_ch.transcode();
         msg << "in field contents: unresolved alias character: '" <<
@@ -262,8 +262,8 @@ Maze_config::load_field(const xercesc::DOMElement *elem_field)
         str_ch.release(&ch_as_c_star);
         fatal(msg.str());
       }
-      const Maze_config_block *block = _blocks->lookup_by_alias_char(&str_ch);
-      field.push_back(block);
+      const Tile *tile = _tiles->lookup_by_alias_char(&str_ch);
+      field.push_back(tile);
     } else {
       // ch is in set of characters to be ignored
     }
@@ -290,45 +290,45 @@ Maze_config::get_brush_field() const
 }
 
 void
-Maze_config::reload_blocks(const xercesc::DOMElement *elem_config)
+Maze_config::reload_tiles(const xercesc::DOMElement *elem_config)
 {
-  debug("'blocks('");
+  debug("'tiles('");
   const xercesc::DOMNodeList *node_list =
-    elem_config->getElementsByTagName(_node_name_block);
+    elem_config->getElementsByTagName(_node_name_tile);
   if (node_list) {
     const XMLSize_t length = node_list->getLength();
     for (uint32_t node_index = 0; node_index < length; node_index++) {
       xercesc::DOMNode *node = node_list->item(node_index);
-      xercesc::DOMElement *elem_block =
+      xercesc::DOMElement *elem_tile =
         dynamic_cast<xercesc::DOMElement *>(node);
-      if (!elem_block) {
+      if (!elem_tile) {
 	fatal("unexpected null element");
       }
-      Maze_config_block *block = load_block(elem_block);
-      _blocks->add(block);
+      Tile *tile = load_tile(elem_tile);
+      _tiles->add(tile);
     }
   } else {
-    // no blocks => nothing to parse
+    // no tiles => nothing to parse
   }
   debug("')'");
 }
 
-Maze_config_block *
-Maze_config::load_block(const xercesc::DOMElement *elem_block)
+Tile *
+Maze_config::load_tile(const xercesc::DOMElement *elem_tile)
 {
-  debug("'block('");
-  if (!elem_block) {
+  debug("'tile('");
+  if (!elem_tile) {
     fatal("unexpected null element");
   }
 
-  const XMLCh *attr_id = elem_block->getAttribute(_node_name_id);
+  const XMLCh *attr_id = elem_tile->getAttribute(_node_name_id);
   const Xml_string *str_id = new Xml_string(attr_id);
   if (!str_id) {
     fatal("not enough memory");
   }
 
   /*
-  const char *id = attr_id ? load_block_id(attr_id) : 0;
+  const char *id = attr_id ? load_tile_id(attr_id) : 0;
   {
     std::stringstream msg;
     msg << "id='" << id << "'";
@@ -337,9 +337,9 @@ Maze_config::load_block(const xercesc::DOMElement *elem_block)
   */
 
   const xercesc::DOMElement *elem_alias_char =
-    get_single_child_element(elem_block, "alias-char");
+    get_single_child_element(elem_tile, "alias-char");
   const Xml_string *alias_char =
-    elem_alias_char ? load_block_alias_char(elem_alias_char) : 0;
+    elem_alias_char ? load_tile_alias_char(elem_alias_char) : 0;
   /*
   {
     std::stringstream msg;
@@ -352,56 +352,56 @@ Maze_config::load_block(const xercesc::DOMElement *elem_block)
 
   QBrush foreground;
   const xercesc::DOMElement *elem_foreground =
-    get_single_child_element(elem_block, "foreground");
+    get_single_child_element(elem_tile, "foreground");
   if (elem_foreground) {
     reload_brush(elem_foreground, &foreground);
   } else {
     std::stringstream msg;
-    msg << "foreground on block '" << str_id <<
+    msg << "foreground on tile '" << str_id <<
       "': falling back to global foreground";
     fatal(msg.str());
   }
 
   QBrush background;
   const xercesc::DOMElement *elem_background =
-    get_single_child_element(elem_block, "background");
+    get_single_child_element(elem_tile, "background");
   if (elem_background) {
     reload_brush(elem_background, &background);
   } else {
     std::stringstream msg;
-    msg << "background on block '" << str_id <<
+    msg << "background on tile '" << str_id <<
       "': falling back to global background";
     fatal(msg.str());
     //background = _background; // may not yet be initialized
   }
 
   const xercesc::DOMElement *elem_shape =
-    get_single_child_element(elem_block, "shape", true);
+    get_single_child_element(elem_tile, "shape", true);
   if (!elem_shape) {
-    fatal("for now, block definition must contain shape definition");
+    fatal("for now, tile definition must contain shape definition");
   }
-  Shape_terms *terms = load_block_shape(elem_shape);
+  Shape_terms *terms = load_tile_shape(elem_shape);
 
   const double foreground_potential = 0.0; // TODO
   const double background_potential = 0.0; // TODO
 
-  Maze_config_block *block =
-    new Maze_config_block(str_id,
-                          alias_char,
-                          foreground, background,
-                          foreground_potential, background_potential,
-                          terms);
-  if (!block) {
+  Tile *tile =
+    new Tile(str_id,
+             alias_char,
+             foreground, background,
+             foreground_potential, background_potential,
+             terms);
+  if (!tile) {
     fatal("not enough memory");
   }
 
   debug("')'");
 
-  return block;
+  return tile;
 }
 
 const char *
-Maze_config::load_block_id(const XMLCh *attr_id)
+Maze_config::load_tile_id(const XMLCh *attr_id)
 {
   debug("'id('");
   if (!attr_id) {
@@ -420,7 +420,7 @@ Maze_config::load_block_id(const XMLCh *attr_id)
 }
 
 const Xml_string *
-Maze_config::load_block_alias_char(const xercesc::DOMElement *elem_alias_char)
+Maze_config::load_tile_alias_char(const xercesc::DOMElement *elem_alias_char)
 {
   debug("'alias_char('");
   if (!elem_alias_char) {
@@ -454,9 +454,9 @@ Maze_config::load_block_alias_char(const xercesc::DOMElement *elem_alias_char)
 }
 
 Shape_terms *
-Maze_config::load_block_shape(const xercesc::DOMElement *elem_shape)
+Maze_config::load_tile_shape(const xercesc::DOMElement *elem_shape)
 {
-  debug("'block-shape('");
+  debug("'tile-shape('");
   if (!elem_shape) {
     fatal("unexpected null element");
   }

@@ -22,75 +22,75 @@
  * Author's web site: www.juergen-reuter.de
  */
 
-#include <maze-config-blocks-store.hh>
+#include <tiles-store.hh>
 #include <log.hh>
 
-Maze_config_blocks_store::Maze_config_blocks_store()
+Tiles_store::Tiles_store()
 {
-  _id_to_block =
-    new xml_string_to_block_t(BUCKET_COUNT,
-                              Xml_string::hashing_functor(),
-                              Xml_string::equal_functor());
-  if (!_id_to_block) {
+  _id_to_tile =
+    new xml_string_to_tile_t(BUCKET_COUNT,
+                             Xml_string::hashing_functor(),
+                             Xml_string::equal_functor());
+  if (!_id_to_tile) {
     Log::fatal("not enough memory");
   }
 
-  _alias_char_to_block =
-    new xml_string_to_block_t(BUCKET_COUNT,
-                              Xml_string::hashing_functor(),
-                              Xml_string::equal_functor());
-  if (!_alias_char_to_block) {
+  _alias_char_to_tile =
+    new xml_string_to_tile_t(BUCKET_COUNT,
+                             Xml_string::hashing_functor(),
+                             Xml_string::equal_functor());
+  if (!_alias_char_to_tile) {
     Log::fatal("not enough memory");
   }
 }
 
-Maze_config_blocks_store::~Maze_config_blocks_store()
+Tiles_store::~Tiles_store()
 {
-  delete _id_to_block;
-  _id_to_block = 0;
-  delete _alias_char_to_block;
-  _alias_char_to_block = 0;
+  delete _id_to_tile;
+  _id_to_tile = 0;
+  delete _alias_char_to_tile;
+  _alias_char_to_tile = 0;
 }
 
 void
-Maze_config_blocks_store::add(Maze_config_block *block)
+Tiles_store::add(Tile *tile)
 {
-  if (!block) {
-    Log::fatal("unexpected null block");
+  if (!tile) {
+    Log::fatal("unexpected null tile");
   }
 
-  const Xml_string *id = block->get_id();
-  (*_id_to_block)[id] = block;
+  const Xml_string *id = tile->get_id();
+  (*_id_to_tile)[id] = tile;
 
-  const Xml_string *alias_char = block->get_alias_char();
-  (*_alias_char_to_block)[alias_char] = block;
+  const Xml_string *alias_char = tile->get_alias_char();
+  (*_alias_char_to_tile)[alias_char] = tile;
 }
 
 const bool
-Maze_config_blocks_store::exists_id(const Xml_string *id) const
+Tiles_store::exists_id(const Xml_string *id) const
 {
   if (!id) {
     Log::fatal("unexpected null id");
   }
   return
-    _id_to_block->count(id) > 0;
+    _id_to_tile->count(id) > 0;
 }
 
 const bool
-Maze_config_blocks_store::exists_alias_char(const Xml_string *alias_char) const
+Tiles_store::exists_alias_char(const Xml_string *alias_char) const
 {
   if (!alias_char) {
     Log::fatal("unexpected null alias_char");
   }
   return
-    _alias_char_to_block->count(alias_char) > 0;
+    _alias_char_to_tile->count(alias_char) > 0;
 }
 
 void
-Maze_config_blocks_store::dump() const
+Tiles_store::dump() const
 {
   for (std::pair<const Xml_string *,
-         const Maze_config_block *> element : *_id_to_block) {
+         const Tile *> element : *_id_to_tile) {
     char *id_as_c_star = element.first->transcode();
     const Xml_string *alias_char = element.second->get_alias_char();
     char *alias_char_as_c_star = alias_char->transcode();
@@ -101,22 +101,22 @@ Maze_config_blocks_store::dump() const
   }
 }
 
-const Maze_config_block *
-Maze_config_blocks_store::lookup_by_id(const Xml_string *id) const
+const Tile *
+Tiles_store::lookup_by_id(const Xml_string *id) const
 {
   if (!id) {
     Log::fatal("unexpected null id");
   }
-  return (*_id_to_block)[id];
+  return (*_id_to_tile)[id];
 }
 
-const Maze_config_block *
-Maze_config_blocks_store::lookup_by_alias_char(const Xml_string *alias_char) const
+const Tile *
+Tiles_store::lookup_by_alias_char(const Xml_string *alias_char) const
 {
   if (!alias_char) {
     Log::fatal("unexpected null alias_char");
   }
-  return (*_alias_char_to_block)[alias_char];
+  return (*_alias_char_to_tile)[alias_char];
 }
 
 /*

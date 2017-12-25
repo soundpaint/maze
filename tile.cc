@@ -22,17 +22,17 @@
  * Author's web site: www.juergen-reuter.de
  */
 
-#include <maze-config-block.hh>
+#include <tile.hh>
 #include <stdlib.h>
 #include <log.hh>
 
-Maze_config_block::Maze_config_block(const Xml_string *id,
-                                     const Xml_string *alias_char,
-                                     const QBrush foreground,
-                                     const QBrush background,
-                                     const double foreground_potential,
-                                     const double background_potential,
-                                     const Shape_terms *shape_expression) :
+Tile::Tile(const Xml_string *id,
+           const Xml_string *alias_char,
+           const QBrush foreground,
+           const QBrush background,
+           const double foreground_potential,
+           const double background_potential,
+           const Shape_terms *shape_expression) :
   _id(id),
   _alias_char(alias_char),
   _foreground(QBrush(foreground)),
@@ -49,7 +49,7 @@ Maze_config_block::Maze_config_block(const Xml_string *id,
   }
 }
 
-Maze_config_block::~Maze_config_block()
+Tile::~Tile()
 {
   //free(_id); // TODO
   _id = 0;
@@ -58,10 +58,10 @@ Maze_config_block::~Maze_config_block()
 }
 
 const std::string
-Maze_config_block::to_string() const
+Tile::to_string() const
 {
   std::stringstream str;
-  str << "Maze_config_block{";
+  str << "Tile{";
   str << "id=" << _id;
   str << ", alias_char=" << _alias_char;
   str << ", foreground=" << &_foreground;
@@ -74,7 +74,7 @@ Maze_config_block::to_string() const
 }
 
 const double
-Maze_config_block::get_potential(const double x, const double y) const
+Tile::get_potential(const double x, const double y) const
 {
   if (_shape_expression->is_inside(x, y)) {
     return _foreground_potential;
@@ -84,7 +84,7 @@ Maze_config_block::get_potential(const double x, const double y) const
 }
 
 const QBrush *
-Maze_config_block::get_brush(const double x, const double y) const
+Tile::get_brush(const double x, const double y) const
 {
   const QBrush *brush;
   if (_shape_expression->is_inside(x, y)) {
@@ -96,41 +96,41 @@ return brush;
 }
 
 const double
-Maze_config_block::get_avg_tan(const double block_offset_x,
-                               const double block_offset_y,
-                               const double dx,
-                               const double dy) const
+Tile::get_avg_tan(const double tile_offset_x,
+                  const double tile_offset_y,
+                  const double dx,
+                  const double dy) const
 {
   // TODO
   return 0.0;
 }
 
 const Xml_string *
-Maze_config_block::get_id() const
+Tile::get_id() const
 {
   return _id;
 }
 
 const Xml_string *
-Maze_config_block::get_alias_char() const
+Tile::get_alias_char() const
 {
   return _alias_char;
 }
 
 const QBrush
-Maze_config_block::get_foreground() const
+Tile::get_foreground() const
 {
   return _foreground;
 }
 
 const QBrush
-Maze_config_block::get_background() const
+Tile::get_background() const
 {
   return _background;
 }
 
 const Shape_terms *
-Maze_config_block::get_terms() const
+Tile::get_terms() const
 {
   return _shape_expression;
 }
