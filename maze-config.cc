@@ -229,7 +229,7 @@ Maze_config::load_field(const xercesc::DOMElement *elem_field)
   char *node_value_contents_as_c_star =
     xercesc::XMLString::transcode(node_value_contents);
 
-  std::vector<const IShape *> field;
+  std::vector<const Tile *> field;
   int elems = 0;
   for (XMLSize_t i = 0;
        i < xercesc::XMLString::stringLen(node_value_contents); i++) {

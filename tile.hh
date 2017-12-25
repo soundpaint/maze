@@ -28,10 +28,9 @@
 #include <xercesc/dom/DOM.hpp>
 #include <QtGui/QBrush>
 #include <xml-string.hh>
-#include <ishape.hh>
 #include <shape-expression.hh>
 
-class Tile : public IShape
+class Tile
 {
 public:
   Tile(const Xml_string *id,
@@ -42,13 +41,13 @@ public:
        const double background_potential,
        const Shape_terms *terms);
   virtual ~Tile();
-  virtual const std::string to_string() const;
-  virtual const double get_potential(const double x, const double y) const;
-  virtual const QBrush *get_brush(const double x, const double y) const;
-  virtual const double get_avg_tan(const double tile_offset_x,
-                                   const double tile_offset_y,
-                                   const double dx,
-                                   const double dy) const;
+  const std::string to_string() const;
+  const double get_potential(const double x, const double y) const;
+  const QBrush *get_brush(const double x, const double y) const;
+  const double get_avg_tan(const double tile_offset_x,
+                           const double tile_offset_y,
+                           const double dx,
+                           const double dy) const;
   const Xml_string *get_id() const;
   const Xml_string *get_alias_char() const;
   const QBrush get_foreground() const;

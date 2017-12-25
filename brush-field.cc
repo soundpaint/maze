@@ -27,7 +27,7 @@
 
 Brush_field::Brush_field(const uint16_t width,
                          const uint16_t height,
-                         const std::vector<const IShape *> field) :
+                         const std::vector<const Tile *> field) :
   _width(width),
   _height(height),
   _field(field)
@@ -46,8 +46,8 @@ Brush_field::to_string() const
       "width=" << _width <<
       ", height=" << _height <<
       ", field={\r\n";
-    for (const IShape *shape : _field) {
-      str << "  " << shape->to_string() << "\r\n";
+    for (const Tile *tile : _field) {
+      str << "  " << tile->to_string() << "\r\n";
     }
     str << "}}";
     return std::string(str.str());
@@ -65,10 +65,10 @@ Brush_field::get_height() const
   return _height;
 }
 
-const IShape *
-Brush_field::get_block(const double x, const double y,
-                       double * const block_offset_x,
-                       double * const block_offset_y) const
+const Tile *
+Brush_field::get_tile(const double x, const double y,
+                      double * const tile_offset_x,
+                      double * const tile_offset_y) const
 {
   if ((x < 0.0) || (x >= 1.0) || std::isnan(x) || std::isinf(x)) {
     std::stringstream msg;
@@ -84,58 +84,57 @@ Brush_field::get_block(const double x, const double y,
   }
   const double pos_x = x * _width;
   const double pos_y = y * _height;
-  const uint16_t block_index_x = (uint16_t)(pos_x);
-  const uint16_t block_index_y = (uint16_t)(pos_y);
-  const double __block_offset_x = pos_x - block_index_x;
-  const double __block_offset_y = pos_y - block_index_y;
-  if ((block_index_x < 0) || (block_index_x >= _width)) {
+  const uint16_t tile_index_x = (uint16_t)(pos_x);
+  const uint16_t tile_index_y = (uint16_t)(pos_y);
+  const double __tile_offset_x = pos_x - tile_index_x;
+  const double __tile_offset_y = pos_y - tile_index_y;
+  if ((tile_index_x < 0) || (tile_index_x >= _width)) {
     std::stringstream msg;
-    msg << "block_index_x=" << block_index_x;
+    msg << "tile_index_x=" << tile_index_x;
     Log::info(msg.str());
-    Log::fatal("Brush_field::get_block(): block index x out of range");
+    Log::fatal("Brush_field::get_tile(): tile index x out of range");
   }
-  if ((block_index_y < 0) || (block_index_y >= _height)) {
-    Log::fatal("Brush_field::get_block(): block index y out of range");
+  if ((tile_index_y < 0) || (tile_index_y >= _height)) {
+    Log::fatal("Brush_field::get_tile(): tile index y out of range");
   }
-  if ((__block_offset_x < 0.0) || (__block_offset_x >= 1.0)) {
-    Log::fatal("Brush_field::get_block(): block offset x out of range");
+  if ((__tile_offset_x < 0.0) || (__tile_offset_x >= 1.0)) {
+    Log::fatal("Brush_field::get_tile(): tile offset x out of range");
   }
-  if ((__block_offset_y < 0.0) || (__block_offset_y >= 1.0)) {
-    Log::fatal("Brush_field::get_block(): block offset y out of range");
+  if ((__tile_offset_y < 0.0) || (__tile_offset_y >= 1.0)) {
+    Log::fatal("Brush_field::get_tile(): tile offset y out of range");
   }
-  const IShape *block = _field[block_index_y * _width + block_index_x];
-  *block_offset_x = __block_offset_x;
-  *block_offset_y = __block_offset_y;
-  return block;
+  const Tile *tile = _field[tile_index_y * _width + tile_index_x];
+  *tile_offset_x = __tile_offset_x;
+  *tile_offset_y = __tile_offset_y;
+  return tile;
 }
 
 const QBrush *
 Brush_field::get_brush(const double x, const double y) const
 {
-  double block_offset_x;
-  double block_offset_y;
-  const IShape *block = get_block(x, y, &block_offset_x, &block_offset_y);
-  return block->get_brush(block_offset_x, block_offset_y);
+  double tile_offset_x;
+  double tile_offset_y;
+  const Tile *tile = get_tile(x, y, &tile_offset_x, &tile_offset_y);
+  return tile->get_brush(tile_offset_x, tile_offset_y);
 }
 
 const double
 Brush_field::get_potential(const double x, const double y) const
 {
-  double block_offset_x;
-  double block_offset_y;
-  const IShape *block = get_block(x, y, &block_offset_x, &block_offset_y);
-  return block->get_potential(block_offset_x, block_offset_y);
+  double tile_offset_x;
+  double tile_offset_y;
+  const Tile *tile = get_tile(x, y, &tile_offset_x, &tile_offset_y);
+  return tile->get_potential(tile_offset_x, tile_offset_y);
 }
 
 const double
 Brush_field::get_avg_tan(const double x0, const double y0,
                          const double dx, const double dy) const
 {
-  double block_offset_x;
-  double block_offset_y;
-  const IShape *block = get_block(x0, y0, &block_offset_x, &block_offset_y);
-  return block->get_avg_tan(block_offset_x, block_offset_y,
-			    dx, dy);
+  double tile_offset_x;
+  double tile_offset_y;
+  const Tile *tile = get_tile(x0, y0, &tile_offset_x, &tile_offset_y);
+  return tile->get_avg_tan(tile_offset_x, tile_offset_y, dx, dy);
 }
 
 const bool

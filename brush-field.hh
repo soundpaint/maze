@@ -30,14 +30,14 @@
 #include <inttypes.h>
 #include <QtGui/QPixmap>
 #include <QtGui/QBrush>
-#include <ishape.hh>
+#include <tile.hh>
 
 class Brush_field
 {
 public:
   Brush_field(const uint16_t width,
               const uint16_t height,
-              const std::vector<const IShape *> field);
+              const std::vector<const Tile *> field);
   virtual ~Brush_field();
   const std::string to_string() const;
   const uint16_t get_width() const;
@@ -51,10 +51,10 @@ public:
 private:
   const uint16_t _width;
   const uint16_t _height;
-  const std::vector<const IShape *> _field;
-  const IShape *get_block(const double x, const double y,
-			  double * const block_offset_x,
-			  double * const block_offset_y) const;
+  const std::vector<const Tile *> _field;
+  const Tile *get_tile(const double x, const double y,
+                       double * const tile_offset_x,
+                       double * const tile_offset_y) const;
 };
 
 #endif /* BRUSH_FIELD_HH */
