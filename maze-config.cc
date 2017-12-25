@@ -27,7 +27,6 @@
 #include <unistd.h>
 #include <inttypes.h>
 #include <log.hh>
-#include <shape.hh>
 
 #define CONFIG_SCHEMA_LOCATION "http://soundpaint.org/schema/maze-0.1/config.xsd"
 

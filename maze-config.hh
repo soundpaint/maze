@@ -33,7 +33,6 @@
 #include <maze-config-blocks-store.hh>
 #include <shape-expression.hh>
 #include <implicit-curve-compiler.hh>
-#include <shape.hh>
 #include <brush-field.hh>
 
 class Maze_config : Config
