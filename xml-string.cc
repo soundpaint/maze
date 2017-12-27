@@ -25,6 +25,13 @@
 #include <xml-string.hh>
 #include <log.hh>
 
+/*
+Xml_string::Xml_string() : Xml_string(0)
+{
+  Log::warn("creating empty Xml_string");
+}
+*/
+
 Xml_string::Xml_string(const Xml_string& other) :
   Xml_string(other._char_array, other._hash)
 {
@@ -48,9 +55,20 @@ Xml_string::~Xml_string()
   xercesc::XMLString::release(&no_const_char_array);
 }
 
+const XMLSize_t
+Xml_string::length() const
+{
+  return xercesc::XMLString::stringLen(_char_array);
+}
+
 const XMLCh *
 Xml_string::replicate_char_array(const XMLCh *char_array)
 {
+  /*
+  if (!char_array) {
+    return 0;
+  }
+  */
   const XMLCh *copy_of_char_array =
     xercesc::XMLString::replicate(char_array);
   if (!copy_of_char_array) {
@@ -62,6 +80,9 @@ Xml_string::replicate_char_array(const XMLCh *char_array)
 const std::size_t
 Xml_string::compute_hash(const XMLCh *char_array)
 {
+  if (!char_array) {
+    Log::fatal("unexpected null char_array");
+  }
   char *char_array_as_c_star =
     xercesc::XMLString::transcode(char_array);
   const std::string str_char_array(char_array_as_c_star);
@@ -83,6 +104,23 @@ Xml_string::equals(const Xml_string * const & a,
     return !(*a < *b) && !(*b < *a);
   }
 }
+
+/*
+Xml_string&
+Xml_string::copy(const Xml_string &other)
+{
+  (void) other;
+  return *this;
+}
+*/
+
+/*
+Xml_string&
+Xml_string::operator=(const Xml_string& other)
+{
+  return copy(other);
+}
+*/
 
 bool
 Xml_string::operator<(const Xml_string& other) const

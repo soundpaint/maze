@@ -22,10 +22,10 @@
  * Author's web site: www.juergen-reuter.de
  */
 
-#include <tiles-store.hh>
+#include <tile-symbols.hh>
 #include <log.hh>
 
-Tiles_store::Tiles_store()
+Tile_symbols::Tile_symbols()
 {
   _id_to_tile =
     new xml_string_to_tile_t(BUCKET_COUNT,
@@ -34,40 +34,37 @@ Tiles_store::Tiles_store()
   if (!_id_to_tile) {
     Log::fatal("not enough memory");
   }
-
-  _alias_char_to_tile =
-    new xml_string_to_tile_t(BUCKET_COUNT,
-                             Xml_string::hashing_functor(),
-                             Xml_string::equal_functor());
-  if (!_alias_char_to_tile) {
-    Log::fatal("not enough memory");
-  }
 }
 
-Tiles_store::~Tiles_store()
+Tile_symbols::~Tile_symbols()
 {
   delete _id_to_tile;
   _id_to_tile = 0;
-  delete _alias_char_to_tile;
-  _alias_char_to_tile = 0;
 }
 
 void
-Tiles_store::add(Tile *tile)
+Tile_symbols::add(const Xml_string *id, const Tile *tile)
 {
+  if (!id) {
+    Log::fatal("unexpected null id");
+  }
   if (!tile) {
     Log::fatal("unexpected null tile");
   }
 
-  const Xml_string *id = tile->get_id();
-  (*_id_to_tile)[id] = tile;
+  if (exists(id)) {
+    std::stringstream msg;
+    char *str_id = id->transcode();
+    msg << "already have tile with id=" << str_id  << " in symbol table";
+    id->release(&str_id);
+    Log::fatal(msg.str());
+  }
 
-  const Xml_string *alias_char = tile->get_alias_char();
-  (*_alias_char_to_tile)[alias_char] = tile;
+  (*_id_to_tile)[id] = tile;
 }
 
 const bool
-Tiles_store::exists_id(const Xml_string *id) const
+Tile_symbols::exists(const Xml_string *id) const
 {
   if (!id) {
     Log::fatal("unexpected null id");
@@ -76,33 +73,8 @@ Tiles_store::exists_id(const Xml_string *id) const
     _id_to_tile->count(id) > 0;
 }
 
-const bool
-Tiles_store::exists_alias_char(const Xml_string *alias_char) const
-{
-  if (!alias_char) {
-    Log::fatal("unexpected null alias_char");
-  }
-  return
-    _alias_char_to_tile->count(alias_char) > 0;
-}
-
-void
-Tiles_store::dump() const
-{
-  for (std::pair<const Xml_string *,
-         const Tile *> element : *_id_to_tile) {
-    char *id_as_c_star = element.first->transcode();
-    const Xml_string *alias_char = element.second->get_alias_char();
-    char *alias_char_as_c_star = alias_char->transcode();
-    std::cout << "'" << id_as_c_star << "' => '" <<
-      alias_char_as_c_star << "'" << std::endl;
-    alias_char->release(&id_as_c_star);
-    alias_char->release(&alias_char_as_c_star);
-  }
-}
-
 const Tile *
-Tiles_store::lookup_by_id(const Xml_string *id) const
+Tile_symbols::lookup(const Xml_string *id) const
 {
   if (!id) {
     Log::fatal("unexpected null id");
@@ -110,13 +82,14 @@ Tiles_store::lookup_by_id(const Xml_string *id) const
   return (*_id_to_tile)[id];
 }
 
-const Tile *
-Tiles_store::lookup_by_alias_char(const Xml_string *alias_char) const
+void
+Tile_symbols::dump() const
 {
-  if (!alias_char) {
-    Log::fatal("unexpected null alias_char");
+  for (std::pair<const Xml_string *, const Tile *> element : *_id_to_tile) {
+    char *id_as_c_star = element.first->transcode();
+    std::cout << "'" << id_as_c_star << std::endl;
+    element.first->release(&id_as_c_star);
   }
-  return (*_alias_char_to_tile)[alias_char];
 }
 
 /*

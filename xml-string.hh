@@ -31,10 +31,13 @@
 class Xml_string
 {
 public:
+  //Xml_string();
   Xml_string(const Xml_string& other);
   Xml_string(const XMLCh *char_array);
   Xml_string(const XMLCh *char_array, const std::size_t hash);
   virtual ~Xml_string();
+  const XMLSize_t length() const;
+  //Xml_string& operator=(const Xml_string& other);
   bool operator <(const Xml_string& other) const;
   bool operator ==(const Xml_string& other) const;
   std::size_t hash() const;
@@ -65,6 +68,7 @@ private:
   const std::size_t _hash;
   static const XMLCh *replicate_char_array(const XMLCh *char_array);
   static const std::size_t compute_hash(const XMLCh *char_array);
+  //Xml_string& copy(const Xml_string &other);
 };
 
 struct Xml_string_star_hash

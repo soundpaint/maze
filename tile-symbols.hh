@@ -22,23 +22,21 @@
  * Author's web site: www.juergen-reuter.de
  */
 
-#ifndef TILES_STORE_HH
-#define TILES_STORE_HH
+#ifndef TILE_SYMBOLS_HH
+#define TILE_SYMBOLS_HH
 
 #include <unordered_map>
 #include <tile.hh>
 #include <xml-string.hh>
 
-class Tiles_store
+class Tile_symbols
 {
 public:
-  Tiles_store();
-  virtual ~Tiles_store();
-  void add(Tile *tile);
-  const bool exists_id(const Xml_string *id) const;
-  const bool exists_alias_char(const Xml_string *alias_char) const;
-  const Tile *lookup_by_id(const Xml_string *id) const;
-  const Tile *lookup_by_alias_char(const Xml_string *alias_char) const;
+  Tile_symbols();
+  virtual ~Tile_symbols();
+  void add(const Xml_string *id, const Tile *tile);
+  const bool exists(const Xml_string *id) const;
+  const Tile *lookup(const Xml_string *id) const;
   void dump() const;
 private:
   typedef std::unordered_map<const Xml_string *,
@@ -46,14 +44,11 @@ private:
                              Xml_string::hashing_functor,
                              Xml_string::equal_functor>
   xml_string_to_tile_t;
-
   static const xml_string_to_tile_t::size_type BUCKET_COUNT = 5;
-
   xml_string_to_tile_t *_id_to_tile;
-  xml_string_to_tile_t *_alias_char_to_tile;
 };
 
-#endif /* TILES_STORE_HH */
+#endif /* TILE_SYMBOLS_HH */
 
 /*
  * Local variables:

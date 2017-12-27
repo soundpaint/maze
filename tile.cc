@@ -27,14 +27,12 @@
 #include <log.hh>
 
 Tile::Tile(const Xml_string *id,
-           const Xml_string *alias_char,
            const QBrush foreground,
            const QBrush background,
            const double foreground_potential,
            const double background_potential,
            const Shape_terms *shape_expression) :
   _id(id),
-  _alias_char(alias_char),
   _foreground(QBrush(foreground)),
   _background(QBrush(background)),
   _foreground_potential(foreground_potential),
@@ -63,7 +61,6 @@ Tile::to_string() const
   std::stringstream str;
   str << "Tile{";
   str << "id=" << _id;
-  str << ", alias_char=" << _alias_char;
   str << ", foreground=" << &_foreground;
   str << ", background=" << &_background;
   str << ", foreground_potential=" << _foreground_potential;
@@ -109,12 +106,6 @@ const Xml_string *
 Tile::get_id() const
 {
   return _id;
-}
-
-const Xml_string *
-Tile::get_alias_char() const
-{
-  return _alias_char;
 }
 
 const QBrush

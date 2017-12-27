@@ -74,7 +74,7 @@ Force_field::load_field(const uint16_t x, const uint16_t y,
     const double r = sobel->get_edge_magnitude(x, y);
     if ((r < 0.0) || (r > 1.0)) {
       std::stringstream msg;
-      msg << "r=" << r << "\r\n";
+      msg << "r=" << r << std::endl;
       Log::info(msg.str());
       Log::fatal("Force_field::load_field(): edge magnitude out of range");
     }

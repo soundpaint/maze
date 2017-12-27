@@ -18,7 +18,6 @@
     </pixmap>
   </background>
   <tile id="corridor">
-    <alias-char>╳</alias-char>
     <!-- default background: transparent -->
     <background>
       <pixmap>
@@ -40,7 +39,6 @@
     </shape>
   </tile>
   <tile id="circle">
-    <alias-char>o</alias-char>
     <!-- default background: transparent -->
     <background>
       <pixmap>
@@ -61,7 +59,6 @@
     </shape>
   </tile>
   <tile id="hole">
-    <alias-char>0</alias-char> <!-- o -->
     <!-- default background: transparent -->
     <background>
       <pixmap>
@@ -82,7 +79,6 @@
     </shape>
   </tile>
   <tile id="wall-solid">
-    <alias-char>┼</alias-char>
     <!-- default background: transparent -->
     <background>
       <pixmap>
@@ -103,7 +99,6 @@
     </shape>
   </tile>
   <tile id="wall-rounded-upper-left">
-    <alias-char>╭</alias-char>
     <!-- default background: transparent -->
     <background>
       <pixmap>
@@ -124,7 +119,6 @@
     </shape>
   </tile>
   <tile id="wall-rounded-upper-right">
-    <alias-char>╮</alias-char>
     <!-- default background: transparent -->
     <background>
       <pixmap>
@@ -145,7 +139,6 @@
     </shape>
   </tile>
   <tile id="wall-rounded-lower-left">
-    <alias-char>╰</alias-char>
     <!-- default background: transparent -->
     <background>
       <pixmap>
@@ -166,7 +159,6 @@
     </shape>
   </tile>
   <tile id="wall-rounded-lower-right">
-    <alias-char>╯</alias-char>
     <!-- default background: transparent -->
     <background>
       <pixmap>
@@ -191,6 +183,14 @@
     <ignore>&#x0a;</ignore>
     <ignore>&#x0d;</ignore>
     <ignore>&#x20;</ignore>
+    <tile-shortcut id="╭" ref="wall-rounded-upper-left" />
+    <tile-shortcut id="╰" ref="wall-rounded-lower-left" />
+    <tile-shortcut id="╮" ref="wall-rounded-upper-right" />
+    <tile-shortcut id="╯" ref="wall-rounded-lower-right" />
+    <tile-shortcut id="┼" ref="wall-solid" />
+    <tile-shortcut id="╳" ref="corridor" />
+    <tile-shortcut id="o" ref="circle" />
+    <tile-shortcut id="0" ref="hole" />
     <columns>16</columns>
     <rows>16</rows>
     <contents>

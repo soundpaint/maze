@@ -35,7 +35,7 @@ void
 Log::fatal(const std::string msg)
 {
   pthread_mutex_lock(&_serialize_lock);
-  std::cerr << "[fatal] " << msg << "\r\n" << std::flush;
+  std::cerr << "[fatal] " << msg << std::endl << std::flush;
   pthread_mutex_unlock(&_serialize_lock);
   //exit(EXIT_FAILURE);
   throw 20;
@@ -45,7 +45,7 @@ void
 Log::error(const std::string msg)
 {
   pthread_mutex_lock(&_serialize_lock);
-  std::cerr << "[error] " << msg << "\r\n" << std::flush;
+  std::cerr << "[error] " << msg << std::endl << std::flush;
   pthread_mutex_unlock(&_serialize_lock);
 }
 
@@ -53,7 +53,7 @@ void
 Log::warn(const std::string msg)
 {
   pthread_mutex_lock(&_serialize_lock);
-  std::cerr << "[warn] " << msg << "\r\n" << std::flush;
+  std::cerr << "[warn] " << msg << std::endl << std::flush;
   pthread_mutex_unlock(&_serialize_lock);
 }
 
@@ -79,7 +79,7 @@ void
 Log::debug(const std::string msg)
 {
   pthread_mutex_lock(&_serialize_lock);
-  std::cout << "[debug] " << msg << "\r\n" << std::flush;
+  std::cout << "[debug] " << msg << std::endl << std::flush;
   pthread_mutex_unlock(&_serialize_lock);
 }
 

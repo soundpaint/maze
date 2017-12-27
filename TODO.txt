@@ -1,21 +1,17 @@
-* <alias-char> not beneath <block>, but beneath <field> with reference
-  to block id:
-
-  <field>
-    <alias-char ref="wall-rounded-lower-right">J</alias-char>
-    ...
-  </field>
-
 * Make it possible to define shapes outside of blocks, such that the
   same shape can be referenced from multiple blocks (with display
   offsets x and y), rather than having to redefine the shape over and
   over again.  Useful for shapes that are that large that they cover
   multiple blocks.
-
 * Make global <background> work as fall-back when no <background> is
   specified in a block.  Same for <foreground>.
 * Extend supported implicit curve syntax, e.g. expressions like:
   (x + y)² - 1
+* Turn config compiler from current one-pass technique into a true
+  muli-pass compiler with AST based visitor pattern for reference
+  resolution.  Benefit: Get rid of the current limitation that
+  references may only refer to delcrations that have already been
+  passed.
 * Optimize shape expressions in terms of evaluation performance cost.
   Obvious optimization is elimination of duplicate negations:
   not(not(x)) = x.  Note that conjuctive / disjunctive normal form
@@ -35,9 +31,3 @@
 * Support multiple levels.
 * Support multiple games.
 * Create fast booting framework, maybe something similar to BerryBoot.
-
-Done:
-* Complete 1st version of collision detection.
-* Let ball geometry support left/right and up/down extension.
-* Fix memory leaks when using Point_3D.
-* Consider geometry of balls.

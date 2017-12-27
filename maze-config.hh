@@ -30,7 +30,7 @@
 #include <QtGui/QBrush>
 #include <config.hh>
 #include <xml-string.hh>
-#include <tiles-store.hh>
+#include <tile-symbols.hh>
 #include <shape-expression.hh>
 #include <implicit-curve-compiler.hh>
 #include <brush-field.hh>
@@ -45,14 +45,23 @@ protected:
   virtual void reload(const xercesc::DOMElement *elem_config);
   virtual void print_config();
 private:
-  XMLCh *_node_name_any;
-  XMLCh *_node_name_ignore;
-  XMLCh *_node_name_field;
-  XMLCh *_node_name_tile;
-  XMLCh *_node_name_id;
+  typedef std::unordered_map<const Xml_string *,
+                             const Xml_string *,
+                             Xml_string::hashing_functor,
+                             Xml_string::equal_functor>
+  xml_string_to_xml_string_t;
+  static const xml_string_to_xml_string_t::size_type BUCKET_COUNT = 5;
+
+  const XMLCh *_node_name_any;
+  const XMLCh *_node_name_id;
+  const XMLCh *_node_name_ignore;
+  const XMLCh *_node_name_field;
+  const XMLCh *_node_name_ref;
+  const XMLCh *_node_name_tile;
+  const XMLCh *_node_name_tile_shortcut;
+  Tile_symbols *_tiles;
   QBrush _background;
   Implicit_curve_compiler _implicit_curve_compiler;
-  Tiles_store *_tiles;
   Brush_field *_field;
   void reload_brush(const xercesc::DOMElement *elem_background,
 		    QBrush *background);
@@ -60,11 +69,17 @@ private:
   void reload_field(const xercesc::DOMElement *elem_config);
   static const size_t text_content_as_size_t(const xercesc::DOMElement *elem);
   void load_field_ignore_chars(const xercesc::DOMElement *elem_field,
-                               std::set<Xml_string> *chars) const;
+                               std::set<Xml_string> *ignore_chars) const;
+  void load_field_tile_shortcuts(const xercesc::DOMElement *elem_field,
+                                 xml_string_to_xml_string_t *shortcuts);
+  Brush_field *
+  load_field_contents(const xercesc::DOMElement *elem_contents,
+                      const size_t width, const size_t height,
+                      std::set<Xml_string> *ignore_chars,
+                      xml_string_to_xml_string_t *shortcuts);
   void load_field(const xercesc::DOMElement *elem_field);
-  Tile *load_tile(const xercesc::DOMElement *elem_tile);
+  const Tile *load_tile(const xercesc::DOMElement *elem_tile);
   const char *load_tile_id(const XMLCh *attr_id);
-  const Xml_string *load_tile_alias_char(const xercesc::DOMElement *elem_alias_char);
   Shape_terms *load_tile_shape(const xercesc::DOMElement *elem_shape);
   Shape_terms *load_shape_expression(const xercesc::DOMElement *elem_expression);
   Shape_factors *load_shape_term(const xercesc::DOMElement *elem_term);

@@ -33,12 +33,14 @@
 Maze_config::Maze_config(const char *path) :
   Config(path),
   _node_name_any(xercesc::XMLString::transcode("*")),
+  _node_name_id(xercesc::XMLString::transcode("id")),
   _node_name_ignore(xercesc::XMLString::transcode("ignore")),
   _node_name_field(xercesc::XMLString::transcode("field")),
+  _node_name_ref(xercesc::XMLString::transcode("ref")),
   _node_name_tile(xercesc::XMLString::transcode("tile")),
-  _node_name_id(xercesc::XMLString::transcode("id"))
+  _node_name_tile_shortcut(xercesc::XMLString::transcode("tile-shortcut")),
+  _tiles(new Tile_symbols())
 {
-  _tiles = new Tiles_store();
   Config::reload();
 }
 
@@ -50,12 +52,34 @@ Maze_config::~Maze_config()
   _tiles = 0;
   delete _field;
   _field = 0;
-  xercesc::XMLString::release(&_node_name_any);
+
+  XMLCh *node_name_any = (XMLCh *)_node_name_any;
+  xercesc::XMLString::release(&node_name_any);
   _node_name_any = 0;
-  xercesc::XMLString::release(&_node_name_tile);
-  _node_name_tile = 0;
-  xercesc::XMLString::release(&_node_name_id);
+
+  XMLCh *node_name_id = (XMLCh *)_node_name_id;
+  xercesc::XMLString::release(&node_name_id);
   _node_name_id = 0;
+
+  XMLCh *node_name_ignore = (XMLCh *)_node_name_ignore;
+  xercesc::XMLString::release(&node_name_ignore);
+  _node_name_ignore = 0;
+
+  XMLCh *node_name_field = (XMLCh *)_node_name_field;
+  xercesc::XMLString::release(&node_name_field);
+  _node_name_field = 0;
+
+  XMLCh *node_name_ref = (XMLCh *)_node_name_ref;
+  xercesc::XMLString::release(&node_name_ref);
+  _node_name_ref = 0;
+
+  XMLCh *node_name_tile = (XMLCh *)_node_name_tile;
+  xercesc::XMLString::release(&node_name_tile);
+  _node_name_tile = 0;
+
+  XMLCh *node_name_tile_shortcut = (XMLCh *)_node_name_tile_shortcut;
+  xercesc::XMLString::release(&node_name_tile_shortcut);
+  _node_name_tile_shortcut = 0;
 }
 
 void
@@ -108,8 +132,6 @@ Maze_config::reload_brush(const xercesc::DOMElement *elem_background,
 void
 Maze_config::reload_field(const xercesc::DOMElement *elem_config)
 {
-  debug("'field('");
-  debug("')'");
   const xercesc::DOMNodeList *node_list =
     elem_config->getElementsByTagName(_node_name_field);
   if (node_list) {
@@ -176,25 +198,25 @@ Maze_config::load_field_ignore_chars(const xercesc::DOMElement *elem_field,
 	fatal("unexpected null element");
       }
       const XMLCh *node_value_ignore = elem_ignore->getTextContent();
-      char *node_value_ignore_as_c_star =
-        xercesc::XMLString::transcode(node_value_ignore);
-      if (xercesc::XMLString::stringLen(node_value_ignore) != 1) {
+      const Xml_string str_ignore(node_value_ignore);
+      char *node_value_ignore_as_c_star = str_ignore.transcode();
+      if (str_ignore.length() != 1) {
         std::stringstream msg;
         msg << "in text value of node '" << elem_ignore->getNodeName() <<
           "': ignore value must have exactly 1 character, but has " <<
-          xercesc::XMLString::stringLen(node_value_ignore_as_c_star) <<
-          " characters: '" << node_value_ignore_as_c_star << "'";
+          str_ignore.length() << " characters: '" <<
+          node_value_ignore_as_c_star << "'";
+        xercesc::XMLString::release(&node_value_ignore_as_c_star);
         fatal(msg.str());
       }
-      chars->insert(Xml_string(node_value_ignore));
+      chars->insert(str_ignore);
       xercesc::XMLString::release(&node_value_ignore_as_c_star);
-      node_value_ignore_as_c_star = 0;
     }
     std::stringstream msg;
-    msg << "found brush field ignore characters:\r\n";
+    msg << "found brush field ignore characters:" << std::endl;
     for (const Xml_string &str_ch : *chars) {
       char *str_ch_as_c_star = str_ch.transcode();
-      msg << "'" << str_ch_as_c_star << "'\r\n";
+      msg << "ignore character '" << str_ch_as_c_star << "'" << std::endl;
       str_ch.release(&str_ch_as_c_star);
     }
     debug(msg.str());
@@ -204,27 +226,84 @@ Maze_config::load_field_ignore_chars(const xercesc::DOMElement *elem_field,
 }
 
 void
-Maze_config::load_field(const xercesc::DOMElement *elem_field)
+Maze_config::load_field_tile_shortcuts(const xercesc::DOMElement *elem_field,
+                                       xml_string_to_xml_string_t *shortcuts)
 {
-  const xercesc::DOMElement *elem_columns =
-    get_single_child_element(elem_field, "columns", true);
-  const size_t width = text_content_as_size_t(elem_columns);
+  const xercesc::DOMNodeList *node_list =
+    elem_field->getElementsByTagName(_node_name_tile_shortcut);
+  if (node_list) {
+    const XMLSize_t length = node_list->getLength();
+    for (uint32_t node_index = 0; node_index < length; node_index++) {
+      xercesc::DOMNode *node = node_list->item(node_index);
+      xercesc::DOMElement *elem_tile_shortcut =
+        dynamic_cast<xercesc::DOMElement *>(node);
+      if (!elem_tile_shortcut) {
+	fatal("unexpected null element");
+      }
 
-  const xercesc::DOMElement *elem_rows =
-    get_single_child_element(elem_field, "rows", true);
-  const size_t height = text_content_as_size_t(elem_rows);
+      const XMLCh *attr_id = elem_tile_shortcut->getAttribute(_node_name_id);
+      const Xml_string *str_id = new Xml_string(attr_id);
+      if (!str_id) {
+        fatal("not enough memory");
+      }
+      char *attr_value_id_as_c_star = str_id->transcode();
+      if (str_id->length() != 1) {
+        std::stringstream msg;
+        msg << "in tile-shortcut node '" << elem_tile_shortcut->getNodeName() <<
+          "': 'id' attribute value must have exactly 1 character, but has " <<
+          str_id->length() << " characters: '" <<
+          attr_value_id_as_c_star << "'";
+        xercesc::XMLString::release(&attr_value_id_as_c_star);
+        fatal(msg.str());
+      }
+      {
+        std::stringstream msg;
+        msg << "found shortcut: '" << attr_value_id_as_c_star << "'";
+        debug(msg.str());
+      }
 
-  std::set<Xml_string> chars;
-  load_field_ignore_chars(elem_field, &chars);
+      if (shortcuts->count(str_id) > 0) {
+        std::stringstream msg;
+        msg << "in node '" << elem_tile_shortcut->getNodeName() <<
+          "': multiple declarations of shortcut with id='" <<
+          attr_value_id_as_c_star << "'";
+        xercesc::XMLString::release(&attr_value_id_as_c_star);
+        fatal(msg.str());
+      }
+      xercesc::XMLString::release(&attr_value_id_as_c_star);
 
-  {
-    std::stringstream msg;
-    msg << "building playing field [" << width << "×" << height << "]";
-    debug(msg.str());
+      const XMLCh *attr_ref = elem_tile_shortcut->getAttribute(_node_name_ref);
+      const Xml_string *str_ref = new Xml_string(attr_ref);
+      if (!str_ref) {
+        fatal("not enough memory");
+      }
+      (*shortcuts)[str_id] = str_ref;
+    }
+    {
+      std::stringstream msg;
+      msg << "found tile shortcuts:" << std::endl;
+      for (const auto& entry : *shortcuts) {
+        const Xml_string *id = entry.first;
+        const Xml_string *ref = entry.second;
+        char *str_id = id->transcode();
+        char *str_ref = ref->transcode();
+        msg << "'" << str_id << "' => '" << str_ref << "'" << std::endl;
+        id->release(&str_id);
+        ref->release(&str_id);
+      }
+      debug(msg.str());
+    }
+  } else {
+    Log::warn("no tile shortcut found");
   }
+}
 
-  const xercesc::DOMElement *elem_contents =
-    get_single_child_element(elem_field, "contents", true);
+Brush_field *
+Maze_config::load_field_contents(const xercesc::DOMElement *elem_contents,
+                                 const size_t width, const size_t height,
+                                 std::set<Xml_string> *ignore_chars,
+                                 xml_string_to_xml_string_t *shortcuts)
+{
   const XMLCh *node_value_contents = elem_contents->getTextContent();
   char *node_value_contents_as_c_star =
     xercesc::XMLString::transcode(node_value_contents);
@@ -233,39 +312,35 @@ Maze_config::load_field(const xercesc::DOMElement *elem_field)
   int elems = 0;
   for (XMLSize_t i = 0;
        i < xercesc::XMLString::stringLen(node_value_contents); i++) {
-    XMLCh ch = node_value_contents[i];
-    XMLCh ch_star[2] = { ch, 0 };
+    XMLCh alias_id = node_value_contents[i];
+    XMLCh alias_id_star[2] = { alias_id, 0 };
 
-    // DEBUG:
-    /*
-    {
-      char *ch_as_c_star = xercesc::XMLString::transcode(ch_star);
-      std::stringstream msg;
-      msg << "pos " << i << ": '" << ch_as_c_star << "'";
-      xercesc::XMLString::release(&ch_as_c_star);
-      debug(msg.str());
-    }
-    */
-
-    //chars.begin();
-
-    Xml_string str_ch(ch_star);
-    auto search = chars.find(str_ch);
-    if (search == chars.end()) {
-      if (!_tiles->exists_alias_char(&str_ch)) {
-        _tiles->dump();
+    const Xml_string str_alias_id(alias_id_star);
+    const auto search = ignore_chars->find(str_alias_id);
+    if (search == ignore_chars->end()) {
+      if (shortcuts->count(&str_alias_id) <= 0) {
         std::stringstream msg;
-        char *ch_as_c_star = str_ch.transcode();
+        char *alias_id_as_c_star = str_alias_id.transcode();
         msg << "in field contents: unresolved alias character: '" <<
-          ch_as_c_star << "' at position " << i << "; contents:\r\n" <<
-          node_value_contents_as_c_star << "\r\n";
-        str_ch.release(&ch_as_c_star);
+          alias_id_as_c_star << "' at position " << i << "; contents:" <<
+          std::endl << node_value_contents_as_c_star << std::endl;
+        str_alias_id.release(&alias_id_as_c_star);
         fatal(msg.str());
       }
-      const Tile *tile = _tiles->lookup_by_alias_char(&str_ch);
+      const Xml_string *str_tile_id = (*shortcuts)[&str_alias_id];
+      if (_tiles->exists(str_tile_id) <= 0) {
+        std::stringstream msg;
+        char *tile_id_as_c_star = str_tile_id->transcode();
+        msg << "in field contents: unresolved tile id: '" <<
+          tile_id_as_c_star << "' at position " << i << "; contents:" <<
+          std::endl << node_value_contents_as_c_star << std::endl;
+        str_tile_id->release(&tile_id_as_c_star);
+        fatal(msg.str());
+      }
+      const Tile *tile = _tiles->lookup(str_tile_id);
       field.push_back(tile);
     } else {
-      // ch is in set of characters to be ignored
+      // alias_id is in set of characters to be ignored
     }
   }
   if (field.size() != (width * height)) {
@@ -280,7 +355,46 @@ Maze_config::load_field(const xercesc::DOMElement *elem_field)
   xercesc::XMLString::release(&node_value_contents_as_c_star);
   node_value_contents_as_c_star = 0;
 
-  _field = new Brush_field(width, height, field);
+  Brush_field *brush_field = new Brush_field(width, height, field);
+  if (!brush_field) {
+    fatal("not enough memory");
+  }
+  return brush_field;
+}
+
+void
+Maze_config::load_field(const xercesc::DOMElement *elem_field)
+{
+  debug("'field('");
+  const xercesc::DOMElement *elem_columns =
+    get_single_child_element(elem_field, "columns", true);
+  const size_t width = text_content_as_size_t(elem_columns);
+
+  const xercesc::DOMElement *elem_rows =
+    get_single_child_element(elem_field, "rows", true);
+  const size_t height = text_content_as_size_t(elem_rows);
+
+  std::set<Xml_string> ignore_chars;
+  load_field_ignore_chars(elem_field, &ignore_chars);
+
+  xml_string_to_xml_string_t shortcuts(BUCKET_COUNT,
+                                       Xml_string::hashing_functor(),
+                                       Xml_string::equal_functor());
+  load_field_tile_shortcuts(elem_field, &shortcuts);
+
+  {
+    std::stringstream msg;
+    msg << "building playing field [" << width << "×" << height << "]";
+    debug(msg.str());
+  }
+
+  const xercesc::DOMElement *elem_contents =
+    get_single_child_element(elem_field, "contents", true);
+  _field =
+    load_field_contents(elem_contents, width, height,
+                        &ignore_chars, &shortcuts);
+
+  debug("')'");
 }
 
 const Brush_field *
@@ -304,8 +418,9 @@ Maze_config::reload_tiles(const xercesc::DOMElement *elem_config)
       if (!elem_tile) {
 	fatal("unexpected null element");
       }
-      Tile *tile = load_tile(elem_tile);
-      _tiles->add(tile);
+      const Tile *tile = load_tile(elem_tile);
+      const Xml_string *id = tile->get_id();
+      _tiles->add(id, tile);
     }
   } else {
     // no tiles => nothing to parse
@@ -313,7 +428,7 @@ Maze_config::reload_tiles(const xercesc::DOMElement *elem_config)
   debug("')'");
 }
 
-Tile *
+const Tile *
 Maze_config::load_tile(const xercesc::DOMElement *elem_tile)
 {
   debug("'tile('");
@@ -332,20 +447,6 @@ Maze_config::load_tile(const xercesc::DOMElement *elem_tile)
   {
     std::stringstream msg;
     msg << "id='" << id << "'";
-    debug(msg.str());
-  }
-  */
-
-  const xercesc::DOMElement *elem_alias_char =
-    get_single_child_element(elem_tile, "alias-char");
-  const Xml_string *alias_char =
-    elem_alias_char ? load_tile_alias_char(elem_alias_char) : 0;
-  /*
-  {
-    std::stringstream msg;
-    char *alias_char_as_c_star = xercesc::XMLString::transcode(&alias_char);
-    msg << "alias char='" << alias_char_as_c_star;
-    xercesc::XMLString::release(&alias_char_as_c_star);
     debug(msg.str());
   }
   */
@@ -387,7 +488,6 @@ Maze_config::load_tile(const xercesc::DOMElement *elem_tile)
 
   Tile *tile =
     new Tile(str_id,
-             alias_char,
              foreground, background,
              foreground_potential, background_potential,
              terms);
@@ -417,40 +517,6 @@ Maze_config::load_tile_id(const XMLCh *attr_id)
   debug(id);
   debug("')'");
   return id;
-}
-
-const Xml_string *
-Maze_config::load_tile_alias_char(const xercesc::DOMElement *elem_alias_char)
-{
-  debug("'alias_char('");
-  if (!elem_alias_char) {
-    fatal("unexpected null element");
-  }
-  const XMLCh *node_value_alias_char = elem_alias_char->getTextContent();
-  char *node_value_alias_char_as_c_star =
-    xercesc::XMLString::transcode(node_value_alias_char);
-  if (xercesc::XMLString::stringLen(node_value_alias_char) != 1) {
-    std::stringstream msg;
-    msg << "in text value of node '" << elem_alias_char->getNodeName() <<
-      "': alias-char value must have exactly 1 character, but has " <<
-      xercesc::XMLString::stringLen(node_value_alias_char) <<
-      " characters: '" << node_value_alias_char_as_c_star << "'";
-    fatal(msg.str());
-  }
-  {
-    std::stringstream msg;
-    msg << node_value_alias_char_as_c_star;
-    debug(msg.str());
-  }
-  xercesc::XMLString::release(&node_value_alias_char_as_c_star);
-  node_value_alias_char_as_c_star = 0;
-  debug("')'");
-
-  const Xml_string *alias_char = new Xml_string(node_value_alias_char);
-  if (!alias_char) {
-    fatal("not enough memory");
-  }
-  return alias_char;
 }
 
 Shape_terms *
@@ -631,31 +697,8 @@ void
 Maze_config::print_config()
 {
   std::stringstream msg;
-  msg << "\r\n";
-  msg << "######## CONFIG ########\r\n";
-  /*
-  msg << "column height: " << _column_height << "\r\n";
-  msg << "client id: ";
-  if (_client_id) {
-    msg << _client_id;
-  } else {
-    msg << "<use-host-name>";
-  }
-  msg << "\r\n";
-  msg << "effective client id: " << _effective_client_id << "\r\n";
-  msg << "range index: " << _range_index << "\r\n";
-  msg << "range out of: " << _range_out_of << "\r\n";
-  msg << "range bottom index: " << _range_bottom_index << "\r\n";
-  msg << "range top index: " << _range_top_index << "\r\n";
-  msg << "effective bottom index: " << _effective_bottom_index << "\r\n";
-  msg << "effective top index: " << _effective_top_index << "\r\n";
-  print_config_client_sound("red", &msg, _sound_red);
-  print_config_client_sound("green", &msg, _sound_green);
-  print_config_client_sound("blue", &msg, _sound_blue);
-  msg << "client volume: " << _volume << "\r\n";
-  msg << "########################";
-  debug(msg.str());
-  */
+  msg << std::endl << "######## CONFIG ########" << std::endl;
+  // TODO
 }
 
 /*

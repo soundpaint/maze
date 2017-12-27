@@ -40,7 +40,7 @@ MY_OBJ_FILES = \
   implicit-curve-compiler.o implicit-curve-ast.o implicit-curve-parser.o \
   implicit-curve-parser-token.o implicit-curve-tokenizer.o log.o \
   maze-config.o point-3d.o sensors.o shape-expression.o sobel.o tile.o \
-  tiles-store.o xml-document.o xml-string.o xml-utils.o \
+  tile-symbols.o xml-document.o xml-string.o xml-utils.o \
   $(MY_QT5_OBJ_FILES)
 
 LIB_OBJ_FILES =

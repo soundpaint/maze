@@ -34,7 +34,6 @@ class Tile
 {
 public:
   Tile(const Xml_string *id,
-       const Xml_string *alias_char,
        const QBrush foreground,
        const QBrush background,
        const double foreground_potential,
@@ -49,13 +48,11 @@ public:
                            const double dx,
                            const double dy) const;
   const Xml_string *get_id() const;
-  const Xml_string *get_alias_char() const;
   const QBrush get_foreground() const;
   const QBrush get_background() const;
   const Shape_terms *get_terms() const;
 private:
   const Xml_string *_id;
-  const Xml_string *_alias_char;
   const QBrush _foreground;
   const QBrush _background;
   const double _foreground_potential;

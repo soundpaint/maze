@@ -45,9 +45,9 @@ Brush_field::to_string() const
     str << "Brush_field{" <<
       "width=" << _width <<
       ", height=" << _height <<
-      ", field={\r\n";
+      ", field={" << std::endl;
     for (const Tile *tile : _field) {
-      str << "  " << tile->to_string() << "\r\n";
+      str << "  " << tile->to_string() << std::endl;
     }
     str << "}}";
     return std::string(str.str());
