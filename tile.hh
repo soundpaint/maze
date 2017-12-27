@@ -38,7 +38,7 @@ public:
        const QBrush background,
        const double foreground_potential,
        const double background_potential,
-       const Shape_terms *terms);
+       const Shape *shape);
   virtual ~Tile();
   const std::string to_string() const;
   const double get_potential(const double x, const double y) const;
@@ -50,14 +50,14 @@ public:
   const Xml_string *get_id() const;
   const QBrush get_foreground() const;
   const QBrush get_background() const;
-  const Shape_terms *get_terms() const;
+  const Shape *get_shape() const;
 private:
   const Xml_string *_id;
   const QBrush _foreground;
   const QBrush _background;
   const double _foreground_potential;
   const double _background_potential;
-  const Shape_terms *_shape_expression;
+  const Shape *_shape;
 };
 
 #endif /* TILE_HH */

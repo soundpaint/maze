@@ -30,6 +30,7 @@
 #include <QtGui/QBrush>
 #include <config.hh>
 #include <xml-string.hh>
+#include <shape-symbols.hh>
 #include <tile-symbols.hh>
 #include <shape-expression.hh>
 #include <implicit-curve-compiler.hh>
@@ -61,14 +62,15 @@ private:
   const XMLCh *_node_name_field;
   const XMLCh *_node_name_file;
   const XMLCh *_node_name_foreground;
-  const XMLCh *_node_name_id;
   const XMLCh *_node_name_ignore;
   const XMLCh *_node_name_pixmap;
-  const XMLCh *_node_name_ref;
   const XMLCh *_node_name_rows;
   const XMLCh *_node_name_shape;
   const XMLCh *_node_name_tile;
   const XMLCh *_node_name_tile_shortcut;
+  const XMLCh *_attr_name_id;
+  const XMLCh *_attr_name_ref;
+  Shape_symbols *_shapes;
   Tile_symbols *_tiles;
   QBrush _default_foreground;
   QBrush _default_background;
@@ -77,6 +79,7 @@ private:
   static void release(const XMLCh **node_name);
   void reload_brush(const xercesc::DOMElement *elem_brush_ground,
 		    QBrush *brush_ground);
+  void reload_shapes(const xercesc::DOMElement *elem_config);
   void reload_tiles(const xercesc::DOMElement *elem_config);
   void reload_field(const xercesc::DOMElement *elem_config);
   static const size_t text_content_as_size_t(const xercesc::DOMElement *elem);
@@ -90,14 +93,21 @@ private:
                       std::set<Xml_string> *ignore_chars,
                       xml_string_to_xml_string_t *shortcuts);
   void load_field(const xercesc::DOMElement *elem_field);
+  const Shape *load_shape_definition(const xercesc::DOMElement *elem_shape,
+                                     const XMLCh *attr_id) const;
+  const Shape *resolve_shape_reference(const xercesc::DOMElement *elem_shape,
+                                       const XMLCh *attr_ref) const;
+  const Shape *load_shape(const xercesc::DOMElement *elem_shape,
+                          const bool require_id);
   const Tile *load_tile(const xercesc::DOMElement *elem_tile);
   const char *load_tile_id(const XMLCh *attr_id);
-  Shape_terms *load_tile_shape(const xercesc::DOMElement *elem_shape);
-  Shape_terms *load_shape_expression(const xercesc::DOMElement *elem_expression);
-  Shape_factors *load_shape_term(const xercesc::DOMElement *elem_term);
-  Shape_unary_expression *
-  load_shape_factor(const xercesc::DOMElement *elem_factor);
-  Shape_prime *load_prime(const xercesc::DOMElement *elem_prime);
+  const Shape_terms *load_shape_expression(const xercesc::DOMElement *elem_expression,
+                                           const bool negated) const;
+  Shape_factors *load_shape_term(const xercesc::DOMElement *elem_term) const;
+  const Shape_unary_expression *
+  load_shape_factor(const xercesc::DOMElement *elem_factor) const;
+  const Shape_prime *load_prime(const xercesc::DOMElement *elem_prime,
+                                const bool negated) const;
 };
 
 #endif /* MAZE_CONFIG_HH */

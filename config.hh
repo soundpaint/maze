@@ -73,6 +73,9 @@ protected:
   static float parse_float(const XMLCh *token);
   static double parse_double(const XMLCh *token);
   static long double parse_long_double(const XMLCh *token);
+  static xercesc::DOMNodeList *
+  get_children_by_tag_name(const xercesc::DOMElement *element,
+                           const XMLCh *single_child_name);
   static xercesc::DOMElement *
   get_single_child_element(const xercesc::DOMElement *parent,
                            const XMLCh *single_child_name,

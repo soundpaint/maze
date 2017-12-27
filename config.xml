@@ -22,77 +22,61 @@
       <file>cracked.png</file>
     </pixmap>
   </default-background>
+  <shape id="empty_curve">
+    <!-- 1 ≤ 0 -->
+    <implicit-curve>1</implicit-curve>
+  </shape>
+  <shape id="full_small_centered_circle">
+    <!-- (x-½)² + (y-½)² ≤ ¼ -->
+    <implicit-curve>x*x - x + 0.25 + y*y - y + 0.25 - 0.25</implicit-curve>
+  </shape>
+  <shape id="full_small_centered_hole">
+    <!-- (x-½)² + (y-½)² ≥ ¼ -->
+    <implicit-curve>-x*x + x - 0.25 - y*y + y - 0.25 + 0.25</implicit-curve>
+  </shape>
+  <shape id="solid_tile">
+    <!-- - 1 ≤ 0 -->
+    <implicit-curve>-1</implicit-curve>
+  </shape>
+  <shape id="circle_in_upper_left_corner">
+    <!-- (x-1)² + (y-1)² ≤ 1 -->
+    <implicit-curve>x*x - 2*x + 1 + y*y - 2*y + 1 - 1</implicit-curve>
+  </shape>
+  <shape id="circle_in_upper_right_corner">
+    <!-- x² + (y-1)² ≤ 1 -->
+    <implicit-curve>x*x + y*y - 2.0*y + 1.0 - 1.0</implicit-curve>
+  </shape>
+  <shape id="circle_in_lower_left_corner">
+    <!-- (x-1)² + y² ≤ 1 -->
+    <implicit-curve>x*x - 2.0*x + 1.0 + y*y - 1.0</implicit-curve>
+  </shape>
+  <shape id="circle_in_lower_right_corner">
+    <!-- x² + y² ≤ 1 -->
+    <implicit-curve>x*x + y*y - 1.0</implicit-curve>
+  </shape>
   <tile id="corridor">
-    <!--
-        empty curve:
-        1 ≤ 0
-    -->
-    <shape>
-      <implicit-curve>1</implicit-curve>
-    </shape>
+    <shape ref="empty_curve" />
   </tile>
   <tile id="circle">
-    <shape>
-      <!--
-          full small centered circle:
-          (x-½)² + (y-½)² ≤ ¼
-      -->
-      <implicit-curve>x*x - x + 0.25 + y*y - y + 0.25 - 0.25</implicit-curve>
-    </shape>
+    <shape ref="full_small_centered_circle" />
   </tile>
   <tile id="hole">
-    <shape>
-      <!--
-          full small centered hole:
-          (x-½)² + (y-½)² ≥ ¼
-      -->
-      <implicit-curve>-x*x + x - 0.25 - y*y + y - 0.25 + 0.25</implicit-curve>
-    </shape>
+    <shape ref="full_small_centered_hole" />
   </tile>
   <tile id="wall-solid">
-    <shape>
-      <!--
-          solid tile:
-          - 1 ≤ 0
-      -->
-      <implicit-curve>-1</implicit-curve>
-    </shape>
+    <shape ref="solid_tile" />
   </tile>
   <tile id="wall-rounded-upper-left">
-    <shape>
-      <!--
-          circle in upper left corner:
-          (x-1)² + (y-1)² ≤ 1
-      -->
-      <implicit-curve>x*x - 2*x + 1 + y*y - 2*y + 1 - 1</implicit-curve>
-    </shape>
+    <shape ref="circle_in_upper_left_corner" />
   </tile>
   <tile id="wall-rounded-upper-right">
-    <shape>
-      <!--
-          circle in upper right corner:
-          x² + (y-1)² ≤ 1
-      -->
-      <implicit-curve>x*x + y*y - 2.0*y + 1.0 - 1.0</implicit-curve>
-    </shape>
+    <shape ref="circle_in_upper_right_corner" />
   </tile>
   <tile id="wall-rounded-lower-left">
-    <shape>
-      <!--
-          circle in lower left corner:
-          (x-1)² + y² ≤ 1
-      -->
-      <implicit-curve>x*x - 2.0*x + 1.0 + y*y - 1.0</implicit-curve>
-    </shape>
+    <shape ref="circle_in_lower_left_corner" />
   </tile>
   <tile id="wall-rounded-lower-right">
-    <shape>
-      <!--
-          circle in lower right corner:
-          x² + y² ≤ 1
-      -->
-      <implicit-curve>x*x + y*y - 1.0</implicit-curve>
-    </shape>
+    <shape ref="circle_in_lower_right_corner" />
   </tile>
   <field>
     <ignore>&#x09;</ignore>
@@ -107,25 +91,25 @@
     <tile-shortcut id="╳" ref="corridor" />
     <tile-shortcut id="o" ref="circle" />
     <tile-shortcut id="0" ref="hole" />
-    <columns>16</columns>
+    <columns>32</columns>
     <rows>16</rows>
     <contents>
-      ┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼
-      ┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼
-      ┼┼╳╳╳╳╳╳╳╳╳╳╳╳┼┼
-      ┼┼╳╳╳╳╳╳╳╳╳╳╳╳┼┼
-      ┼┼┼┼┼╮╳╳╭╮╳╳╳╳┼┼
-      ┼┼┼┼┼┼╳╳┼┼╳╳╳╳┼┼
-      ┼┼╳╳┼┼╳╳┼┼┼┼┼┼┼┼
-      ┼┼╳╳╰╯╳╳╰┼┼┼┼┼┼┼
-      ┼┼╳╳╳╳╳╳╳╳╳╳╳╳┼┼
-      ┼┼╳╳╳╳╳╳╳╳╳o╳╳┼┼
-      ┼┼╳╳╭┼┼┼┼┼┼╮╳╳┼┼
-      ┼┼╳╳╰┼┼┼┼┼┼╯╳╳┼┼
-      ┼┼╳╳╳╳┼┼╳╳╳╳╳╳┼┼
-      ┼┼╳╳╳╳┼┼╳╳╳╳╳╳┼┼
-      ┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼
-      ┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼
+      ┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼
+      ┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼
+      ┼┼┼┼╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳┼┼┼┼
+      ┼┼┼┼╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳0╳╳╳╳╳┼┼┼┼
+      ┼┼┼┼┼┼┼┼┼┼┼╮╳╳╳╳╭┼┼╮╳╳╳╳╳╳╳╳┼┼┼┼
+      ┼┼┼┼┼┼┼┼┼┼┼┼╳╳╳╳┼┼┼┼╳╳╳╳╳╳╳╳┼┼┼┼
+      ┼┼┼┼╳╳╳╳┼┼┼┼╳╳╳╳┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼
+      ┼┼┼┼╳╳╳╳╰┼┼╯╳╳╳╳╰┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼
+      ┼┼┼┼╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳┼┼┼┼
+      ┼┼┼┼╳o╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳┼┼┼┼
+      ┼┼┼┼╳╳╳╳╭┼┼┼┼┼┼┼┼┼┼┼┼┼┼╮╳╳╳╳┼┼┼┼
+      ┼┼┼┼╳╳╳╳╰┼┼┼┼┼┼┼┼┼┼┼┼┼┼╯╳╳╳╳┼┼┼┼
+      ┼┼┼┼╳╳╳╳╳╳╳╳┼┼┼┼╳╳╳╳╳╳╳╳╳╳╳╳┼┼┼┼
+      ┼┼┼┼╳╳╳╳╳╳╳╳┼┼┼┼╳╳╳╳╳╳╳╳╳╳╳╳┼┼┼┼
+      ┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼
+      ┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼
     </contents>
   </field>
 </config>

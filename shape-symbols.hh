@@ -22,26 +22,33 @@
  * Author's web site: www.juergen-reuter.de
  */
 
-#ifndef IMPLICIT_CURVE_COMPILER_HH
-#define IMPLICIT_CURVE_COMPILER_HH
+#ifndef SHAPE_SYMBOLS_HH
+#define SHAPE_SYMBOLS_HH
 
-#endif /* IMPLICIT_CURVE_COMPILER_HH */
+#include <unordered_map>
+#include <shape-expression.hh>
+#include <xml-string.hh>
 
-#include <implicit-curve-parser.hh>
-#include <implicit-curve.hh>
-
-class Implicit_curve_compiler
+class Shape_symbols
 {
 public:
-  Implicit_curve_compiler();
-  virtual ~Implicit_curve_compiler();
-  static const Implicit_curve *compile(const char *expression);
+  Shape_symbols();
+  virtual ~Shape_symbols();
+  void add(const Xml_string *id, const Shape *shape);
+  const bool exists(const Xml_string *id) const;
+  const Shape *lookup(const Xml_string *id) const;
+  void dump() const;
 private:
-  static void summarize_terms_by_variables(Implicit_curve_ast *implicit_curve_ast);
-  static void optimize(Implicit_curve_ast *implicit_curve_ast);
-  static const Implicit_curve *
-  generate_code(Implicit_curve_ast *implicit_curve_ast);
+  typedef std::unordered_map<const Xml_string *,
+                             const Shape *,
+                             Xml_string::hashing_functor,
+                             Xml_string::equal_functor>
+  xml_string_to_shape_t;
+  static const xml_string_to_shape_t::size_type BUCKET_COUNT = 5;
+  xml_string_to_shape_t *_id_to_shape;
 };
+
+#endif /* SHAPE_SYMBOLS_HH */
 
 /*
  * Local variables:

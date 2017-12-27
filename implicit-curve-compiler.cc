@@ -110,8 +110,9 @@ Implicit_curve_compiler::generate_code(Implicit_curve_ast *implicit_curve_ast)
 const Implicit_curve *
 Implicit_curve_compiler::compile(const char *expression)
 {
+  Implicit_curve_parser implicit_curve_parser;
   Implicit_curve_ast implicit_curve_ast =
-    _implicit_curve_parser.parse(expression);
+    implicit_curve_parser.parse(expression);
 
   optimize(&implicit_curve_ast);
 

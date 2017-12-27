@@ -31,19 +31,19 @@ Tile::Tile(const Xml_string *id,
            const QBrush background,
            const double foreground_potential,
            const double background_potential,
-           const Shape_terms *shape_expression) :
+           const Shape *shape) :
   _id(id),
   _foreground(QBrush(foreground)),
   _background(QBrush(background)),
   _foreground_potential(foreground_potential),
   _background_potential(background_potential),
-  _shape_expression(shape_expression)
+  _shape(shape)
 {
   if (!id) {
     Log::fatal("id is null");
   }
-  if (!shape_expression) {
-    Log::fatal("shape_expression is null");
+  if (!shape) {
+    Log::fatal("shape is null");
   }
 }
 
@@ -51,8 +51,8 @@ Tile::~Tile()
 {
   //free(_id); // TODO
   _id = 0;
-  delete _shape_expression;
-  _shape_expression = 0;
+  delete _shape;
+  _shape = 0;
 }
 
 const std::string
@@ -65,7 +65,7 @@ Tile::to_string() const
   str << ", background=" << &_background;
   str << ", foreground_potential=" << _foreground_potential;
   str << ", background_potential=" << _background_potential;
-  str << ", shape_expression=" << _shape_expression;
+  str << ", shape=" << _shape->to_string();
   str <<"}";
   return std::string(str.str());
 }
@@ -73,7 +73,7 @@ Tile::to_string() const
 const double
 Tile::get_potential(const double x, const double y) const
 {
-  if (_shape_expression->is_inside(x, y)) {
+  if (_shape->is_inside(x, y)) {
     return _foreground_potential;
   } else {
     return _background_potential;
@@ -84,7 +84,7 @@ const QBrush *
 Tile::get_brush(const double x, const double y) const
 {
   const QBrush *brush;
-  if (_shape_expression->is_inside(x, y)) {
+  if (_shape->is_inside(x, y)) {
     brush = &_foreground;
   } else {
     brush = &_background;
@@ -120,10 +120,10 @@ Tile::get_background() const
   return _background;
 }
 
-const Shape_terms *
-Tile::get_terms() const
+const Shape *
+Tile::get_shape() const
 {
-  return _shape_expression;
+  return _shape;
 }
 
 /*

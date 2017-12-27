@@ -22,26 +22,25 @@
  * Author's web site: www.juergen-reuter.de
  */
 
-#ifndef IMPLICIT_CURVE_COMPILER_HH
-#define IMPLICIT_CURVE_COMPILER_HH
+#ifndef XML_NODE_LIST_HH
+#define XML_NODE_LIST_HH
 
-#endif /* IMPLICIT_CURVE_COMPILER_HH */
+#include <vector>
+#include <xercesc/dom/DOM.hpp>
 
-#include <implicit-curve-parser.hh>
-#include <implicit-curve.hh>
-
-class Implicit_curve_compiler
+class Xml_node_list : public xercesc::DOMNodeList
 {
 public:
-  Implicit_curve_compiler();
-  virtual ~Implicit_curve_compiler();
-  static const Implicit_curve *compile(const char *expression);
+  Xml_node_list();
+  virtual ~Xml_node_list();
+  void add(xercesc::DOMNode *node);
+  virtual xercesc::DOMNode *item(const XMLSize_t index) const;
+  virtual XMLSize_t getLength() const;
 private:
-  static void summarize_terms_by_variables(Implicit_curve_ast *implicit_curve_ast);
-  static void optimize(Implicit_curve_ast *implicit_curve_ast);
-  static const Implicit_curve *
-  generate_code(Implicit_curve_ast *implicit_curve_ast);
+  std::vector<xercesc::DOMNode *> *_nodes;
 };
+
+#endif /* XML_NODE_LIST_HH */
 
 /*
  * Local variables:

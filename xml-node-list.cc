@@ -22,26 +22,44 @@
  * Author's web site: www.juergen-reuter.de
  */
 
-#ifndef IMPLICIT_CURVE_COMPILER_HH
-#define IMPLICIT_CURVE_COMPILER_HH
+#include <xml-node-list.hh>
+#include <log.hh>
 
-#endif /* IMPLICIT_CURVE_COMPILER_HH */
-
-#include <implicit-curve-parser.hh>
-#include <implicit-curve.hh>
-
-class Implicit_curve_compiler
+Xml_node_list::Xml_node_list()
 {
-public:
-  Implicit_curve_compiler();
-  virtual ~Implicit_curve_compiler();
-  static const Implicit_curve *compile(const char *expression);
-private:
-  static void summarize_terms_by_variables(Implicit_curve_ast *implicit_curve_ast);
-  static void optimize(Implicit_curve_ast *implicit_curve_ast);
-  static const Implicit_curve *
-  generate_code(Implicit_curve_ast *implicit_curve_ast);
-};
+  _nodes = new std::vector<xercesc::DOMNode *>();
+  if (!_nodes) {
+    Log::fatal("not enough memory");
+  }
+}
+
+Xml_node_list::~Xml_node_list()
+{
+  delete _nodes;
+  _nodes = 0;
+}
+
+void
+Xml_node_list::add(xercesc::DOMNode *node)
+{
+  _nodes->push_back(node);
+}
+
+xercesc::DOMNode *
+Xml_node_list::item(const XMLSize_t index) const
+{
+  if (index > getLength()) {
+    Log::fatal("index out of bounds");
+  }
+  return _nodes->at(index);
+}
+
+XMLSize_t
+Xml_node_list::getLength() const
+{
+  return _nodes->size();
+}
+
 
 /*
  * Local variables:

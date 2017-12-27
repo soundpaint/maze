@@ -28,8 +28,10 @@
 #include <vector>
 #include <iterator.hh>
 #include <implicit-curve.hh>
+#include <xml-string.hh>
 
 /*
+ * shape ::= shape_expression .
  * shape_expression ::= shape_terms .
  * shape_terms ::= shape_term |
  *                 "<or>" shape_term+ "</or>" .
@@ -47,6 +49,7 @@ class Shape_unary_expression
 {
 public:
   Shape_unary_expression();
+  Shape_unary_expression(const bool negated);
   virtual ~Shape_unary_expression();
   const bool is_negated() const;
   void set_negated(const bool negated);
@@ -58,7 +61,7 @@ private:
 class Shape_prime : public Shape_unary_expression
 {
 public:
-  Shape_prime(const Implicit_curve *implicit_curve);
+  Shape_prime(const Implicit_curve *implicit_curve, const bool is_negated);
   virtual ~Shape_prime();
   const Implicit_curve *get_implicit_curve() const;
   const bool is_inside(const double x, const double y) const;
@@ -94,6 +97,21 @@ public:
   const bool is_inside(const double x, const double y) const;
 private:
   std::vector<const Shape_factors *> *_terms;
+};
+
+class Shape
+{
+public:
+  Shape(const Xml_string *id,
+        const Shape_terms *shape_terms);
+  virtual ~Shape();
+  const std::string to_string() const;
+  const Xml_string *get_id() const;
+  const Shape_terms *get_terms() const;
+  const bool is_inside(const double x, const double y) const;
+private:
+  const Xml_string *_id;
+  const Shape_terms *_shape_terms;
 };
 
 #endif /* SHAPE_EXPRESSION_HH */

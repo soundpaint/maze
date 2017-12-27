@@ -25,7 +25,9 @@
 #include <shape-expression.hh>
 #include <log.hh>
 
-Shape_prime::Shape_prime(const Implicit_curve *implicit_curve)
+Shape_prime::Shape_prime(const Implicit_curve *implicit_curve,
+                         const bool negated) :
+  Shape_unary_expression(negated)
 {
   if (!implicit_curve) {
     Log::fatal("implicit_curve is null");
@@ -49,8 +51,13 @@ Shape_prime::is_inside(const double x, const double y) const
   return _implicit_curve->is_inside(x, y) != is_negated();
 }
 
-Shape_unary_expression::Shape_unary_expression() {
-  _negated = false;
+Shape_unary_expression::Shape_unary_expression() :
+  Shape_unary_expression(false)
+{
+}
+
+Shape_unary_expression::Shape_unary_expression(const bool negated) {
+  _negated = negated;
 }
 
 Shape_unary_expression::~Shape_unary_expression() {
@@ -160,6 +167,56 @@ Shape_terms::is_inside(const double x, const double y) const
       return !is_negated();
   }
   return is_negated();
+}
+
+Shape::Shape(const Xml_string *id,
+             const Shape_terms *shape_terms) :
+  _id(id),
+  _shape_terms(shape_terms)
+{
+  if (!id) {
+    Log::fatal("id is null");
+  }
+  if (!shape_terms) {
+    Log::fatal("shape_terms is null");
+  }
+}
+
+Shape::~Shape()
+{
+  //free(_id); // TODO
+  _id = 0;
+  delete _shape_terms;
+  _shape_terms = 0;
+}
+
+const std::string
+Shape::to_string() const
+{
+  std::stringstream str;
+  str << "Shape{";
+  str << "id=" << _id;
+  str << ", shape_terms=" << _shape_terms;
+  str <<"}";
+  return std::string(str.str());
+}
+
+const Xml_string *
+Shape::get_id() const
+{
+  return _id;
+}
+
+const Shape_terms *
+Shape::get_terms() const
+{
+  return _shape_terms;
+}
+
+const bool
+Shape::is_inside(const double x, const double y) const
+{
+  return _shape_terms->is_inside(x, y);
 }
 
 /*

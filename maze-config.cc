@@ -41,14 +41,15 @@ Maze_config::Maze_config(const char *path) :
   _node_name_field(xercesc::XMLString::transcode("field")),
   _node_name_file(xercesc::XMLString::transcode("file")),
   _node_name_foreground(xercesc::XMLString::transcode("foreground")),
-  _node_name_id(xercesc::XMLString::transcode("id")),
   _node_name_ignore(xercesc::XMLString::transcode("ignore")),
   _node_name_pixmap(xercesc::XMLString::transcode("pixmap")),
-  _node_name_ref(xercesc::XMLString::transcode("ref")),
   _node_name_rows(xercesc::XMLString::transcode("rows")),
   _node_name_shape(xercesc::XMLString::transcode("shape")),
   _node_name_tile(xercesc::XMLString::transcode("tile")),
   _node_name_tile_shortcut(xercesc::XMLString::transcode("tile-shortcut")),
+  _attr_name_id(xercesc::XMLString::transcode("id")),
+  _attr_name_ref(xercesc::XMLString::transcode("ref")),
+  _shapes(new Shape_symbols()),
   _tiles(new Tile_symbols())
 {
   Config::reload();
@@ -56,6 +57,8 @@ Maze_config::Maze_config(const char *path) :
 
 Maze_config::~Maze_config()
 {
+  delete _shapes;
+  _shapes = 0;
   delete _tiles;
   _tiles = 0;
   delete _field;
@@ -70,14 +73,14 @@ Maze_config::~Maze_config()
   release(&_node_name_field);
   release(&_node_name_file);
   release(&_node_name_foreground);
-  release(&_node_name_id);
   release(&_node_name_ignore);
   release(&_node_name_pixmap);
-  release(&_node_name_ref);
   release(&_node_name_rows);
   release(&_node_name_shape);
   release(&_node_name_tile);
   release(&_node_name_tile_shortcut);
+  release(&_attr_name_id);
+  release(&_attr_name_ref);
 }
 
 void
@@ -115,9 +118,9 @@ Maze_config::reload(const xercesc::DOMElement *elem_config)
     _default_foreground = QBrush(Qt::white);
   }
 
+  reload_shapes(elem_config);
   reload_tiles(elem_config);
   reload_field(elem_config);
-  //fatal("config parsed"); // DEBUG
 }
 
 void
@@ -151,7 +154,7 @@ void
 Maze_config::reload_field(const xercesc::DOMElement *elem_config)
 {
   const xercesc::DOMNodeList *node_list =
-    elem_config->getElementsByTagName(_node_name_field);
+    get_children_by_tag_name(elem_config, _node_name_field);
   if (node_list) {
     const XMLSize_t length = node_list->getLength();
     if (length != 1) {
@@ -205,7 +208,7 @@ Maze_config::load_field_ignore_chars(const xercesc::DOMElement *elem_field,
                                      std::set<Xml_string> *chars) const
 {
   const xercesc::DOMNodeList *node_list =
-    elem_field->getElementsByTagName(_node_name_ignore);
+    get_children_by_tag_name(elem_field, _node_name_ignore);
   if (node_list) {
     const XMLSize_t length = node_list->getLength();
     for (uint32_t node_index = 0; node_index < length; node_index++) {
@@ -248,7 +251,7 @@ Maze_config::load_field_tile_shortcuts(const xercesc::DOMElement *elem_field,
                                        xml_string_to_xml_string_t *shortcuts)
 {
   const xercesc::DOMNodeList *node_list =
-    elem_field->getElementsByTagName(_node_name_tile_shortcut);
+    get_children_by_tag_name(elem_field, _node_name_tile_shortcut);
   if (node_list) {
     const XMLSize_t length = node_list->getLength();
     for (uint32_t node_index = 0; node_index < length; node_index++) {
@@ -259,7 +262,10 @@ Maze_config::load_field_tile_shortcuts(const xercesc::DOMElement *elem_field,
 	fatal("unexpected null element");
       }
 
-      const XMLCh *attr_id = elem_tile_shortcut->getAttribute(_node_name_id);
+      const XMLCh *attr_id = elem_tile_shortcut->getAttribute(_attr_name_id);
+      if (xercesc::XMLString::stringLen(attr_id) <= 0) {
+        fatal("missing or empty 'id' attribute on tile shortcut");
+      }
       const Xml_string *str_id = new Xml_string(attr_id);
       if (!str_id) {
         fatal("not enough memory");
@@ -290,7 +296,10 @@ Maze_config::load_field_tile_shortcuts(const xercesc::DOMElement *elem_field,
       }
       xercesc::XMLString::release(&attr_value_id_as_c_star);
 
-      const XMLCh *attr_ref = elem_tile_shortcut->getAttribute(_node_name_ref);
+      const XMLCh *attr_ref = elem_tile_shortcut->getAttribute(_attr_name_ref);
+      if (xercesc::XMLString::stringLen(attr_ref) <= 0) {
+        fatal("missing or empty 'ref' attribute on tile shortcut");
+      }
       const Xml_string *str_ref = new Xml_string(attr_ref);
       if (!str_ref) {
         fatal("not enough memory");
@@ -422,11 +431,110 @@ Maze_config::get_brush_field() const
 }
 
 void
+Maze_config::reload_shapes(const xercesc::DOMElement *elem_config)
+{
+  debug("'shapes('");
+  const xercesc::DOMNodeList *node_list =
+    get_children_by_tag_name(elem_config, _node_name_shape);
+  if (node_list) {
+    const XMLSize_t length = node_list->getLength();
+    for (uint32_t node_index = 0; node_index < length; node_index++) {
+      xercesc::DOMNode *node = node_list->item(node_index);
+      xercesc::DOMElement *elem_shape =
+        dynamic_cast<xercesc::DOMElement *>(node);
+      if (!elem_shape) {
+	fatal("unexpected null element");
+      }
+      const Shape *shape = load_shape(elem_shape, true);
+      const Xml_string *id = shape->get_id();
+      _shapes->add(id, shape);
+    }
+  } else {
+    // no shapes => nothing to parse
+  }
+  debug("')'");
+}
+
+const Shape *
+Maze_config::load_shape_definition(const xercesc::DOMElement *elem_shape,
+                                   const XMLCh *attr_id) const
+{
+  // symbol definition
+  Xml_string *str_id;
+  if (attr_id) {
+    str_id = new Xml_string(attr_id);
+    if (!str_id) {
+      fatal("not enough memory");
+    }
+  } else {
+    str_id = 0;
+  }
+
+  if (elem_shape->getChildElementCount() != 1) {
+    fatal("'shape' element for shape definition must contain exactly "
+          "one child element");
+  }
+  const xercesc::DOMElement *elem_expression =
+    elem_shape->getFirstElementChild();
+
+  const Shape_terms *shape_terms =
+    load_shape_expression(elem_expression, false);
+  const Shape *shape = new Shape(str_id, shape_terms);
+  if (!shape) {
+    fatal("not enough memory");
+  }
+  return shape;
+}
+
+const Shape *
+Maze_config::resolve_shape_reference(const xercesc::DOMElement *elem_shape,
+                                     const XMLCh *attr_ref) const
+{
+  // symbol reference
+  Xml_string str_ref(attr_ref);
+  const Shape *shape = _shapes->lookup(&str_ref);
+  if (!shape) {
+    std::stringstream msg;
+    char *str_ref_as_c_star = str_ref.transcode();
+    msg << "can not resolve shape '" << str_ref_as_c_star << "'";
+    str_ref.release(&str_ref_as_c_star);
+    fatal(msg.str());
+  }
+  return shape;
+}
+
+const Shape *
+Maze_config::load_shape(const xercesc::DOMElement *elem_shape,
+                        const bool require_definition)
+{
+  debug("'shape('");
+  if (!elem_shape) {
+    fatal("unexpected null element");
+  }
+
+  const XMLCh *attr_id = elem_shape->getAttribute(_attr_name_id);
+
+  if (require_definition) {
+    if (xercesc::XMLString::stringLen(attr_id) <= 0) {
+      fatal("missing or empty 'id' attribute on shape definition");
+    }
+  }
+
+  const XMLCh *attr_ref = elem_shape->getAttribute(_attr_name_ref);
+  const Shape *shape =
+    (xercesc::XMLString::stringLen(attr_ref) > 0) ?
+    resolve_shape_reference(elem_shape, attr_ref) :
+    load_shape_definition(elem_shape, attr_id);
+  debug("')'");
+  return shape;
+}
+
+void
 Maze_config::reload_tiles(const xercesc::DOMElement *elem_config)
 {
   debug("'tiles('");
   const xercesc::DOMNodeList *node_list =
-    elem_config->getElementsByTagName(_node_name_tile);
+    get_children_by_tag_name(elem_config, _node_name_tile);
   if (node_list) {
     const XMLSize_t length = node_list->getLength();
     for (uint32_t node_index = 0; node_index < length; node_index++) {
@@ -454,7 +562,10 @@ Maze_config::load_tile(const xercesc::DOMElement *elem_tile)
     fatal("unexpected null element");
   }
 
-  const XMLCh *attr_id = elem_tile->getAttribute(_node_name_id);
+  const XMLCh *attr_id = elem_tile->getAttribute(_attr_name_id);
+  if (xercesc::XMLString::stringLen(attr_id) <= 0) {
+    fatal("missing or empty 'id' attribute on tile");
+  }
   const Xml_string *str_id = new Xml_string(attr_id);
   if (!str_id) {
     fatal("not enough memory");
@@ -500,7 +611,7 @@ Maze_config::load_tile(const xercesc::DOMElement *elem_tile)
   if (!elem_shape) {
     fatal("for now, tile definition must contain shape definition");
   }
-  Shape_terms *terms = load_tile_shape(elem_shape);
+  const Shape *shape = load_shape(elem_shape, false);
 
   const double foreground_potential = 0.0; // TODO
   const double background_potential = 0.0; // TODO
@@ -509,7 +620,7 @@ Maze_config::load_tile(const xercesc::DOMElement *elem_tile)
     new Tile(str_id,
              foreground, background,
              foreground_potential, background_potential,
-             terms);
+             shape);
   if (!tile) {
     fatal("not enough memory");
   }
@@ -538,25 +649,9 @@ Maze_config::load_tile_id(const XMLCh *attr_id)
   return id;
 }
 
-Shape_terms *
-Maze_config::load_tile_shape(const xercesc::DOMElement *elem_shape)
-{
-  debug("'tile-shape('");
-  if (!elem_shape) {
-    fatal("unexpected null element");
-  }
-  if (elem_shape->getChildElementCount() != 1) {
-    fatal("'shape' element must contain exactly one child element");
-  }
-  const xercesc::DOMElement *elem_expression =
-    elem_shape->getFirstElementChild();
-  Shape_terms *terms = load_shape_expression(elem_expression);
-  debug("')'");
-  return terms;
-}
-
-Shape_terms *
-Maze_config::load_shape_expression(const xercesc::DOMElement *elem_expression)
+const Shape_terms *
+Maze_config::load_shape_expression(const xercesc::DOMElement *elem_expression,
+                                   const bool negated) const
 {
   // TODO: For optimzation (fast evaluation of subsequent shape inside
   // / outside tests), convert shape expression into minimal form.
@@ -574,7 +669,7 @@ Maze_config::load_shape_expression(const xercesc::DOMElement *elem_expression)
   if (!strcmp(node_name_as_c_star, "or")) {
     debug("'or('");
     const xercesc::DOMNodeList *node_list =
-      elem_expression->getElementsByTagName(_node_name_any);
+      get_children_by_tag_name(elem_expression, _node_name_any);
     const XMLSize_t length = node_list->getLength();
     for (uint32_t node_index = 0; node_index < length; node_index++) {
       xercesc::DOMNode *node = node_list->item(node_index);
@@ -591,11 +686,13 @@ Maze_config::load_shape_expression(const xercesc::DOMElement *elem_expression)
   xercesc::XMLString::release(&node_name_as_c_star);
   node_name_as_c_star = 0;
   debug("')'");
+  if (negated)
+    expression->set_negated(true);
   return expression;
 }
 
 Shape_factors *
-Maze_config::load_shape_term(const xercesc::DOMElement *elem_term)
+Maze_config::load_shape_term(const xercesc::DOMElement *elem_term) const
 {
   if (!elem_term) {
     fatal("unexpected null element");
@@ -610,7 +707,7 @@ Maze_config::load_shape_term(const xercesc::DOMElement *elem_term)
   if (!strcmp(node_name_as_c_star, "and")) {
     debug("'and('");
     const xercesc::DOMNodeList *node_list =
-      elem_term->getElementsByTagName(_node_name_any);
+      get_children_by_tag_name(elem_term, _node_name_any);
     const XMLSize_t length = node_list->getLength();
     for (uint32_t node_index = 0; node_index < length; node_index++) {
       xercesc::DOMNode *node = node_list->item(node_index);
@@ -629,13 +726,13 @@ Maze_config::load_shape_term(const xercesc::DOMElement *elem_term)
   return term;
 }
 
-Shape_unary_expression *
-Maze_config::load_shape_factor(const xercesc::DOMElement *elem_factor)
+const Shape_unary_expression *
+Maze_config::load_shape_factor(const xercesc::DOMElement *elem_factor) const
 {
   if (!elem_factor) {
     fatal("unexpected null element");
   }
-  bool is_negated;
+  bool negated;
   const XMLCh *node_name_unary_expression;
   char *node_name_unary_expression_as_c_star;
   const XMLCh *node_name_factor = elem_factor->getNodeName();
@@ -647,30 +744,27 @@ Maze_config::load_shape_factor(const xercesc::DOMElement *elem_factor)
       fatal("'not' element must contain exactly one child element");
     }
     elem_unary_expression = elem_factor->getFirstElementChild();
-    is_negated = true;
+    negated = true;
     node_name_unary_expression = elem_unary_expression->getNodeName();
     node_name_unary_expression_as_c_star =
       xercesc::XMLString::transcode(node_name_unary_expression);
     xercesc::XMLString::release(&node_name_factor_as_c_star);
   } else {
     elem_unary_expression = elem_factor;
-    is_negated = false;
+    negated = false;
     node_name_unary_expression = node_name_factor;
     node_name_unary_expression_as_c_star = node_name_factor_as_c_star;
   }
   node_name_factor_as_c_star = 0;
 
-  if (is_negated) {
+  if (negated) {
     debug("'not('");
   }
-  Shape_unary_expression *unary_expression;
-  if (!strcmp(node_name_unary_expression_as_c_star, "implicit-curve")) {
-    unary_expression = load_prime(elem_unary_expression);
-  } else {
-    unary_expression = load_shape_expression(elem_unary_expression);
-  }
-  unary_expression->set_negated(is_negated);
-  if (is_negated) {
+  const Shape_unary_expression *unary_expression =
+  !strcmp(node_name_unary_expression_as_c_star, "implicit-curve") ?
+    (const Shape_unary_expression *)load_prime(elem_unary_expression, negated) :
+    (const Shape_unary_expression *)load_shape_expression(elem_unary_expression, negated);
+  if (negated) {
     debug("')'");
   }
   xercesc::XMLString::release(&node_name_unary_expression_as_c_star);
@@ -679,8 +773,9 @@ Maze_config::load_shape_factor(const xercesc::DOMElement *elem_factor)
   return unary_expression;
 }
 
-Shape_prime *
-Maze_config::load_prime(const xercesc::DOMElement *elem_prime)
+const Shape_prime *
+Maze_config::load_prime(const xercesc::DOMElement *elem_prime,
+                        const bool negated) const
 {
   debug("'implicit_curve('");
   if (!elem_prime) {
@@ -704,7 +799,7 @@ Maze_config::load_prime(const xercesc::DOMElement *elem_prime)
     debug(msg.str());
   }
 
-  Shape_prime *prime = new Shape_prime(implicit_curve);
+  const Shape_prime *prime = new Shape_prime(implicit_curve, negated);
   if (!prime) {
     fatal("not enough memory");
   }

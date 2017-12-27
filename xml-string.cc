@@ -87,8 +87,7 @@ Xml_string::compute_hash(const XMLCh *char_array)
     xercesc::XMLString::transcode(char_array);
   const std::string str_char_array(char_array_as_c_star);
   const std::size_t hash = std::hash<std::string>{}(str_char_array);
-  xercesc::XMLString::release(&char_array_as_c_star);
-  char_array_as_c_star = 0;
+  release(&char_array_as_c_star);
   return hash;
 }
 
@@ -193,7 +192,7 @@ Xml_string::transcode() const
 }
 
 void
-Xml_string::release(char **transcoded) const
+Xml_string::release(char **transcoded)
 {
   xercesc::XMLString::release(transcoded);
   *transcoded = 0;

@@ -1,3 +1,12 @@
+* Make parser fully static.
+* Check: Shape_terms is not always a constant...
+* Move class Shape from shape-expression.* into separate file.
+* FIXME: Maze_config::load_shape() returns either a definition or a
+  resolved reference, but the caller always assumes a definition
+  (and tries to add it to the shape symbol definitions table).
+  Solution: A reference should have no symbol id, and the caller
+  can deploy this assumption for an appropriate check.
+* Get rid of "//free(...)".
 * Make it possible to define shapes outside of blocks, such that the
   same shape can be referenced from multiple blocks (with display
   offsets x and y), rather than having to redefine the shape over and
