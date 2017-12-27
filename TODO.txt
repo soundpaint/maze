@@ -3,8 +3,6 @@
   offsets x and y), rather than having to redefine the shape over and
   over again.  Useful for shapes that are that large that they cover
   multiple blocks.
-* Make global <background> work as fall-back when no <background> is
-  specified in a block.  Same for <foreground>.
 * Extend supported implicit curve syntax, e.g. expressions like:
   (x + y)² - 1
 * Turn config compiler from current one-pass technique into a true

@@ -53,18 +53,30 @@ private:
   static const xml_string_to_xml_string_t::size_type BUCKET_COUNT = 5;
 
   const XMLCh *_node_name_any;
+  const XMLCh *_node_name_background;
+  const XMLCh *_node_name_columns;
+  const XMLCh *_node_name_contents;
+  const XMLCh *_node_name_default_background;
+  const XMLCh *_node_name_default_foreground;
+  const XMLCh *_node_name_field;
+  const XMLCh *_node_name_file;
+  const XMLCh *_node_name_foreground;
   const XMLCh *_node_name_id;
   const XMLCh *_node_name_ignore;
-  const XMLCh *_node_name_field;
+  const XMLCh *_node_name_pixmap;
   const XMLCh *_node_name_ref;
+  const XMLCh *_node_name_rows;
+  const XMLCh *_node_name_shape;
   const XMLCh *_node_name_tile;
   const XMLCh *_node_name_tile_shortcut;
   Tile_symbols *_tiles;
-  QBrush _background;
+  QBrush _default_foreground;
+  QBrush _default_background;
   Implicit_curve_compiler _implicit_curve_compiler;
   Brush_field *_field;
-  void reload_brush(const xercesc::DOMElement *elem_background,
-		    QBrush *background);
+  static void release(const XMLCh **node_name);
+  void reload_brush(const xercesc::DOMElement *elem_brush_ground,
+		    QBrush *brush_ground);
   void reload_tiles(const xercesc::DOMElement *elem_config);
   void reload_field(const xercesc::DOMElement *elem_config);
   static const size_t text_content_as_size_t(const xercesc::DOMElement *elem);

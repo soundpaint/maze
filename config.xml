@@ -12,24 +12,17 @@
       </velocity>
     </ball>
   </balls>
-  <background>
+  <default-foreground>
+    <pixmap>
+      <file>sm_squares.png</file>
+    </pixmap>
+  </default-foreground>
+  <default-background>
     <pixmap>
       <file>cracked.png</file>
     </pixmap>
-  </background>
+  </default-background>
   <tile id="corridor">
-    <!-- default background: transparent -->
-    <background>
-      <pixmap>
-        <file>cracked.png</file>
-      </pixmap>
-    </background>
-    <!-- default foreground: transparent -->
-    <foreground>
-      <pixmap>
-	<file>sm_squares.png</file>
-      </pixmap>
-    </foreground>
     <!--
         empty curve:
         1 ≤ 0
@@ -39,17 +32,6 @@
     </shape>
   </tile>
   <tile id="circle">
-    <!-- default background: transparent -->
-    <background>
-      <pixmap>
-        <file>cracked.png</file>
-      </pixmap>
-    </background>
-    <foreground>
-      <pixmap>
-	<file>sm_squares.png</file>
-      </pixmap>
-    </foreground>
     <shape>
       <!--
           full small centered circle:
@@ -59,17 +41,6 @@
     </shape>
   </tile>
   <tile id="hole">
-    <!-- default background: transparent -->
-    <background>
-      <pixmap>
-        <file>cracked.png</file>
-      </pixmap>
-    </background>
-    <foreground>
-      <pixmap>
-	<file>sm_squares.png</file>
-      </pixmap>
-    </foreground>
     <shape>
       <!--
           full small centered hole:
@@ -79,17 +50,6 @@
     </shape>
   </tile>
   <tile id="wall-solid">
-    <!-- default background: transparent -->
-    <background>
-      <pixmap>
-        <file>cracked.png</file>
-      </pixmap>
-    </background>
-    <foreground>
-      <pixmap>
-	<file>sm_squares.png</file>
-      </pixmap>
-    </foreground>
     <shape>
       <!--
           solid tile:
@@ -99,17 +59,6 @@
     </shape>
   </tile>
   <tile id="wall-rounded-upper-left">
-    <!-- default background: transparent -->
-    <background>
-      <pixmap>
-        <file>cracked.png</file>
-      </pixmap>
-    </background>
-    <foreground>
-      <pixmap>
-	<file>sm_squares.png</file>
-      </pixmap>
-    </foreground>
     <shape>
       <!--
           circle in upper left corner:
@@ -119,17 +68,6 @@
     </shape>
   </tile>
   <tile id="wall-rounded-upper-right">
-    <!-- default background: transparent -->
-    <background>
-      <pixmap>
-        <file>cracked.png</file>
-      </pixmap>
-    </background>
-    <foreground>
-      <pixmap>
-	<file>sm_squares.png</file>
-      </pixmap>
-    </foreground>
     <shape>
       <!--
           circle in upper right corner:
@@ -139,17 +77,6 @@
     </shape>
   </tile>
   <tile id="wall-rounded-lower-left">
-    <!-- default background: transparent -->
-    <background>
-      <pixmap>
-        <file>cracked.png</file>
-      </pixmap>
-    </background>
-    <foreground>
-      <pixmap>
-	<file>sm_squares.png</file>
-      </pixmap>
-    </foreground>
     <shape>
       <!--
           circle in lower left corner:
@@ -159,17 +86,6 @@
     </shape>
   </tile>
   <tile id="wall-rounded-lower-right">
-    <!-- default background: transparent -->
-    <background>
-      <pixmap>
-        <file>cracked.png</file>
-      </pixmap>
-    </background>
-    <foreground>
-      <pixmap>
-	<file>sm_squares.png</file>
-      </pixmap>
-    </foreground>
     <shape>
       <!--
           circle in lower right corner:

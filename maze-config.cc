@@ -33,10 +33,20 @@
 Maze_config::Maze_config(const char *path) :
   Config(path),
   _node_name_any(xercesc::XMLString::transcode("*")),
+  _node_name_background(xercesc::XMLString::transcode("background")),
+  _node_name_columns(xercesc::XMLString::transcode("columns")),
+  _node_name_contents(xercesc::XMLString::transcode("contents")),
+  _node_name_default_background(xercesc::XMLString::transcode("default-background")),
+  _node_name_default_foreground(xercesc::XMLString::transcode("default-foreground")),
+  _node_name_field(xercesc::XMLString::transcode("field")),
+  _node_name_file(xercesc::XMLString::transcode("file")),
+  _node_name_foreground(xercesc::XMLString::transcode("foreground")),
   _node_name_id(xercesc::XMLString::transcode("id")),
   _node_name_ignore(xercesc::XMLString::transcode("ignore")),
-  _node_name_field(xercesc::XMLString::transcode("field")),
+  _node_name_pixmap(xercesc::XMLString::transcode("pixmap")),
   _node_name_ref(xercesc::XMLString::transcode("ref")),
+  _node_name_rows(xercesc::XMLString::transcode("rows")),
+  _node_name_shape(xercesc::XMLString::transcode("shape")),
   _node_name_tile(xercesc::XMLString::transcode("tile")),
   _node_name_tile_shortcut(xercesc::XMLString::transcode("tile-shortcut")),
   _tiles(new Tile_symbols())
@@ -46,40 +56,36 @@ Maze_config::Maze_config(const char *path) :
 
 Maze_config::~Maze_config()
 {
-  // Q objects will be deleted by Qt, just set them to 0
-
   delete _tiles;
   _tiles = 0;
   delete _field;
   _field = 0;
 
-  XMLCh *node_name_any = (XMLCh *)_node_name_any;
-  xercesc::XMLString::release(&node_name_any);
-  _node_name_any = 0;
+  release(&_node_name_any);
+  release(&_node_name_background);
+  release(&_node_name_columns);
+  release(&_node_name_contents);
+  release(&_node_name_default_background);
+  release(&_node_name_default_foreground);
+  release(&_node_name_field);
+  release(&_node_name_file);
+  release(&_node_name_foreground);
+  release(&_node_name_id);
+  release(&_node_name_ignore);
+  release(&_node_name_pixmap);
+  release(&_node_name_ref);
+  release(&_node_name_rows);
+  release(&_node_name_shape);
+  release(&_node_name_tile);
+  release(&_node_name_tile_shortcut);
+}
 
-  XMLCh *node_name_id = (XMLCh *)_node_name_id;
-  xercesc::XMLString::release(&node_name_id);
-  _node_name_id = 0;
-
-  XMLCh *node_name_ignore = (XMLCh *)_node_name_ignore;
-  xercesc::XMLString::release(&node_name_ignore);
-  _node_name_ignore = 0;
-
-  XMLCh *node_name_field = (XMLCh *)_node_name_field;
-  xercesc::XMLString::release(&node_name_field);
-  _node_name_field = 0;
-
-  XMLCh *node_name_ref = (XMLCh *)_node_name_ref;
-  xercesc::XMLString::release(&node_name_ref);
-  _node_name_ref = 0;
-
-  XMLCh *node_name_tile = (XMLCh *)_node_name_tile;
-  xercesc::XMLString::release(&node_name_tile);
-  _node_name_tile = 0;
-
-  XMLCh *node_name_tile_shortcut = (XMLCh *)_node_name_tile_shortcut;
-  xercesc::XMLString::release(&node_name_tile_shortcut);
-  _node_name_tile_shortcut = 0;
+void
+Maze_config::release(const XMLCh **node_name)
+{
+  XMLCh **__node_name = (XMLCh **)node_name;
+  xercesc::XMLString::release(__node_name);
+  *node_name = 0;
 }
 
 void
@@ -93,9 +99,21 @@ Maze_config::reload(const xercesc::DOMElement *elem_config)
   xercesc::XMLString::release(&node_name_as_c_star);
   node_name_as_c_star = 0;
 
-  const xercesc::DOMElement *elem_background =
-    get_single_child_element(elem_config, "background", true);
-  reload_brush(elem_background, &_background);
+  const xercesc::DOMElement *elem_default_background =
+    get_single_child_element(elem_config, _node_name_default_background, false);
+  if (elem_default_background) {
+    reload_brush(elem_default_background, &_default_background);
+  } else {
+    _default_background = QBrush(Qt::black);
+  }
+
+  const xercesc::DOMElement *elem_default_foreground =
+    get_single_child_element(elem_config, _node_name_default_foreground, false);
+  if (elem_default_foreground) {
+    reload_brush(elem_default_foreground, &_default_foreground);
+  } else {
+    _default_foreground = QBrush(Qt::white);
+  }
 
   reload_tiles(elem_config);
   reload_field(elem_config);
@@ -103,19 +121,19 @@ Maze_config::reload(const xercesc::DOMElement *elem_config)
 }
 
 void
-Maze_config::reload_brush(const xercesc::DOMElement *elem_background,
-			  QBrush *background)
+Maze_config::reload_brush(const xercesc::DOMElement *elem_brush_ground,
+			  QBrush *brush_ground)
 {
-  if (!elem_background) {
-    fatal("elem_background is null");
+  if (!elem_brush_ground) {
+    fatal("elem_brush_ground is null");
   }
   const xercesc::DOMElement *elem_pixmap =
-    get_single_child_element(elem_background, "pixmap");
+    get_single_child_element(elem_brush_ground, _node_name_pixmap);
   if (!elem_pixmap) {
-    fatal("for now, background definition must contain pixmap definition");
+    fatal("for now, brush ground definition must contain pixmap definition");
   }
   const xercesc::DOMElement *elem_file =
-    get_single_child_element(elem_pixmap, "file");
+    get_single_child_element(elem_pixmap, _node_name_file);
   if (!elem_file) {
     fatal("for now, pixmap definition must contain file definition");
   }
@@ -125,7 +143,7 @@ Maze_config::reload_brush(const xercesc::DOMElement *elem_background,
   if (!pixmap) {
     fatal ("not enough memory");
   }
-  *background = QBrush(*pixmap);
+  *brush_ground = QBrush(*pixmap);
   xercesc::XMLString::release(&str_file_path);
 }
 
@@ -367,11 +385,11 @@ Maze_config::load_field(const xercesc::DOMElement *elem_field)
 {
   debug("'field('");
   const xercesc::DOMElement *elem_columns =
-    get_single_child_element(elem_field, "columns", true);
+    get_single_child_element(elem_field, _node_name_columns, true);
   const size_t width = text_content_as_size_t(elem_columns);
 
   const xercesc::DOMElement *elem_rows =
-    get_single_child_element(elem_field, "rows", true);
+    get_single_child_element(elem_field, _node_name_rows, true);
   const size_t height = text_content_as_size_t(elem_rows);
 
   std::set<Xml_string> ignore_chars;
@@ -389,7 +407,7 @@ Maze_config::load_field(const xercesc::DOMElement *elem_field)
   }
 
   const xercesc::DOMElement *elem_contents =
-    get_single_child_element(elem_field, "contents", true);
+    get_single_child_element(elem_field, _node_name_contents, true);
   _field =
     load_field_contents(elem_contents, width, height,
                         &ignore_chars, &shortcuts);
@@ -453,31 +471,32 @@ Maze_config::load_tile(const xercesc::DOMElement *elem_tile)
 
   QBrush foreground;
   const xercesc::DOMElement *elem_foreground =
-    get_single_child_element(elem_tile, "foreground");
+    get_single_child_element(elem_tile, _node_name_foreground);
   if (elem_foreground) {
     reload_brush(elem_foreground, &foreground);
   } else {
     std::stringstream msg;
-    msg << "foreground on tile '" << str_id <<
-      "': falling back to global foreground";
-    fatal(msg.str());
+    msg << "no foreground defined for tile '" << str_id <<
+      "': falling back to default foreground";
+    Log::info(msg.str());
+    foreground = _default_foreground;
   }
 
   QBrush background;
   const xercesc::DOMElement *elem_background =
-    get_single_child_element(elem_tile, "background");
+    get_single_child_element(elem_tile, _node_name_background);
   if (elem_background) {
     reload_brush(elem_background, &background);
   } else {
     std::stringstream msg;
-    msg << "background on tile '" << str_id <<
-      "': falling back to global background";
-    fatal(msg.str());
-    //background = _background; // may not yet be initialized
+    msg << "no background defined for tile '" << str_id <<
+      "': falling back to default background";
+    Log::info(msg.str());
+    background = _default_background;
   }
 
   const xercesc::DOMElement *elem_shape =
-    get_single_child_element(elem_tile, "shape", true);
+    get_single_child_element(elem_tile, _node_name_shape, true);
   if (!elem_shape) {
     fatal("for now, tile definition must contain shape definition");
   }

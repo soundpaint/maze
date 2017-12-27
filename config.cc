@@ -313,19 +313,6 @@ Config::parse_long_double(const XMLCh *token)
 
 xercesc::DOMElement *
 Config::get_single_child_element(const xercesc::DOMElement *parent,
-				 const char *single_child_name_as_c_star,
-                                 const bool required)
-{
-  XMLCh *single_child_name =
-    xercesc::XMLString::transcode(single_child_name_as_c_star);
-  xercesc::DOMElement *single_child_element =
-    get_single_child_element(parent, single_child_name, required);
-  xercesc::XMLString::release(&single_child_name);
-  return single_child_element;
-}
-
-xercesc::DOMElement *
-Config::get_single_child_element(const xercesc::DOMElement *parent,
 				 const XMLCh *single_child_name,
                                  const bool required)
 {
