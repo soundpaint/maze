@@ -169,56 +169,6 @@ Shape_terms::is_inside(const double x, const double y) const
   return is_negated();
 }
 
-Shape::Shape(const Xml_string *id,
-             const Shape_terms *shape_terms) :
-  _id(id),
-  _shape_terms(shape_terms)
-{
-  if (!id) {
-    Log::fatal("id is null");
-  }
-  if (!shape_terms) {
-    Log::fatal("shape_terms is null");
-  }
-}
-
-Shape::~Shape()
-{
-  //free(_id); // TODO
-  _id = 0;
-  delete _shape_terms;
-  _shape_terms = 0;
-}
-
-const std::string
-Shape::to_string() const
-{
-  std::stringstream str;
-  str << "Shape{";
-  str << "id=" << _id;
-  str << ", shape_terms=" << _shape_terms;
-  str <<"}";
-  return std::string(str.str());
-}
-
-const Xml_string *
-Shape::get_id() const
-{
-  return _id;
-}
-
-const Shape_terms *
-Shape::get_terms() const
-{
-  return _shape_terms;
-}
-
-const bool
-Shape::is_inside(const double x, const double y) const
-{
-  return _shape_terms->is_inside(x, y);
-}
-
 /*
  * Local variables:
  *   mode: c++

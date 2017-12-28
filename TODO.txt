@@ -1,6 +1,5 @@
 * Make parser fully static.
 * Check: Shape_terms is not always a constant...
-* Move class Shape from shape-expression.* into separate file.
 * FIXME: Maze_config::load_shape() returns either a definition or a
   resolved reference, but the caller always assumes a definition
   (and tries to add it to the shape symbol definitions table).

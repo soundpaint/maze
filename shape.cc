@@ -22,33 +22,57 @@
  * Author's web site: www.juergen-reuter.de
  */
 
-#ifndef SHAPE_SYMBOLS_HH
-#define SHAPE_SYMBOLS_HH
-
-#include <unordered_map>
 #include <shape.hh>
-#include <xml-string.hh>
-
-class Shape_symbols
+#include <log.hh>
+Shape::Shape(const Xml_string *id,
+             const Shape_terms *shape_terms) :
+  _id(id),
+  _shape_terms(shape_terms)
 {
-public:
-  Shape_symbols();
-  virtual ~Shape_symbols();
-  void add(const Xml_string *id, const Shape *shape);
-  const bool exists(const Xml_string *id) const;
-  const Shape *lookup(const Xml_string *id) const;
-  void dump() const;
-private:
-  typedef std::unordered_map<const Xml_string *,
-                             const Shape *,
-                             Xml_string::hashing_functor,
-                             Xml_string::equal_functor>
-  xml_string_to_shape_t;
-  static const xml_string_to_shape_t::size_type BUCKET_COUNT = 5;
-  xml_string_to_shape_t *_id_to_shape;
-};
+  if (!id) {
+    Log::fatal("id is null");
+  }
+  if (!shape_terms) {
+    Log::fatal("shape_terms is null");
+  }
+}
 
-#endif /* SHAPE_SYMBOLS_HH */
+Shape::~Shape()
+{
+  //free(_id); // TODO
+  _id = 0;
+  delete _shape_terms;
+  _shape_terms = 0;
+}
+
+const std::string
+Shape::to_string() const
+{
+  std::stringstream str;
+  str << "Shape{";
+  str << "id=" << _id;
+  str << ", shape_terms=" << _shape_terms;
+  str <<"}";
+  return std::string(str.str());
+}
+
+const Xml_string *
+Shape::get_id() const
+{
+  return _id;
+}
+
+const Shape_terms *
+Shape::get_terms() const
+{
+  return _shape_terms;
+}
+
+const bool
+Shape::is_inside(const double x, const double y) const
+{
+  return _shape_terms->is_inside(x, y);
+}
 
 /*
  * Local variables:

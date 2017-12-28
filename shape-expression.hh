@@ -31,7 +31,6 @@
 #include <xml-string.hh>
 
 /*
- * shape ::= shape_expression .
  * shape_expression ::= shape_terms .
  * shape_terms ::= shape_term |
  *                 "<or>" shape_term+ "</or>" .
@@ -97,21 +96,6 @@ public:
   const bool is_inside(const double x, const double y) const;
 private:
   std::vector<const Shape_factors *> *_terms;
-};
-
-class Shape
-{
-public:
-  Shape(const Xml_string *id,
-        const Shape_terms *shape_terms);
-  virtual ~Shape();
-  const std::string to_string() const;
-  const Xml_string *get_id() const;
-  const Shape_terms *get_terms() const;
-  const bool is_inside(const double x, const double y) const;
-private:
-  const Xml_string *_id;
-  const Shape_terms *_shape_terms;
 };
 
 #endif /* SHAPE_EXPRESSION_HH */

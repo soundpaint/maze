@@ -32,7 +32,7 @@
 #include <xml-string.hh>
 #include <shape-symbols.hh>
 #include <tile-symbols.hh>
-#include <shape-expression.hh>
+#include <shape.hh>
 #include <implicit-curve-compiler.hh>
 #include <brush-field.hh>
 

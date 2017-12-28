@@ -22,45 +22,27 @@
  * Author's web site: www.juergen-reuter.de
  */
 
-#ifndef TILE_HH
-#define TILE_HH
+#ifndef SHAPE_HH
+#define SHAPE_HH
 
-#include <xercesc/dom/DOM.hpp>
-#include <QtGui/QBrush>
-#include <xml-string.hh>
-#include <shape.hh>
+#include <shape-expression.hh>
 
-class Tile
+class Shape
 {
 public:
-  Tile(const Xml_string *id,
-       const QBrush foreground,
-       const QBrush background,
-       const double foreground_potential,
-       const double background_potential,
-       const Shape *shape);
-  virtual ~Tile();
+  Shape(const Xml_string *id,
+        const Shape_terms *shape_terms);
+  virtual ~Shape();
   const std::string to_string() const;
-  const double get_potential(const double x, const double y) const;
-  const QBrush *get_brush(const double x, const double y) const;
-  const double get_avg_tan(const double tile_offset_x,
-                           const double tile_offset_y,
-                           const double dx,
-                           const double dy) const;
   const Xml_string *get_id() const;
-  const QBrush get_foreground() const;
-  const QBrush get_background() const;
-  const Shape *get_shape() const;
+  const Shape_terms *get_terms() const;
+  const bool is_inside(const double x, const double y) const;
 private:
   const Xml_string *_id;
-  const QBrush _foreground;
-  const QBrush _background;
-  const double _foreground_potential;
-  const double _background_potential;
-  const Shape *_shape;
+  const Shape_terms *_shape_terms;
 };
 
-#endif /* TILE_HH */
+#endif /* SHAPE_HH */
 
 /*
  * Local variables:
