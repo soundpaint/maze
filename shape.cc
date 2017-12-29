@@ -39,7 +39,7 @@ Shape::Shape(const Xml_string *id,
 
 Shape::~Shape()
 {
-  //free(_id); // TODO
+  delete _id;
   _id = 0;
   delete _shape_terms;
   _shape_terms = 0;

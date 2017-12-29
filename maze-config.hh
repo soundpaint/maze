@@ -62,12 +62,17 @@ private:
   const XMLCh *_node_name_field;
   const XMLCh *_node_name_file;
   const XMLCh *_node_name_foreground;
+  const XMLCh *_node_name_fractal;
   const XMLCh *_node_name_ignore;
   const XMLCh *_node_name_pixmap;
   const XMLCh *_node_name_rows;
   const XMLCh *_node_name_shape;
   const XMLCh *_node_name_tile;
   const XMLCh *_node_name_tile_shortcut;
+  const XMLCh *_node_name_x_offset;
+  const XMLCh *_node_name_x_scale;
+  const XMLCh *_node_name_y_offset;
+  const XMLCh *_node_name_y_scale;
   const XMLCh *_attr_name_id;
   const XMLCh *_attr_name_ref;
   Shape_symbols *_shapes;
@@ -83,6 +88,9 @@ private:
   void reload_tiles(const xercesc::DOMElement *elem_config);
   void reload_field(const xercesc::DOMElement *elem_config);
   static const size_t text_content_as_size_t(const xercesc::DOMElement *elem);
+  void determine_screen_geometry(uint16_t *width, uint16_t *height) const;
+  const QPixmap *load_pixmap_fractal(const xercesc::DOMElement *elem_fractal) const;
+  const QPixmap *load_pixmap_file(const xercesc::DOMElement *elem_file) const;
   void load_field_ignore_chars(const xercesc::DOMElement *elem_field,
                                std::set<Xml_string> *ignore_chars) const;
   void load_field_tile_shortcuts(const xercesc::DOMElement *elem_field,

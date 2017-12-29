@@ -31,12 +31,12 @@ class Fractals_factory
 {
   Q_OBJECT
 public:
-  static const QPixmap *create_fractal(const uint16_t width,
-				       const uint16_t height,
-				       const double x0 = 0.0,
-				       const double y0 = 0.0,
-				       const double x_scale = 1.0,
-				       const double y_scale = 1.0);
+  static const QPixmap *create_mandelbrot_set(const uint16_t width,
+                                              const uint16_t height,
+                                              const double x0 = 0.0,
+                                              const double y0 = 0.0,
+                                              const double x_scale = 1.0,
+                                              const double y_scale = 1.0);
 };
 
 #endif /* FRACTALS_FACTORY_HH */

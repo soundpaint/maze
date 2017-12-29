@@ -26,7 +26,10 @@
 #include <cerrno>
 #include <unistd.h>
 #include <inttypes.h>
+#include <QtWidgets/QApplication>
+#include <QtGui/QIcon>
 #include <log.hh>
+#include <fractals-factory.hh>
 
 #define CONFIG_SCHEMA_LOCATION "http://soundpaint.org/schema/maze-0.1/config.xsd"
 
@@ -41,12 +44,17 @@ Maze_config::Maze_config(const char *path) :
   _node_name_field(xercesc::XMLString::transcode("field")),
   _node_name_file(xercesc::XMLString::transcode("file")),
   _node_name_foreground(xercesc::XMLString::transcode("foreground")),
+  _node_name_fractal(xercesc::XMLString::transcode("fractal")),
   _node_name_ignore(xercesc::XMLString::transcode("ignore")),
   _node_name_pixmap(xercesc::XMLString::transcode("pixmap")),
   _node_name_rows(xercesc::XMLString::transcode("rows")),
   _node_name_shape(xercesc::XMLString::transcode("shape")),
   _node_name_tile(xercesc::XMLString::transcode("tile")),
   _node_name_tile_shortcut(xercesc::XMLString::transcode("tile-shortcut")),
+  _node_name_x_offset(xercesc::XMLString::transcode("x-offset")),
+  _node_name_x_scale(xercesc::XMLString::transcode("x-scale")),
+  _node_name_y_offset(xercesc::XMLString::transcode("y-offset")),
+  _node_name_y_scale(xercesc::XMLString::transcode("y-scale")),
   _attr_name_id(xercesc::XMLString::transcode("id")),
   _attr_name_ref(xercesc::XMLString::transcode("ref")),
   _shapes(new Shape_symbols()),
@@ -73,12 +81,17 @@ Maze_config::~Maze_config()
   release(&_node_name_field);
   release(&_node_name_file);
   release(&_node_name_foreground);
+  release(&_node_name_fractal);
   release(&_node_name_ignore);
   release(&_node_name_pixmap);
   release(&_node_name_rows);
   release(&_node_name_shape);
   release(&_node_name_tile);
   release(&_node_name_tile_shortcut);
+  release(&_node_name_x_offset);
+  release(&_node_name_x_scale);
+  release(&_node_name_y_offset);
+  release(&_node_name_y_scale);
   release(&_attr_name_id);
   release(&_attr_name_ref);
 }
@@ -124,6 +137,68 @@ Maze_config::reload(const xercesc::DOMElement *elem_config)
 }
 
 void
+Maze_config::determine_screen_geometry(uint16_t *width, uint16_t *height) const
+{
+#if 0
+  QScreen *screen = qApp->primaryScreen();
+  QRect geometry = screen->geometry();
+  *width = geometry.width();
+  *height = geometry.height();
+#else
+  *width = 1300;
+  *height = 600;
+#endif
+}
+
+const QPixmap *
+Maze_config::load_pixmap_fractal(const xercesc::DOMElement *elem_fractal) const
+{
+  const xercesc::DOMElement *elem_x_offset =
+    get_single_child_element(elem_fractal, _node_name_x_offset, true);
+  const XMLCh *node_value_x_offset = elem_x_offset->getTextContent();
+  const double x_offset = parse_double(node_value_x_offset);
+  const xercesc::DOMElement *elem_y_offset =
+    get_single_child_element(elem_fractal, _node_name_y_offset, true);
+  const XMLCh *node_value_y_offset = elem_y_offset->getTextContent();
+  const double y_offset = parse_double(node_value_y_offset);
+
+  const xercesc::DOMElement *elem_x_scale =
+    get_single_child_element(elem_fractal, _node_name_x_scale, true);
+  const XMLCh *node_value_x_scale = elem_x_scale->getTextContent();
+  const double x_scale = parse_double(node_value_x_scale);
+  const xercesc::DOMElement *elem_y_scale =
+    get_single_child_element(elem_fractal, _node_name_y_scale, true);
+  const XMLCh *node_value_y_scale = elem_y_scale->getTextContent();
+  const double y_scale = parse_double(node_value_y_scale);
+
+  uint16_t screen_width;
+  uint16_t screen_height;
+  determine_screen_geometry(&screen_width, &screen_height);
+
+  const QPixmap *pixmap =
+    Fractals_factory::create_mandelbrot_set(screen_width, screen_height,
+                                            x_offset, y_offset,
+                                            x_scale, y_scale);
+  if (!pixmap) {
+    fatal("not enough memory");
+  }
+  return pixmap;
+}
+
+const QPixmap *
+Maze_config::load_pixmap_file(const xercesc::DOMElement *elem_file) const
+{
+  const XMLCh *node_value_file = elem_file->getTextContent();
+  char *str_file_path = xercesc::XMLString::transcode(node_value_file);
+  const QPixmap *pixmap = new QPixmap(str_file_path);
+  xercesc::XMLString::release(&str_file_path);
+  if (!pixmap) {
+    fatal("not enough memory");
+  }
+  return pixmap;
+}
+
+void
 Maze_config::reload_brush(const xercesc::DOMElement *elem_brush_ground,
 			  QBrush *brush_ground)
 {
@@ -136,18 +211,21 @@ Maze_config::reload_brush(const xercesc::DOMElement *elem_brush_ground,
     fatal("for now, brush ground definition must contain pixmap definition");
   }
   const xercesc::DOMElement *elem_file =
-    get_single_child_element(elem_pixmap, _node_name_file);
-  if (!elem_file) {
-    fatal("for now, pixmap definition must contain file definition");
+    get_single_child_element(elem_pixmap, _node_name_file, false);
+  const xercesc::DOMElement *elem_fractal =
+    get_single_child_element(elem_pixmap, _node_name_fractal, false);
+  if (elem_file && elem_fractal) {
+    fatal("pixmap definition must not contain both file and "
+          "fractal definition");
   }
-  const XMLCh *node_value_file = elem_file->getTextContent();
-  char *str_file_path = xercesc::XMLString::transcode(node_value_file);
-  QPixmap *pixmap = new QPixmap(str_file_path);
-  if (!pixmap) {
-    fatal ("not enough memory");
+  if (!elem_file && !elem_fractal) {
+    fatal("for now, pixmap definition must contain either file or "
+          "fractal definition");
   }
+  const QPixmap *pixmap = elem_file ?
+    load_pixmap_file(elem_file) :
+    load_pixmap_fractal(elem_fractal);
   *brush_ground = QBrush(*pixmap);
-  xercesc::XMLString::release(&str_file_path);
 }
 
 void
@@ -616,7 +694,7 @@ Maze_config::load_tile(const xercesc::DOMElement *elem_tile)
   const double foreground_potential = 0.0; // TODO
   const double background_potential = 0.0; // TODO
 
-  Tile *tile =
+  const Tile *tile =
     new Tile(str_id,
              foreground, background,
              foreground_potential, background_potential,

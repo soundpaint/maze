@@ -1,3 +1,7 @@
+* Get rid of screen geometry constant definitions (1300, 600).
+* Classes Shape_symbols and Tile_symbols (and more symbol table
+  classes to come) should derive from an abstract Symbol_table
+  class and thus avoid code duplication.
 * Make parser fully static.
 * Check: Shape_terms is not always a constant...
 * FIXME: Maze_config::load_shape() returns either a definition or a
@@ -5,7 +9,6 @@
   (and tries to add it to the shape symbol definitions table).
   Solution: A reference should have no symbol id, and the caller
   can deploy this assumption for an appropriate check.
-* Get rid of "//free(...)".
 * Make it possible to define shapes outside of blocks, such that the
   same shape can be referenced from multiple blocks (with display
   offsets x and y), rather than having to redefine the shape over and

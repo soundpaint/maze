@@ -49,7 +49,7 @@ Tile::Tile(const Xml_string *id,
 
 Tile::~Tile()
 {
-  //free(_id); // TODO
+  delete _id;
   _id = 0;
   delete _shape;
   _shape = 0;

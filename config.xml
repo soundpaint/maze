@@ -19,7 +19,12 @@
   </default-foreground>
   <default-background>
     <pixmap>
-      <file>cracked.png</file>
+      <fractal>
+        <x-offset>-1.45</x-offset>
+        <y-offset>+0.125</y-offset>
+        <x-scale>+0.25</x-scale>
+        <y-scale>-0.25</y-scale>
+      </fractal>
     </pixmap>
   </default-background>
   <shape id="empty_curve">
