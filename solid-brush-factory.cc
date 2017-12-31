@@ -40,6 +40,16 @@ Solid_brush_factory::create_brush(const uint16_t width, const uint16_t height)
   return _brush;
 }
 
+std::string
+Solid_brush_factory::to_string()
+{
+  std::stringstream str;
+  str << "Solid_brush_factory{" <<
+    "color=" << _brush.color().name().toStdString() <<
+    "}";
+  return std::string(str.str());
+}
+
 /*
  * Local variables:
  *   mode: c++

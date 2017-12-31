@@ -34,6 +34,7 @@ public:
   Pixmap_brush_factory(const char *file_path);
   virtual ~Pixmap_brush_factory();
   virtual QBrush create_brush(const uint16_t width, const uint16_t height);
+  virtual std::string to_string();
 private:
   const QBrush _brush;
   static const QBrush create_brush(const char *file_path);

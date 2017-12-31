@@ -35,6 +35,7 @@ public:
   Solid_brush_factory(const QColor color);
   virtual ~Solid_brush_factory();
   virtual QBrush create_brush(const uint16_t width, const uint16_t height);
+  virtual std::string to_string();
 private:
   const QBrush _brush;
 };

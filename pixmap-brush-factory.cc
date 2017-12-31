@@ -49,6 +49,18 @@ Pixmap_brush_factory::create_brush(const uint16_t width, const uint16_t height)
   return _brush;
 }
 
+std::string
+Pixmap_brush_factory::to_string()
+{
+  QPixmap pixmap = _brush.texture();
+  std::stringstream str;
+  str << "Pixmap_brush_factory{" <<
+    "width=" << pixmap.width() <<
+    ", height=" << pixmap.height() <<
+    "}";
+  return std::string(str.str());
+}
+
 /*
  * Local variables:
  *   mode: c++

@@ -30,7 +30,7 @@
 #include <QtGui/QIcon>
 #include <QtGui/QScreen>
 #include <log.hh>
-#include <fractals-factory.hh>
+#include <fractals-brush-factory.hh>
 #include <pixmap-brush-factory.hh>
 #include <solid-brush-factory.hh>
 
@@ -162,8 +162,8 @@ Maze_config::load_brush_fractal(const xercesc::DOMElement *elem_fractal) const
   const XMLCh *node_value_y_scale = elem_y_scale->getTextContent();
   const double y_scale = parse_double(node_value_y_scale);
 
-  IBrush_factory *factory = new Fractals_factory(x_offset, y_offset,
-                                                 x_scale, y_scale);
+  IBrush_factory *factory = new Fractals_brush_factory(x_offset, y_offset,
+                                                       x_scale, y_scale);
   if (!factory) {
     fatal("not enough memory");
   }

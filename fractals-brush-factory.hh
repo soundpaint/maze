@@ -22,13 +22,13 @@
  * Author's web site: www.juergen-reuter.de
  */
 
-#ifndef FRACTALS_FACTORY_HH
-#define FRACTALS_FACTORY_HH
+#ifndef FRACTALS_BRUSH_FACTORY_HH
+#define FRACTALS_BRUSH_FACTORY_HH
 
 #include <QtGui/QPixmap>
 #include <ibrush-factory.hh>
 
-class Fractals_factory : public IBrush_factory
+class Fractals_brush_factory : public IBrush_factory
 {
 public:
   static QPixmap * const create_mandelbrot_set(const uint16_t width,
@@ -37,12 +37,13 @@ public:
                                                const double y0 = 0.0,
                                                const double x_scale = 1.0,
                                                const double y_scale = 1.0);
-  Fractals_factory(const double x0 = 0.0,
-                   const double y0 = 0.0,
-                   const double x_scale = 1.0,
-                   const double y_scale = 1.0);
-  virtual ~Fractals_factory();
+  Fractals_brush_factory(const double x0 = 0.0,
+                         const double y0 = 0.0,
+                         const double x_scale = 1.0,
+                         const double y_scale = 1.0);
+  virtual ~Fractals_brush_factory();
   virtual QBrush create_brush(const uint16_t width, const uint16_t height);
+  virtual std::string to_string();
 private:
   const double _x0;
   const double _y0;
@@ -53,7 +54,7 @@ private:
   uint16_t _height_of_cached_pixmap;
 };
 
-#endif /* FRACTALS_FACTORY_HH */
+#endif /* FRACTALS_BRUSH_FACTORY_HH */
 
 /*
  * Local variables:

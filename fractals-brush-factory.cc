@@ -22,15 +22,15 @@
  * Author's web site: www.juergen-reuter.de
  */
 
-#include <fractals-factory.hh>
+#include <fractals-brush-factory.hh>
 #include <QtGui/QColor>
 #include <QtGui/QPainter>
 #include <log.hh>
 
-Fractals_factory::Fractals_factory(const double x0,
-                                   const double y0,
-                                   const double x_scale,
-                                   const double y_scale) :
+Fractals_brush_factory::Fractals_brush_factory(const double x0,
+                                               const double y0,
+                                               const double x_scale,
+                                               const double y_scale) :
   _x0(x0),
   _y0(y0),
   _x_scale(x_scale),
@@ -41,7 +41,7 @@ Fractals_factory::Fractals_factory(const double x0,
   _height_of_cached_pixmap = 0;
 }
 
-Fractals_factory::~Fractals_factory()
+Fractals_brush_factory::~Fractals_brush_factory()
 {
   if (_cached_pixmap) {
     delete _cached_pixmap;
@@ -52,7 +52,8 @@ Fractals_factory::~Fractals_factory()
 }
 
 QBrush
-Fractals_factory::create_brush(const uint16_t width, const uint16_t height)
+Fractals_brush_factory::create_brush(const uint16_t width,
+                                     const uint16_t height)
 {
   if ((width != _width_of_cached_pixmap) ||
       (height != _height_of_cached_pixmap) ||
@@ -72,16 +73,16 @@ Fractals_factory::create_brush(const uint16_t width, const uint16_t height)
 }
 
 QPixmap * const
-Fractals_factory::create_mandelbrot_set(const uint16_t width,
-                                        const uint16_t height,
-                                        const double x0,
-                                        const double y0,
-                                        const double x_scale,
-                                        const double y_scale)
+Fractals_brush_factory::create_mandelbrot_set(const uint16_t width,
+                                              const uint16_t height,
+                                              const double x0,
+                                              const double y0,
+                                              const double x_scale,
+                                              const double y_scale)
 {
   QPixmap * const pixmap = new QPixmap(width, height);
   if (!pixmap) {
-    Log::fatal("Fractals_factory::create_fractal(): not enough memory");
+    Log::fatal("not enough memory");
   }
   if ((width == 0) || (height == 0))
     return pixmap;
@@ -114,6 +115,17 @@ Fractals_factory::create_mandelbrot_set(const uint16_t width,
     }
   }
   return pixmap;
+}
+
+std::string
+Fractals_brush_factory::to_string()
+{
+  std::stringstream str;
+  str << "Fractals_brush_factory{" <<
+    "x0=" << _x0 << ", y0=" << _y0 <<
+    ", x_scale=" << _x_scale << ", y_scale=" << _y_scale <<
+    "}";
+  return std::string(str.str());
 }
 
 /*
