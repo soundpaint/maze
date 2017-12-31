@@ -61,6 +61,7 @@ Maze_config::Maze_config(const char *path) :
   _node_name_y_scale(xercesc::XMLString::transcode("y-scale")),
   _attr_name_id(xercesc::XMLString::transcode("id")),
   _attr_name_ref(xercesc::XMLString::transcode("ref")),
+  _brush_factories(new Brush_factory_symbols()),
   _shapes(new Shape_symbols()),
   _tiles(new Tile_symbols())
 {
@@ -73,6 +74,8 @@ Maze_config::~Maze_config()
   _shapes = 0;
   delete _tiles;
   _tiles = 0;
+  delete _brush_factories;
+  _brush_factories = 0;
   delete _field;
   _field = 0;
 
@@ -120,20 +123,34 @@ Maze_config::reload(const xercesc::DOMElement *elem_config)
   xercesc::XMLString::release(&node_name_as_c_star);
   node_name_as_c_star = 0;
 
+  reload_brush_factories(elem_config);
+
   const xercesc::DOMElement *elem_default_background =
     get_single_child_element(elem_config, _node_name_default_background, false);
   if (elem_default_background) {
-    _default_background_brush_factory = reload_brush(elem_default_background);
+    const xercesc::DOMElement *elem_brush =
+      get_single_child_element(elem_default_background, _node_name_brush);
+    if (!elem_brush) {
+      fatal("missing brush element");
+    }
+    _default_background_brush_factory =
+      load_brush(elem_brush, false);
   } else {
-    _default_background_brush_factory = new Solid_brush_factory(Qt::black);
+    _default_background_brush_factory = new Solid_brush_factory(0, Qt::black);
   }
 
   const xercesc::DOMElement *elem_default_foreground =
     get_single_child_element(elem_config, _node_name_default_foreground, false);
   if (elem_default_foreground) {
-    _default_foreground_brush_factory = reload_brush(elem_default_foreground);
+    const xercesc::DOMElement *elem_brush =
+      get_single_child_element(elem_default_foreground, _node_name_brush);
+    if (!elem_brush) {
+      fatal("missing brush element");
+    }
+    _default_foreground_brush_factory =
+      load_brush(elem_brush, false);
   } else {
-    _default_background_brush_factory = new Solid_brush_factory(Qt::white);
+    _default_background_brush_factory = new Solid_brush_factory(0, Qt::white);
   }
 
   reload_shapes(elem_config);
@@ -142,7 +159,8 @@ Maze_config::reload(const xercesc::DOMElement *elem_config)
 }
 
 IBrush_factory *
-Maze_config::load_brush_fractal(const xercesc::DOMElement *elem_fractal) const
+Maze_config::load_brush_fractal(const Xml_string *id,
+                                const xercesc::DOMElement *elem_fractal) const
 {
   const xercesc::DOMElement *elem_x_offset =
     get_single_child_element(elem_fractal, _node_name_x_offset, true);
@@ -162,7 +180,8 @@ Maze_config::load_brush_fractal(const xercesc::DOMElement *elem_fractal) const
   const XMLCh *node_value_y_scale = elem_y_scale->getTextContent();
   const double y_scale = parse_double(node_value_y_scale);
 
-  IBrush_factory *factory = new Fractals_brush_factory(x_offset, y_offset,
+  IBrush_factory *factory = new Fractals_brush_factory(id,
+                                                       x_offset, y_offset,
                                                        x_scale, y_scale);
   if (!factory) {
     fatal("not enough memory");
@@ -171,11 +190,12 @@ Maze_config::load_brush_fractal(const xercesc::DOMElement *elem_fractal) const
 }
 
 IBrush_factory *
-Maze_config::load_brush_file(const xercesc::DOMElement *elem_file) const
+Maze_config::load_brush_file(const Xml_string *id,
+                             const xercesc::DOMElement *elem_file) const
 {
   const XMLCh *node_value_file = elem_file->getTextContent();
   char *str_file_path = xercesc::XMLString::transcode(node_value_file);
-  IBrush_factory *factory = new Pixmap_brush_factory(str_file_path);
+  IBrush_factory *factory = new Pixmap_brush_factory(id, str_file_path);
   if (!factory) {
     fatal("not enough memory");
   }
@@ -184,7 +204,8 @@ Maze_config::load_brush_file(const xercesc::DOMElement *elem_file) const
 }
 
 IBrush_factory *
-Maze_config::load_brush_solid(const xercesc::DOMElement *elem_solid) const
+Maze_config::load_brush_solid(const Xml_string *id,
+                              const xercesc::DOMElement *elem_solid) const
 {
   const XMLCh *node_value_solid = elem_solid->getTextContent();
   char *str_solid_color = xercesc::XMLString::transcode(node_value_solid);
@@ -196,7 +217,7 @@ Maze_config::load_brush_solid(const xercesc::DOMElement *elem_solid) const
     fatal(msg.str());
   }
   xercesc::XMLString::release(&str_solid_color);
-  IBrush_factory *factory = new Solid_brush_factory(solid_color);
+  IBrush_factory *factory = new Solid_brush_factory(id, solid_color);
   if (!factory) {
     fatal("not enough memory");
   }
@@ -204,16 +225,20 @@ Maze_config::load_brush_solid(const xercesc::DOMElement *elem_solid) const
 }
 
 IBrush_factory *
-Maze_config::reload_brush(const xercesc::DOMElement *elem_brush_ground)
+Maze_config::load_brush_definition(const xercesc::DOMElement *elem_brush,
+                                   const XMLCh *attr_id) const
 {
-  if (!elem_brush_ground) {
-    fatal("elem_brush_ground is null");
+  // symbol definition
+  Xml_string *str_id;
+  if (attr_id) {
+    str_id = new Xml_string(attr_id);
+    if (!str_id) {
+      fatal("not enough memory");
+    }
+  } else {
+    str_id = 0;
   }
-  const xercesc::DOMElement *elem_brush =
-    get_single_child_element(elem_brush_ground, _node_name_brush);
-  if (!elem_brush) {
-    fatal("missing brush element");
-  }
+
   const xercesc::DOMElement *elem_solid =
     get_single_child_element(elem_brush, _node_name_solid, false);
   const xercesc::DOMElement *elem_file =
@@ -226,11 +251,56 @@ Maze_config::reload_brush(const xercesc::DOMElement *elem_brush_ground)
     fatal("brush definition must contain exactly one of either solid or "
           "file or fractal definition");
   }
+
   IBrush_factory *factory =
-    elem_solid ? load_brush_solid(elem_solid) :
-    elem_file ? load_brush_file(elem_file) :
-    load_brush_fractal(elem_fractal);
+    elem_solid ? load_brush_solid(str_id, elem_solid) :
+    elem_file ? load_brush_file(str_id, elem_file) :
+    load_brush_fractal(str_id, elem_fractal);
+  debug("')'");
   return factory;
+}
+
+IBrush_factory *
+Maze_config::resolve_brush_reference(const xercesc::DOMElement *elem_brush,
+                                     const XMLCh *attr_ref) const
+{
+  // symbol reference
+  Xml_string str_ref(attr_ref);
+  IBrush_factory *brush_factory = _brush_factories->lookup(&str_ref);
+  if (!brush_factory) {
+    std::stringstream msg;
+    char *str_ref_as_c_star = str_ref.transcode();
+    msg << "can not resolve brush '" << str_ref_as_c_star << "'";
+    str_ref.release(&str_ref_as_c_star);
+    fatal(msg.str());
+  }
+  return brush_factory;
+}
+
+IBrush_factory *
+Maze_config::load_brush(const xercesc::DOMElement *elem_brush,
+                        const bool require_definition) const
+{
+  debug("'brush('");
+  if (!elem_brush) {
+    fatal("unexpected null element");
+  }
+
+  const XMLCh *attr_id = elem_brush->getAttribute(_attr_name_id);
+
+  if (require_definition) {
+    if (xercesc::XMLString::stringLen(attr_id) <= 0) {
+      fatal("missing or empty 'id' attribute on brush definition");
+    }
+  }
+
+  const XMLCh *attr_ref = elem_brush->getAttribute(_attr_name_ref);
+  IBrush_factory *brush_factory =
+    (xercesc::XMLString::stringLen(attr_ref) > 0) ?
+    resolve_brush_reference(elem_brush, attr_ref) :
+    load_brush_definition(elem_brush, attr_id);
+  debug("')'");
+  return brush_factory;
 }
 
 void
@@ -592,7 +662,7 @@ Maze_config::load_shape(const xercesc::DOMElement *elem_shape,
 {
   debug("'shape('");
   if (!elem_shape) {
-    fatal("unexpected null element");
+    fatal("missing shape element");
   }
 
   const XMLCh *attr_id = elem_shape->getAttribute(_attr_name_id);
@@ -610,6 +680,31 @@ Maze_config::load_shape(const xercesc::DOMElement *elem_shape,
     load_shape_definition(elem_shape, attr_id);
   debug("')'");
   return shape;
+}
+
+void
+Maze_config::reload_brush_factories(const xercesc::DOMElement *elem_config)
+{
+  debug("'brushes('");
+  const xercesc::DOMNodeList *node_list =
+    get_children_by_tag_name(elem_config, _node_name_brush);
+  if (node_list) {
+    const XMLSize_t length = node_list->getLength();
+    for (uint32_t node_index = 0; node_index < length; node_index++) {
+      xercesc::DOMNode *node = node_list->item(node_index);
+      xercesc::DOMElement *elem_brush =
+        dynamic_cast<xercesc::DOMElement *>(node);
+      if (!elem_brush) {
+	fatal("unexpected null element");
+      }
+      IBrush_factory *brush_factory = load_brush(elem_brush, true);
+      const Xml_string *id = brush_factory->get_id();
+      _brush_factories->add(id, brush_factory);
+    }
+  } else {
+    // no brush factories => nothing to parse
+  }
+  debug("')'");
 }
 
 void
@@ -667,7 +762,12 @@ Maze_config::load_tile(const xercesc::DOMElement *elem_tile)
   const xercesc::DOMElement *elem_foreground =
     get_single_child_element(elem_tile, _node_name_foreground);
   if (elem_foreground) {
-    foreground_brush_factory = reload_brush(elem_foreground);
+    const xercesc::DOMElement *elem_brush =
+      get_single_child_element(elem_foreground, _node_name_brush);
+    if (!elem_brush) {
+      fatal("missing brush element");
+    }
+    foreground_brush_factory = load_brush(elem_brush, false);
   } else {
     std::stringstream msg;
     msg << "no foreground defined for tile '" << str_id <<
@@ -680,7 +780,12 @@ Maze_config::load_tile(const xercesc::DOMElement *elem_tile)
   const xercesc::DOMElement *elem_background =
     get_single_child_element(elem_tile, _node_name_background);
   if (elem_background) {
-    background_brush_factory = reload_brush(elem_background);
+    const xercesc::DOMElement *elem_brush =
+      get_single_child_element(elem_background, _node_name_brush);
+    if (!elem_brush) {
+      fatal("missing brush element");
+    }
+    background_brush_factory = load_brush(elem_brush, false);
   } else {
     std::stringstream msg;
     msg << "no background defined for tile '" << str_id <<

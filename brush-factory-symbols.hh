@@ -22,21 +22,33 @@
  * Author's web site: www.juergen-reuter.de
  */
 
-#ifndef IBRUSH_FACTORY_HH
-#define IBRUSH_FACTORY_HH
+#ifndef BRUSH_FACTORY_SYMBOLS_HH
+#define BRUSH_FACTORY_SYMBOLS_HH
 
-#include <QtGui/QBrush>
+#include <unordered_map>
+#include <ibrush-factory.hh>
 #include <xml-string.hh>
 
-class IBrush_factory
+class Brush_factory_symbols
 {
 public:
-  virtual QBrush create_brush(const uint16_t width, const uint16_t height) = 0;
-  virtual const Xml_string *get_id() const = 0;
-  virtual std::string to_string() = 0;
+  Brush_factory_symbols();
+  virtual ~Brush_factory_symbols();
+  void add(const Xml_string *id, IBrush_factory *brush_factory);
+  const bool exists(const Xml_string *id) const;
+  IBrush_factory *lookup(const Xml_string *id) const;
+  void dump() const;
+private:
+  typedef std::unordered_map<const Xml_string *,
+                             IBrush_factory *,
+                             Xml_string::hashing_functor,
+                             Xml_string::equal_functor>
+  xml_string_to_brush_factory_t;
+  static const xml_string_to_brush_factory_t::size_type BUCKET_COUNT = 5;
+  xml_string_to_brush_factory_t *_id_to_brush_factory;
 };
 
-#endif /* IBRUSH_FACTORY_HH */
+#endif /* BRUSH_FACTORY_SYMBOLS_HH */
 
 /*
  * Local variables:

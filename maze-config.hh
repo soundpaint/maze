@@ -28,13 +28,12 @@
 #include <set>
 #include <xercesc/dom/DOM.hpp>
 #include <QtGui/QBrush>
+#include <brush-field.hh>
+#include <brush-factory-symbols.hh>
 #include <config.hh>
-#include <xml-string.hh>
+#include <implicit-curve-compiler.hh>
 #include <shape-symbols.hh>
 #include <tile-symbols.hh>
-#include <shape.hh>
-#include <implicit-curve-compiler.hh>
-#include <brush-field.hh>
 
 class Maze_config : Config
 {
@@ -76,6 +75,7 @@ private:
   const XMLCh *_node_name_y_scale;
   const XMLCh *_attr_name_id;
   const XMLCh *_attr_name_ref;
+  Brush_factory_symbols *_brush_factories;
   Shape_symbols *_shapes;
   Tile_symbols *_tiles;
   IBrush_factory *_default_foreground_brush_factory;
@@ -83,14 +83,23 @@ private:
   Implicit_curve_compiler _implicit_curve_compiler;
   Brush_field *_field;
   static void release(const XMLCh **node_name);
-  IBrush_factory *reload_brush(const xercesc::DOMElement *elem_brush_ground);
+  void reload_brush_factories(const xercesc::DOMElement *elem_config);
   void reload_shapes(const xercesc::DOMElement *elem_config);
   void reload_tiles(const xercesc::DOMElement *elem_config);
   void reload_field(const xercesc::DOMElement *elem_config);
   static const size_t text_content_as_size_t(const xercesc::DOMElement *elem);
-  IBrush_factory *load_brush_fractal(const xercesc::DOMElement *elem_fractal) const;
-  IBrush_factory *load_brush_file(const xercesc::DOMElement *elem_file) const;
-  IBrush_factory *load_brush_solid(const xercesc::DOMElement *elem_solid) const;
+  IBrush_factory *load_brush_fractal(const Xml_string *id,
+                                     const xercesc::DOMElement *elem_fractal) const;
+  IBrush_factory *load_brush_file(const Xml_string *id,
+                                  const xercesc::DOMElement *elem_file) const;
+  IBrush_factory *load_brush_solid(const Xml_string *id,
+                                   const xercesc::DOMElement *elem_solid) const;
+  IBrush_factory *load_brush_definition(const xercesc::DOMElement *elem_brush,
+                                        const XMLCh *attr_id) const;
+  IBrush_factory *resolve_brush_reference(const xercesc::DOMElement *elem_brush,
+                                          const XMLCh *attr_ref) const;
+  IBrush_factory *load_brush(const xercesc::DOMElement *elem_brush_ground,
+                             const bool require_definition) const;
   void load_field_ignore_chars(const xercesc::DOMElement *elem_field,
                                std::set<Xml_string> *ignore_chars) const;
   void load_field_tile_shortcuts(const xercesc::DOMElement *elem_field,

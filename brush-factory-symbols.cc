@@ -22,70 +22,71 @@
  * Author's web site: www.juergen-reuter.de
  */
 
-#include <tile-symbols.hh>
+#include <brush-factory-symbols.hh>
 #include <log.hh>
 
-Tile_symbols::Tile_symbols()
+Brush_factory_symbols::Brush_factory_symbols()
 {
-  _id_to_tile =
-    new xml_string_to_tile_t(BUCKET_COUNT,
-                             Xml_string::hashing_functor(),
-                             Xml_string::equal_functor());
-  if (!_id_to_tile) {
+  _id_to_brush_factory =
+    new xml_string_to_brush_factory_t(BUCKET_COUNT,
+                                      Xml_string::hashing_functor(),
+                                      Xml_string::equal_functor());
+  if (!_id_to_brush_factory) {
     Log::fatal("not enough memory");
   }
 }
 
-Tile_symbols::~Tile_symbols()
+Brush_factory_symbols::~Brush_factory_symbols()
 {
-  delete _id_to_tile;
-  _id_to_tile = 0;
+  delete _id_to_brush_factory;
+  _id_to_brush_factory = 0;
 }
 
 void
-Tile_symbols::add(const Xml_string *id, Tile *tile)
+Brush_factory_symbols::add(const Xml_string *id, IBrush_factory *brush_factory)
 {
   if (!id) {
     Log::fatal("unexpected null id");
   }
-  if (!tile) {
-    Log::fatal("unexpected null tile");
+  if (!brush_factory) {
+    Log::fatal("unexpected null brush_factory");
   }
 
   if (exists(id)) {
     std::stringstream msg;
     char *str_id = id->transcode();
-    msg << "already have tile with id=" << str_id << " in symbol table";
+    msg << "already have brush factory with id=" << str_id <<
+      " in symbol table";
     id->release(&str_id);
     Log::fatal(msg.str());
   }
 
-  (*_id_to_tile)[id] = tile;
+  (*_id_to_brush_factory)[id] = brush_factory;
 }
 
 const bool
-Tile_symbols::exists(const Xml_string *id) const
+Brush_factory_symbols::exists(const Xml_string *id) const
 {
   if (!id) {
     Log::fatal("unexpected null id");
   }
   return
-    _id_to_tile->count(id) > 0;
+    _id_to_brush_factory->count(id) > 0;
 }
 
-Tile *
-Tile_symbols::lookup(const Xml_string *id) const
+IBrush_factory *
+Brush_factory_symbols::lookup(const Xml_string *id) const
 {
   if (!id) {
     Log::fatal("unexpected null id");
   }
-  return (*_id_to_tile)[id];
+  return (*_id_to_brush_factory)[id];
 }
 
 void
-Tile_symbols::dump() const
+Brush_factory_symbols::dump() const
 {
-  for (std::pair<const Xml_string *, Tile *> element : *_id_to_tile) {
+  for (std::pair<const Xml_string *, IBrush_factory *> element : *_id_to_brush_factory) {
     char *id_as_c_star = element.first->transcode();
     std::cout << "'" << id_as_c_star << std::endl;
     element.first->release(&id_as_c_star);

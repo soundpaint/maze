@@ -12,20 +12,21 @@
       </velocity>
     </ball>
   </balls>
+  <brush id="background_fractal">
+    <fractal>
+      <x-offset>-1.360</x-offset>
+      <y-offset>-0.095</y-offset>
+      <x-scale>+0.06125</x-scale>
+      <y-scale>+0.06125</y-scale>
+    </fractal>
+  </brush>
   <default-foreground>
     <brush>
       <file>sm_squares.png</file>
     </brush>
   </default-foreground>
   <default-background>
-    <brush>
-      <fractal>
-        <x-offset>-1.360</x-offset>
-        <y-offset>-0.095</y-offset>
-        <x-scale>+0.06125</x-scale>
-        <y-scale>+0.06125</y-scale>
-      </fractal>
-    </brush>
+    <brush ref="background_fractal" />
   </default-background>
   <shape id="empty_curve">
     <!-- 1 ≤ 0 -->

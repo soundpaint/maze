@@ -27,10 +27,12 @@
 #include <QtGui/QPainter>
 #include <log.hh>
 
-Fractals_brush_factory::Fractals_brush_factory(const double x0,
+Fractals_brush_factory::Fractals_brush_factory(const Xml_string *id,
+                                               const double x0,
                                                const double y0,
                                                const double x_scale,
                                                const double y_scale) :
+  _id(id),
   _x0(x0),
   _y0(y0),
   _x_scale(x_scale),
@@ -43,12 +45,22 @@ Fractals_brush_factory::Fractals_brush_factory(const double x0,
 
 Fractals_brush_factory::~Fractals_brush_factory()
 {
+  if (_id) {
+    delete _id;
+    _id = 0;
+  }
   if (_cached_pixmap) {
     delete _cached_pixmap;
     _cached_pixmap = 0;
   }
   _width_of_cached_pixmap = 0;
   _height_of_cached_pixmap = 0;
+}
+
+const Xml_string *
+Fractals_brush_factory::get_id() const
+{
+  return _id;
 }
 
 QBrush
@@ -122,7 +134,8 @@ Fractals_brush_factory::to_string()
 {
   std::stringstream str;
   str << "Fractals_brush_factory{" <<
-    "x0=" << _x0 << ", y0=" << _y0 <<
+    "id=" << _id <<
+    ", x0=" << _x0 << ", y0=" << _y0 <<
     ", x_scale=" << _x_scale << ", y_scale=" << _y_scale <<
     "}";
   return std::string(str.str());

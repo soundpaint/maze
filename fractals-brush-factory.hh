@@ -37,14 +37,17 @@ public:
                                                const double y0 = 0.0,
                                                const double x_scale = 1.0,
                                                const double y_scale = 1.0);
-  Fractals_brush_factory(const double x0 = 0.0,
+  Fractals_brush_factory(const Xml_string *id,
+                         const double x0 = 0.0,
                          const double y0 = 0.0,
                          const double x_scale = 1.0,
                          const double y_scale = 1.0);
   virtual ~Fractals_brush_factory();
+  const Xml_string *get_id() const;
   virtual QBrush create_brush(const uint16_t width, const uint16_t height);
   virtual std::string to_string();
 private:
+  const Xml_string *_id;
   const double _x0;
   const double _y0;
   const double _x_scale;

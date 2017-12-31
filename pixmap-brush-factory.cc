@@ -34,13 +34,25 @@ Pixmap_brush_factory::create_brush(const char *file_path)
   return QBrush(pixmap);
 }
 
-Pixmap_brush_factory::Pixmap_brush_factory(const char *file_path) :
+Pixmap_brush_factory::Pixmap_brush_factory(const Xml_string *id,
+                                           const char *file_path) :
+  _id(id),
   _brush(create_brush(file_path))
 {
 }
 
 Pixmap_brush_factory::~Pixmap_brush_factory()
 {
+  if (_id) {
+    delete _id;
+    _id = 0;
+  }
+}
+
+const Xml_string *
+Pixmap_brush_factory::get_id() const
+{
+  return _id;
 }
 
 QBrush
@@ -55,7 +67,8 @@ Pixmap_brush_factory::to_string()
   QPixmap pixmap = _brush.texture();
   std::stringstream str;
   str << "Pixmap_brush_factory{" <<
-    "width=" << pixmap.width() <<
+    "id=" << _id <<
+    ", width=" << pixmap.width() <<
     ", height=" << pixmap.height() <<
     "}";
   return std::string(str.str());

@@ -25,13 +25,25 @@
 #include <solid-brush-factory.hh>
 #include <log.hh>
 
-Solid_brush_factory::Solid_brush_factory(const QColor color) :
+Solid_brush_factory::Solid_brush_factory(const Xml_string *id,
+                                         const QColor color) :
+  _id(id),
   _brush(QBrush(color))
 {
 }
 
 Solid_brush_factory::~Solid_brush_factory()
 {
+  if (_id) {
+    delete _id;
+    _id = 0;
+  }
+}
+
+const Xml_string *
+Solid_brush_factory::get_id() const
+{
+  return _id;
 }
 
 QBrush
@@ -45,7 +57,8 @@ Solid_brush_factory::to_string()
 {
   std::stringstream str;
   str << "Solid_brush_factory{" <<
-    "color=" << _brush.color().name().toStdString() <<
+    "id=" << _id <<
+    ", color=" << _brush.color().name().toStdString() <<
     "}";
   return std::string(str.str());
 }

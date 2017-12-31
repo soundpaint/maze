@@ -55,7 +55,7 @@ Shape_symbols::add(const Xml_string *id, const Shape *shape)
   if (exists(id)) {
     std::stringstream msg;
     char *str_id = id->transcode();
-    msg << "already have shape with id=" << str_id  << " in symbol table";
+    msg << "already have shape with id=" << str_id << " in symbol table";
     id->release(&str_id);
     Log::fatal(msg.str());
   }

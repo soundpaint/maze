@@ -1,3 +1,8 @@
+* All symbols should always have an id.  Anonymous symbols should
+  automatically get a generated id.  That way, code may be
+  simplified (no null-check in destructor and to_string();
+  but assert non-null in constructor), and symbols can always
+  be uniquely identified by their id.
 * FIXME: Possible performance / memory usage issue:
   fractals-factory.cc: Fractal pixmaps are cached by the factory to
   avoid multiple recomputation, but Qt probably creates copies of the
@@ -5,14 +10,11 @@
   result(*_cached_pixmap);"?
 * FIXME: Minor memory leak: Instances of IBrush_factory are not
   cleanly deleted when no more used.
-* Make it possible to reference globally defined brushes as
-  background / foreground (Syntax: <brush id="...">...</brush>
-  ... <foreground><brush ref="..." /></foreground>).
 * Move ball configuration to beneath field definition.
 * Support Julia set fractals.
-* Classes Shape_symbols and Tile_symbols (and more symbol table
-  classes to come) should derive from an abstract Symbol_table
-  class and thus avoid code duplication.
+* Classes Brush_factory_symbols, Shape_symbols and Tile_symbols (and
+  possibly even more symbol table classes to come) should derive from
+  an abstract Symbol_table class and thus avoid code duplication.
 * Make parser fully static.
 * Check: Shape_terms is not always a constant...
 * FIXME: Maze_config::load_shape() returns either a definition or a
@@ -20,11 +22,11 @@
   (and tries to add it to the shape symbol definitions table).
   Solution: A reference should have no symbol id, and the caller
   can deploy this assumption for an appropriate check.
-* Make it possible to define shapes outside of blocks, such that the
-  same shape can be referenced from multiple blocks (with display
+* Make it possible to define shapes outside of tiles, such that the
+  same shape can be referenced from multiple tiles (with display
   offsets x and y), rather than having to redefine the shape over and
   over again.  Useful for shapes that are that large that they cover
-  multiple blocks.
+  multiple tiles.
 * Extend supported implicit curve syntax, e.g. expressions like:
   (x + y)² - 1
 * Turn config compiler from current one-pass technique into a true
