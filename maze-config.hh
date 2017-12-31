@@ -41,7 +41,7 @@ class Maze_config : Config
 public:
   Maze_config(const char *path);
   virtual ~Maze_config();
-  const Brush_field *get_brush_field() const;
+  Brush_field *get_brush_field() const;
 protected:
   virtual void reload(const xercesc::DOMElement *elem_config);
   virtual void print_config();
@@ -77,20 +77,18 @@ private:
   const XMLCh *_attr_name_ref;
   Shape_symbols *_shapes;
   Tile_symbols *_tiles;
-  QBrush _default_foreground;
-  QBrush _default_background;
+  IBrush_factory *_default_foreground_brush_factory;
+  IBrush_factory *_default_background_brush_factory;
   Implicit_curve_compiler _implicit_curve_compiler;
   Brush_field *_field;
   static void release(const XMLCh **node_name);
-  void reload_brush(const xercesc::DOMElement *elem_brush_ground,
-		    QBrush *brush_ground);
+  IBrush_factory *reload_brush(const xercesc::DOMElement *elem_brush_ground);
   void reload_shapes(const xercesc::DOMElement *elem_config);
   void reload_tiles(const xercesc::DOMElement *elem_config);
   void reload_field(const xercesc::DOMElement *elem_config);
   static const size_t text_content_as_size_t(const xercesc::DOMElement *elem);
-  void determine_screen_geometry(uint16_t *width, uint16_t *height) const;
-  const QPixmap *load_pixmap_fractal(const xercesc::DOMElement *elem_fractal) const;
-  const QPixmap *load_pixmap_file(const xercesc::DOMElement *elem_file) const;
+  IBrush_factory *load_pixmap_fractal(const xercesc::DOMElement *elem_fractal) const;
+  IBrush_factory *load_pixmap_file(const xercesc::DOMElement *elem_file) const;
   void load_field_ignore_chars(const xercesc::DOMElement *elem_field,
                                std::set<Xml_string> *ignore_chars) const;
   void load_field_tile_shortcuts(const xercesc::DOMElement *elem_field,
@@ -107,7 +105,7 @@ private:
                                        const XMLCh *attr_ref) const;
   const Shape *load_shape(const xercesc::DOMElement *elem_shape,
                           const bool require_id);
-  const Tile *load_tile(const xercesc::DOMElement *elem_tile);
+  Tile *load_tile(const xercesc::DOMElement *elem_tile);
   const char *load_tile_id(const XMLCh *attr_id);
   const Shape_terms *load_shape_expression(const xercesc::DOMElement *elem_expression,
                                            const bool negated) const;

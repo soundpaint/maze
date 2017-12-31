@@ -73,6 +73,8 @@ Maze::Maze(int &argc, char **argv)
     Log::fatal("Maze(): not enough memory");
   }
 
+  _main_window->get_playing_field()->add_field_geometry_listener(_sensors);
+
   _simulation = new Simulation(_balls, _main_window);
   if (!_simulation) {
     Log::fatal("Maze(): not enough memory");

@@ -25,18 +25,22 @@
 #ifndef SENSORS_HH
 #define SENSORS_HH
 
-#include <inttypes.h>
+#include <ifield-geometry-listener.hh>
 
-class Sensors
+class Sensors : public IField_geometry_listener
 {
 public:
   Sensors();
   virtual ~Sensors();
   void sample_and_hold();
-  uint16_t get_pitch() const;
-  uint16_t get_roll() const;
-  uint16_t get_yaw() const;
+  const uint16_t get_pitch() const;
+  const uint16_t get_roll() const;
+  const uint16_t get_yaw() const;
+  virtual void geometry_changed(const uint16_t width,
+                                const uint16_t height);
 private:
+  uint16_t _field_width;
+  uint16_t _field_height;
   uint16_t _pitch;
   uint16_t _roll;
   uint16_t _yaw;

@@ -30,14 +30,15 @@
 #include <inttypes.h>
 #include <QtGui/QPixmap>
 #include <QtGui/QBrush>
+#include <ifield-geometry-listener.hh>
 #include <tile.hh>
 
-class Brush_field
+class Brush_field : public IField_geometry_listener
 {
 public:
   Brush_field(const uint16_t width,
               const uint16_t height,
-              const std::vector<const Tile *> field);
+              const std::vector<Tile *> field);
   virtual ~Brush_field();
   const std::string to_string() const;
   const uint16_t get_width() const;
@@ -47,11 +48,11 @@ public:
   const double get_avg_tan(const double x0, const double y0,
 			   const double dx, const double dy) const;
   const bool matches_goal(const double x, const double y) const;
-
+  virtual void geometry_changed(const uint16_t width, const uint16_t height);
 private:
   const uint16_t _width;
   const uint16_t _height;
-  const std::vector<const Tile *> _field;
+  const std::vector<Tile *> _field;
   const Tile *get_tile(const double x, const double y,
                        double * const tile_offset_x,
                        double * const tile_offset_y) const;

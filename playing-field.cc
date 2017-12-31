@@ -29,7 +29,7 @@
 #include <ball.hh>
 #include <log.hh>
 
-Playing_field::Playing_field(const Brush_field *brush_field,
+Playing_field::Playing_field(Brush_field *brush_field,
 			     const uint16_t minimum_width,
 			     const uint16_t minimum_height,
                              IBalls *balls,
@@ -41,6 +41,12 @@ Playing_field::Playing_field(const Brush_field *brush_field,
   _ball_visible = true;
   _minimum_width = minimum_width;
   _minimum_height = minimum_height;
+
+  _field_geometry_listeners = new std::vector<IField_geometry_listener *>();
+  if (!_field_geometry_listeners) {
+    Log::fatal("not enough memory");
+  }
+
   if (!balls) {
     Log::fatal("Playing_field::Playing_field(): balls is null");
   }
@@ -81,6 +87,9 @@ Playing_field::~Playing_field()
   _minimum_width = 0;
   _minimum_height = 0;
 
+  delete _field_geometry_listeners;
+  _field_geometry_listeners = 0;
+
   delete _brush_field;
   _brush_field = 0;
 
@@ -90,6 +99,12 @@ Playing_field::~Playing_field()
   // Q objects will be deleted by Qt, just set them to 0
   _background_std = 0;
   _background_ff = 0;
+}
+
+void
+Playing_field::add_field_geometry_listener(IField_geometry_listener *listener)
+{
+  _field_geometry_listeners->push_back(listener);
 }
 
 QImage *
@@ -162,40 +177,52 @@ Playing_field::minimumSizeHint() const
 }
 
 void
-Playing_field::draw_background(QPainter *painter, const QRect rect)
+Playing_field::check_update_geometry()
 {
   const uint16_t current_width = width();
   const uint16_t current_height = height();
   if ((current_width != _background_std->width()) ||
       (current_height != _background_std->height())) {
-    Log::debug("loading force field");
-    _force_field->load_field(_brush_field, current_width, current_height);
-    Log::debug("compute forces field onto ball");
-    for (uint8_t i = 0; i < _balls->get_count(); i++) {
-      Ball *ball = _balls->at(i);
-      ball->precompute_forces(_force_field);
+    for (IField_geometry_listener *listener : *_field_geometry_listeners) {
+      listener->geometry_changed(current_width, current_height);
     }
-    Log::debug("(re-)create standard background");
-    if (_background_std) {
-      delete _background_std;
-    }
-    _background_std = create_background(current_width, current_height, false);
-    if (!_background_std) {
-      Log::fatal("Playing_field::paintEvent(): not enough memory");
-    }
-    Log::debug("(re-)create background with forces display");
-    if (_background_ff) {
-      delete _background_ff;
-    }
-    _background_ff = create_background(current_width, current_height, true);
-    if (!_background_ff) {
-      Log::fatal("Playing_field::paintEvent(): not enough memory");
-    }
+
+    /*
+     * Unfortunately, we can not add this Playing-field object instance to
+     * the vector of listeners, since a class can not inherit from both,
+     * a QWidget and an additional interface like the listener interface.
+     * Therefore, we must -- in addition to the above for loop -- call
+     * method geometry_changed() explicitly on this class.
+     */
+    geometry_changed(current_width, current_height);
   }
-  if (_force_field_visible) {
-    painter->drawImage(rect, *_background_ff, rect);
-  } else {
-    painter->drawImage(rect, *_background_std, rect);
+}
+
+void
+Playing_field::geometry_changed(const uint16_t width, const uint16_t height)
+{
+  Log::debug("loading force field");
+  _force_field->load_field(_brush_field, width, height);
+  Log::debug("compute forces field onto ball");
+  for (uint8_t i = 0; i < _balls->get_count(); i++) {
+    Ball *ball = _balls->at(i);
+    ball->precompute_forces(_force_field);
+  }
+  Log::debug("(re-)create standard background");
+  if (_background_std) {
+    delete _background_std;
+  }
+  _background_std = create_background(width, height, false);
+  if (!_background_std) {
+    Log::fatal("Playing_field::paintEvent(): not enough memory");
+  }
+  Log::debug("(re-)create background with forces display");
+  if (_background_ff) {
+    delete _background_ff;
+  }
+  _background_ff = create_background(width, height, true);
+  if (!_background_ff) {
+    Log::fatal("Playing_field::paintEvent(): not enough memory");
   }
 }
 
@@ -247,9 +274,14 @@ Playing_field::draw_velocities(QPainter *painter, const QRect rect)
 void
 Playing_field::paintEvent(QPaintEvent *event)
 {
+  check_update_geometry();
   const QRect rect = event->rect();
   QPainter painter(this);
-  draw_background(&painter, rect);
+  if (_force_field_visible) {
+    painter.drawImage(rect, *_background_ff, rect);
+  } else {
+    painter.drawImage(rect, *_background_std, rect);
+  }
   if (_ball_visible) {
     draw_balls(&painter, rect);
   }

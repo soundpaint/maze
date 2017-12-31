@@ -20,10 +20,10 @@
   <default-background>
     <pixmap>
       <fractal>
-        <x-offset>-1.45</x-offset>
-        <y-offset>+0.125</y-offset>
-        <x-scale>+0.25</x-scale>
-        <y-scale>-0.25</y-scale>
+        <x-offset>-1.360</x-offset>
+        <y-offset>-0.095</y-offset>
+        <x-scale>+0.06125</x-scale>
+        <y-scale>+0.06125</y-scale>
       </fractal>
     </pixmap>
   </default-background>

@@ -43,7 +43,7 @@ Tile_symbols::~Tile_symbols()
 }
 
 void
-Tile_symbols::add(const Xml_string *id, const Tile *tile)
+Tile_symbols::add(const Xml_string *id, Tile *tile)
 {
   if (!id) {
     Log::fatal("unexpected null id");
@@ -73,7 +73,7 @@ Tile_symbols::exists(const Xml_string *id) const
     _id_to_tile->count(id) > 0;
 }
 
-const Tile *
+Tile *
 Tile_symbols::lookup(const Xml_string *id) const
 {
   if (!id) {
@@ -85,7 +85,7 @@ Tile_symbols::lookup(const Xml_string *id) const
 void
 Tile_symbols::dump() const
 {
-  for (std::pair<const Xml_string *, const Tile *> element : *_id_to_tile) {
+  for (std::pair<const Xml_string *, Tile *> element : *_id_to_tile) {
     char *id_as_c_star = element.first->transcode();
     std::cout << "'" << id_as_c_star << std::endl;
     element.first->release(&id_as_c_star);

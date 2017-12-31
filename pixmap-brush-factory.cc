@@ -22,33 +22,32 @@
  * Author's web site: www.juergen-reuter.de
  */
 
-#ifndef TILE_SYMBOLS_HH
-#define TILE_SYMBOLS_HH
+#include <pixmap-brush-factory.hh>
+#include <QtGui/QColor>
+#include <QtGui/QPainter>
+#include <log.hh>
 
-#include <unordered_map>
-#include <tile.hh>
-#include <xml-string.hh>
-
-class Tile_symbols
+const QBrush
+Pixmap_brush_factory::create_brush(const char *file_path)
 {
-public:
-  Tile_symbols();
-  virtual ~Tile_symbols();
-  void add(const Xml_string *id, Tile *tile);
-  const bool exists(const Xml_string *id) const;
-  Tile *lookup(const Xml_string *id) const;
-  void dump() const;
-private:
-  typedef std::unordered_map<const Xml_string *,
-                             Tile *,
-                             Xml_string::hashing_functor,
-                             Xml_string::equal_functor>
-  xml_string_to_tile_t;
-  static const xml_string_to_tile_t::size_type BUCKET_COUNT = 5;
-  xml_string_to_tile_t *_id_to_tile;
-};
+  const QPixmap pixmap(file_path);
+  return QBrush(pixmap);
+}
 
-#endif /* TILE_SYMBOLS_HH */
+Pixmap_brush_factory::Pixmap_brush_factory(const char *file_path) :
+  _brush(create_brush(file_path))
+{
+}
+
+Pixmap_brush_factory::~Pixmap_brush_factory()
+{
+}
+
+QBrush
+Pixmap_brush_factory::create_brush(const uint16_t width, const uint16_t height)
+{
+  return _brush;
+}
 
 /*
  * Local variables:

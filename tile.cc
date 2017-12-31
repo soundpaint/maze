@@ -27,17 +27,19 @@
 #include <log.hh>
 
 Tile::Tile(const Xml_string *id,
-           const QBrush foreground,
-           const QBrush background,
+           IBrush_factory *foreground_brush_factory,
+           IBrush_factory *background_brush_factory,
            const double foreground_potential,
            const double background_potential,
            const Shape *shape) :
   _id(id),
-  _foreground(QBrush(foreground)),
-  _background(QBrush(background)),
+  _foreground_brush_factory(foreground_brush_factory),
+  _background_brush_factory(background_brush_factory),
   _foreground_potential(foreground_potential),
   _background_potential(background_potential),
-  _shape(shape)
+  _shape(shape),
+  _width(0),
+  _height(0)
 {
   if (!id) {
     Log::fatal("id is null");
@@ -49,10 +51,20 @@ Tile::Tile(const Xml_string *id,
 
 Tile::~Tile()
 {
+  // The caller of this class's constructor
+  // manages (de)allocation of brush factories.
+  // Therefore, we just set it to 0.
+  _foreground_brush_factory = 0;
+  _background_brush_factory = 0;
+
   delete _id;
   _id = 0;
+
   delete _shape;
   _shape = 0;
+
+  _width = 0;
+  _height = 0;
 }
 
 const std::string
@@ -61,13 +73,26 @@ Tile::to_string() const
   std::stringstream str;
   str << "Tile{";
   str << "id=" << _id;
-  str << ", foreground=" << &_foreground;
-  str << ", background=" << &_background;
+  str << ", foreground_brush_factory=" << &_foreground_brush_factory;
+  str << ", background_brush_factory=" << &_background_brush_factory;
+  str << ", width=" << &_width;
+  str << ", height=" << &_height;
   str << ", foreground_potential=" << _foreground_potential;
   str << ", background_potential=" << _background_potential;
   str << ", shape=" << _shape->to_string();
   str <<"}";
   return std::string(str.str());
+}
+
+void
+Tile::geometry_changed(const uint16_t width, const uint16_t height)
+{
+  if ((_width != width) || (_height != height)) {
+    _width = width;
+    _height = height;
+    _foreground = _foreground_brush_factory->create_brush(width, height);
+    _background = _background_brush_factory->create_brush(width, height);
+  }
 }
 
 const double
@@ -106,18 +131,6 @@ const Xml_string *
 Tile::get_id() const
 {
   return _id;
-}
-
-const QBrush
-Tile::get_foreground() const
-{
-  return _foreground;
-}
-
-const QBrush
-Tile::get_background() const
-{
-  return _background;
 }
 
 const Shape *

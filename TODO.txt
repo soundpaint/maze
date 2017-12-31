@@ -1,4 +1,15 @@
-* Get rid of screen geometry constant definitions (1300, 600).
+* FIXME: Possible performance / memory usage issue:
+  fractals-factory.cc: Fractal pixmaps are cached by the factory to
+  avoid multiple recomputation, but Qt probably creates copies of the
+  same pixmap over and over again when calling "QBrush
+  result(*_cached_pixmap);"?
+* FIXME: Minor memory leak: Instances of IBrush_factory are not
+  cleanly deleted when no more used.
+* Add function to_string() to IBrush_factory.  Call it from
+  within Tile::to_string().
+* Move ball configuration to beneath field definition.
+* Support solid color backgrounds / foregrounds.
+* Support Julia set fractals.
 * Classes Shape_symbols and Tile_symbols (and more symbol table
   classes to come) should derive from an abstract Symbol_table
   class and thus avoid code duplication.

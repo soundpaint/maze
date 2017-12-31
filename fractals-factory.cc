@@ -27,7 +27,51 @@
 #include <QtGui/QPainter>
 #include <log.hh>
 
-const QPixmap *
+Fractals_factory::Fractals_factory(const double x0,
+                                   const double y0,
+                                   const double x_scale,
+                                   const double y_scale) :
+  _x0(x0),
+  _y0(y0),
+  _x_scale(x_scale),
+  _y_scale(y_scale)
+{
+  _cached_pixmap = 0;
+  _width_of_cached_pixmap = 0;
+  _height_of_cached_pixmap = 0;
+}
+
+Fractals_factory::~Fractals_factory()
+{
+  if (_cached_pixmap) {
+    delete _cached_pixmap;
+    _cached_pixmap = 0;
+  }
+  _width_of_cached_pixmap = 0;
+  _height_of_cached_pixmap = 0;
+}
+
+QBrush
+Fractals_factory::create_brush(const uint16_t width, const uint16_t height)
+{
+  if ((width != _width_of_cached_pixmap) ||
+      (height != _height_of_cached_pixmap) ||
+      (!_cached_pixmap)) {
+    if (_cached_pixmap) {
+      delete _cached_pixmap;
+      _cached_pixmap = 0;
+    }
+    _cached_pixmap = create_mandelbrot_set(width, height,
+                                           _x0, _y0,
+                                           _x_scale, _y_scale);
+    _width_of_cached_pixmap = width;
+    _height_of_cached_pixmap = height;
+  }
+  QBrush result(*_cached_pixmap);
+  return result;
+}
+
+QPixmap * const
 Fractals_factory::create_mandelbrot_set(const uint16_t width,
                                         const uint16_t height,
                                         const double x0,
@@ -35,10 +79,12 @@ Fractals_factory::create_mandelbrot_set(const uint16_t width,
                                         const double x_scale,
                                         const double y_scale)
 {
-  QPixmap *pixmap = new QPixmap(width, height);
+  QPixmap * const pixmap = new QPixmap(width, height);
   if (!pixmap) {
     Log::fatal("Fractals_factory::create_fractal(): not enough memory");
   }
+  if ((width == 0) || (height == 0))
+    return pixmap;
   QPainter painter(pixmap);
   const double scaled_x_scale = x_scale / width;
   const double scaled_y_scale = y_scale / height;

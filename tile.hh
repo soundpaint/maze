@@ -29,13 +29,15 @@
 #include <QtGui/QBrush>
 #include <xml-string.hh>
 #include <shape.hh>
+#include <ibrush-factory.hh>
+#include <ifield-geometry-listener.hh>
 
-class Tile
+class Tile : public IField_geometry_listener
 {
 public:
   Tile(const Xml_string *id,
-       const QBrush foreground,
-       const QBrush background,
+       IBrush_factory *foreground_brush_factory,
+       IBrush_factory *background_brush_factory,
        const double foreground_potential,
        const double background_potential,
        const Shape *shape);
@@ -48,16 +50,19 @@ public:
                            const double dx,
                            const double dy) const;
   const Xml_string *get_id() const;
-  const QBrush get_foreground() const;
-  const QBrush get_background() const;
   const Shape *get_shape() const;
+  void geometry_changed(const uint16_t width, const uint16_t height);
 private:
   const Xml_string *_id;
-  const QBrush _foreground;
-  const QBrush _background;
+  IBrush_factory *_foreground_brush_factory;
+  IBrush_factory *_background_brush_factory;
   const double _foreground_potential;
   const double _background_potential;
   const Shape *_shape;
+  uint16_t _width;
+  uint16_t _height;
+  QBrush _foreground;
+  QBrush _background;
 };
 
 #endif /* TILE_HH */

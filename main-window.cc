@@ -25,6 +25,7 @@
 #include <main-window.hh>
 #include <QtWidgets/QApplication>
 #include <QtGui/QIcon>
+#include <QtGui/QScreen>
 #include <log.hh>
 
 Main_window::Main_window(const Maze_config *config, Balls *balls,
@@ -35,11 +36,20 @@ Main_window::Main_window(const Maze_config *config, Balls *balls,
     Log::fatal("Main_window(): balls is null");
   }
 
-  //setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
-  //setCursor(Qt::BlankCursor);
+#if 0 // full-screen mode
+  setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
+  setCursor(Qt::BlankCursor);
+  const QScreen *screen = qApp->primaryScreen();
+  const QRect geometry = screen->geometry();
+  const uint16_t width = geometry.width();
+  const uint16_t height = geometry.height();
+#else // window mode
+  const uint16_t width = 1300;
+  const uint16_t height = 600;
+#endif
 
   setWindowTitle(tr("Maze"));
-  QIcon icon("main-window-icon.png");
+  const QIcon icon("main-window-icon.png");
   setWindowIcon(icon);
 
   _central_widget_layout = new QVBoxLayout();
@@ -54,17 +64,8 @@ Main_window::Main_window(const Maze_config *config, Balls *balls,
   _central_widget->setLayout(_central_widget_layout);
   setCentralWidget(_central_widget);
 
-#if 0
-  QScreen *screen = qApp->primaryScreen();
-  QRect geometry = screen->geometry();
-  uint16_t width = geometry.width();
-  uint16_t height = geometry.height();
-#else
-  uint16_t width = 1300;
-  uint16_t height = 600;
-#endif
-
-  const Brush_field *brush_field = config->get_brush_field();
+  Brush_field *brush_field = config->get_brush_field();
+  brush_field->geometry_changed(width, height);
 
   _playing_field = new Playing_field(brush_field, width, height, balls, this);
   if (!_playing_field) {

@@ -25,10 +25,7 @@
 #include <sensors.hh>
 #include <cmath>
 #include <QtCore/QPoint>
-#include <QtCore/QRect>
-#include <QtGui/QCursor>
-#include <QtGui/QGuiApplication>
-#include <QtGui/QScreen>
+//#include <QtGui/QCursor>
 #include <log.hh>
 
 Sensors::Sensors()
@@ -48,17 +45,10 @@ Sensors::~Sensors()
 void
 Sensors::sample_and_hold()
 {
-#if 1
-  QScreen *screen = QGuiApplication::primaryScreen();
-#else
-  QScreen *screen = qApp->primaryScreen();
-#endif
-  QRect geometry = screen->geometry();
-  uint16_t width = geometry.width();
-  uint16_t height = geometry.height();
-  QPoint pos = QPoint(width / 2, height / 2); // QCursor::pos();
-  double pitch = atan(pos.x() - width / 2);
-  double roll = atan(pos.y() - height / 2);
+  const QPoint pos = // QCursor::pos();
+    QPoint(_field_width / 2, _field_height / 2);
+  const double pitch = atan(pos.x() - _field_width / 2);
+  const double roll = atan(pos.y() - _field_height / 2);
   _pitch = (int)(0.5 + floor(180.0 * pitch / M_PI));
   _roll = (int)(0.5 + floor(180.0 * roll / M_PI));
 
@@ -70,22 +60,30 @@ Sensors::sample_and_hold()
   _yaw = 0;
 }
 
-uint16_t
+const uint16_t
 Sensors::get_pitch() const
 {
   return _pitch;
 }
 
-uint16_t
+const uint16_t
 Sensors::get_roll() const
 {
   return _roll;
 }
 
-uint16_t
+const uint16_t
 Sensors::get_yaw() const
 {
   return _yaw;
+}
+
+void
+Sensors::geometry_changed(const uint16_t width,
+                          const uint16_t height)
+{
+  _field_width = width;
+  _field_height = height;
 }
 
 /*

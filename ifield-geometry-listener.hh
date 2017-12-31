@@ -22,33 +22,19 @@
  * Author's web site: www.juergen-reuter.de
  */
 
-#ifndef TILE_SYMBOLS_HH
-#define TILE_SYMBOLS_HH
+#ifndef IFIELD_GEOMETRY_LISTENER_HH
+#define IFIELD_GEOMETRY_LISTENER_HH
 
-#include <unordered_map>
-#include <tile.hh>
-#include <xml-string.hh>
+#include <inttypes.h>
 
-class Tile_symbols
+class IField_geometry_listener
 {
 public:
-  Tile_symbols();
-  virtual ~Tile_symbols();
-  void add(const Xml_string *id, Tile *tile);
-  const bool exists(const Xml_string *id) const;
-  Tile *lookup(const Xml_string *id) const;
-  void dump() const;
-private:
-  typedef std::unordered_map<const Xml_string *,
-                             Tile *,
-                             Xml_string::hashing_functor,
-                             Xml_string::equal_functor>
-  xml_string_to_tile_t;
-  static const xml_string_to_tile_t::size_type BUCKET_COUNT = 5;
-  xml_string_to_tile_t *_id_to_tile;
+  virtual void geometry_changed(const uint16_t width,
+                                const uint16_t height) = 0;
 };
 
-#endif /* TILE_SYMBOLS_HH */
+#endif /* IFIELD_GEOMETRY_LISTENER_HH */
 
 /*
  * Local variables:

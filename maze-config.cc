@@ -28,8 +28,11 @@
 #include <inttypes.h>
 #include <QtWidgets/QApplication>
 #include <QtGui/QIcon>
+#include <QtGui/QScreen>
 #include <log.hh>
 #include <fractals-factory.hh>
+#include <pixmap-brush-factory.hh>
+#include <solid-brush-factory.hh>
 
 #define CONFIG_SCHEMA_LOCATION "http://soundpaint.org/schema/maze-0.1/config.xsd"
 
@@ -118,17 +121,17 @@ Maze_config::reload(const xercesc::DOMElement *elem_config)
   const xercesc::DOMElement *elem_default_background =
     get_single_child_element(elem_config, _node_name_default_background, false);
   if (elem_default_background) {
-    reload_brush(elem_default_background, &_default_background);
+    _default_background_brush_factory = reload_brush(elem_default_background);
   } else {
-    _default_background = QBrush(Qt::black);
+    _default_background_brush_factory = new Solid_brush_factory(Qt::black);
   }
 
   const xercesc::DOMElement *elem_default_foreground =
     get_single_child_element(elem_config, _node_name_default_foreground, false);
   if (elem_default_foreground) {
-    reload_brush(elem_default_foreground, &_default_foreground);
+    _default_foreground_brush_factory = reload_brush(elem_default_foreground);
   } else {
-    _default_foreground = QBrush(Qt::white);
+    _default_background_brush_factory = new Solid_brush_factory(Qt::white);
   }
 
   reload_shapes(elem_config);
@@ -136,21 +139,7 @@ Maze_config::reload(const xercesc::DOMElement *elem_config)
   reload_field(elem_config);
 }
 
-void
-Maze_config::determine_screen_geometry(uint16_t *width, uint16_t *height) const
-{
-#if 0
-  QScreen *screen = qApp->primaryScreen();
-  QRect geometry = screen->geometry();
-  *width = geometry.width();
-  *height = geometry.height();
-#else
-  *width = 1300;
-  *height = 600;
-#endif
-}
-
-const QPixmap *
+IBrush_factory *
 Maze_config::load_pixmap_fractal(const xercesc::DOMElement *elem_fractal) const
 {
   const xercesc::DOMElement *elem_x_offset =
@@ -171,36 +160,29 @@ Maze_config::load_pixmap_fractal(const xercesc::DOMElement *elem_fractal) const
   const XMLCh *node_value_y_scale = elem_y_scale->getTextContent();
   const double y_scale = parse_double(node_value_y_scale);
 
-  uint16_t screen_width;
-  uint16_t screen_height;
-  determine_screen_geometry(&screen_width, &screen_height);
-
-  const QPixmap *pixmap =
-    Fractals_factory::create_mandelbrot_set(screen_width, screen_height,
-                                            x_offset, y_offset,
-                                            x_scale, y_scale);
-  if (!pixmap) {
+  IBrush_factory *factory = new Fractals_factory(x_offset, y_offset,
+                                                 x_scale, y_scale);
+  if (!factory) {
     fatal("not enough memory");
   }
-  return pixmap;
+  return factory;
 }
 
-const QPixmap *
+IBrush_factory *
 Maze_config::load_pixmap_file(const xercesc::DOMElement *elem_file) const
 {
   const XMLCh *node_value_file = elem_file->getTextContent();
   char *str_file_path = xercesc::XMLString::transcode(node_value_file);
-  const QPixmap *pixmap = new QPixmap(str_file_path);
-  xercesc::XMLString::release(&str_file_path);
-  if (!pixmap) {
+  IBrush_factory *factory = new Pixmap_brush_factory(str_file_path);
+  if (!factory) {
     fatal("not enough memory");
   }
-  return pixmap;
+  xercesc::XMLString::release(&str_file_path);
+  return factory;
 }
 
-void
-Maze_config::reload_brush(const xercesc::DOMElement *elem_brush_ground,
-			  QBrush *brush_ground)
+IBrush_factory *
+Maze_config::reload_brush(const xercesc::DOMElement *elem_brush_ground)
 {
   if (!elem_brush_ground) {
     fatal("elem_brush_ground is null");
@@ -222,10 +204,10 @@ Maze_config::reload_brush(const xercesc::DOMElement *elem_brush_ground,
     fatal("for now, pixmap definition must contain either file or "
           "fractal definition");
   }
-  const QPixmap *pixmap = elem_file ?
+  IBrush_factory *factory = elem_file ?
     load_pixmap_file(elem_file) :
     load_pixmap_fractal(elem_fractal);
-  *brush_ground = QBrush(*pixmap);
+  return factory;
 }
 
 void
@@ -413,7 +395,7 @@ Maze_config::load_field_contents(const xercesc::DOMElement *elem_contents,
   char *node_value_contents_as_c_star =
     xercesc::XMLString::transcode(node_value_contents);
 
-  std::vector<const Tile *> field;
+  std::vector<Tile *> field;
   int elems = 0;
   for (XMLSize_t i = 0;
        i < xercesc::XMLString::stringLen(node_value_contents); i++) {
@@ -442,7 +424,7 @@ Maze_config::load_field_contents(const xercesc::DOMElement *elem_contents,
         str_tile_id->release(&tile_id_as_c_star);
         fatal(msg.str());
       }
-      const Tile *tile = _tiles->lookup(str_tile_id);
+      Tile *tile = _tiles->lookup(str_tile_id);
       field.push_back(tile);
     } else {
       // alias_id is in set of characters to be ignored
@@ -502,7 +484,7 @@ Maze_config::load_field(const xercesc::DOMElement *elem_field)
   debug("')'");
 }
 
-const Brush_field *
+Brush_field *
 Maze_config::get_brush_field() const
 {
   return _field;
@@ -622,7 +604,7 @@ Maze_config::reload_tiles(const xercesc::DOMElement *elem_config)
       if (!elem_tile) {
 	fatal("unexpected null element");
       }
-      const Tile *tile = load_tile(elem_tile);
+      Tile *tile = load_tile(elem_tile);
       const Xml_string *id = tile->get_id();
       _tiles->add(id, tile);
     }
@@ -632,7 +614,7 @@ Maze_config::reload_tiles(const xercesc::DOMElement *elem_config)
   debug("')'");
 }
 
-const Tile *
+Tile *
 Maze_config::load_tile(const xercesc::DOMElement *elem_tile)
 {
   debug("'tile('");
@@ -658,30 +640,30 @@ Maze_config::load_tile(const xercesc::DOMElement *elem_tile)
   }
   */
 
-  QBrush foreground;
+  IBrush_factory *foreground_brush_factory;
   const xercesc::DOMElement *elem_foreground =
     get_single_child_element(elem_tile, _node_name_foreground);
   if (elem_foreground) {
-    reload_brush(elem_foreground, &foreground);
+    foreground_brush_factory = reload_brush(elem_foreground);
   } else {
     std::stringstream msg;
     msg << "no foreground defined for tile '" << str_id <<
       "': falling back to default foreground";
     Log::info(msg.str());
-    foreground = _default_foreground;
+    foreground_brush_factory = _default_foreground_brush_factory;
   }
 
-  QBrush background;
+  IBrush_factory *background_brush_factory;
   const xercesc::DOMElement *elem_background =
     get_single_child_element(elem_tile, _node_name_background);
   if (elem_background) {
-    reload_brush(elem_background, &background);
+    background_brush_factory = reload_brush(elem_background);
   } else {
     std::stringstream msg;
     msg << "no background defined for tile '" << str_id <<
       "': falling back to default background";
     Log::info(msg.str());
-    background = _default_background;
+    background_brush_factory = _default_background_brush_factory;
   }
 
   const xercesc::DOMElement *elem_shape =
@@ -694,10 +676,15 @@ Maze_config::load_tile(const xercesc::DOMElement *elem_tile)
   const double foreground_potential = 0.0; // TODO
   const double background_potential = 0.0; // TODO
 
-  const Tile *tile =
+  // FIXME: Memory leak: Currently, nobody feels responsible
+  // for deleting foreground_brush_factory and
+  // background_brush_factory when no more used.
+  Tile *tile =
     new Tile(str_id,
-             foreground, background,
-             foreground_potential, background_potential,
+             foreground_brush_factory,
+             background_brush_factory,
+             foreground_potential,
+             background_potential,
              shape);
   if (!tile) {
     fatal("not enough memory");

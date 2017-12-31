@@ -25,7 +25,6 @@
 #ifndef PLAYING_FIELD_HH
 #define PLAYING_FIELD_HH
 
-#include <inttypes.h>
 #include <QtCore/QObject>
 #include <QtCore/QProcess>
 #include <QtCore/QString>
@@ -39,6 +38,7 @@
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
+#include <ifield-geometry-listener.hh>
 #include <iballs.hh>
 #include <brush-field.hh>
 #include <force-field.hh>
@@ -47,7 +47,7 @@ class Playing_field : public QWidget
 {
   Q_OBJECT
 public:
-  explicit Playing_field(const Brush_field *brush_field,
+  explicit Playing_field(Brush_field *brush_field,
                          const uint16_t minimum_width,
 			 const uint16_t minimum_height,
 			 IBalls *balls,
@@ -70,11 +70,13 @@ public:
   void set_force_field_visible(const bool force_field_visible);
   const bool is_ball_visible() const;
   void set_ball_visible(const bool ball_visible);
+  void add_field_geometry_listener(IField_geometry_listener *listener);
+  virtual void geometry_changed(const uint16_t width, const uint16_t height);
 protected:
   void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
 
 private:
-  const Brush_field *_brush_field;
+  Brush_field *_brush_field;
   Force_field *_force_field;
   uint16_t _minimum_width, _minimum_height;
   IBalls *_balls;
@@ -83,10 +85,11 @@ private:
   bool _velocity_visible;
   bool _force_field_visible;
   bool _ball_visible;
+  std::vector<IField_geometry_listener *> *_field_geometry_listeners;
+  void check_update_geometry();
   QImage *create_background(const uint16_t width,
 			    const uint16_t height,
 			    const bool force_field_visible);
-  void draw_background(QPainter *painter, const QRect rect);
   void draw_balls(QPainter *painter, const QRect rect);
   void draw_velocities(QPainter *painter, const QRect rect);
 };

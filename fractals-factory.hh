@@ -26,17 +26,31 @@
 #define FRACTALS_FACTORY_HH
 
 #include <QtGui/QPixmap>
+#include <ibrush-factory.hh>
 
-class Fractals_factory
+class Fractals_factory : public IBrush_factory
 {
-  Q_OBJECT
 public:
-  static const QPixmap *create_mandelbrot_set(const uint16_t width,
-                                              const uint16_t height,
-                                              const double x0 = 0.0,
-                                              const double y0 = 0.0,
-                                              const double x_scale = 1.0,
-                                              const double y_scale = 1.0);
+  static QPixmap * const create_mandelbrot_set(const uint16_t width,
+                                               const uint16_t height,
+                                               const double x0 = 0.0,
+                                               const double y0 = 0.0,
+                                               const double x_scale = 1.0,
+                                               const double y_scale = 1.0);
+  Fractals_factory(const double x0 = 0.0,
+                   const double y0 = 0.0,
+                   const double x_scale = 1.0,
+                   const double y_scale = 1.0);
+  virtual ~Fractals_factory();
+  virtual QBrush create_brush(const uint16_t width, const uint16_t height);
+private:
+  const double _x0;
+  const double _y0;
+  const double _x_scale;
+  const double _y_scale;
+  QPixmap *_cached_pixmap;
+  uint16_t _width_of_cached_pixmap;
+  uint16_t _height_of_cached_pixmap;
 };
 
 #endif /* FRACTALS_FACTORY_HH */
