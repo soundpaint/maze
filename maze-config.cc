@@ -40,6 +40,7 @@ Maze_config::Maze_config(const char *path) :
   Config(path),
   _node_name_any(xercesc::XMLString::transcode("*")),
   _node_name_background(xercesc::XMLString::transcode("background")),
+  _node_name_brush(xercesc::XMLString::transcode("brush")),
   _node_name_columns(xercesc::XMLString::transcode("columns")),
   _node_name_contents(xercesc::XMLString::transcode("contents")),
   _node_name_default_background(xercesc::XMLString::transcode("default-background")),
@@ -49,9 +50,9 @@ Maze_config::Maze_config(const char *path) :
   _node_name_foreground(xercesc::XMLString::transcode("foreground")),
   _node_name_fractal(xercesc::XMLString::transcode("fractal")),
   _node_name_ignore(xercesc::XMLString::transcode("ignore")),
-  _node_name_pixmap(xercesc::XMLString::transcode("pixmap")),
   _node_name_rows(xercesc::XMLString::transcode("rows")),
   _node_name_shape(xercesc::XMLString::transcode("shape")),
+  _node_name_solid(xercesc::XMLString::transcode("solid")),
   _node_name_tile(xercesc::XMLString::transcode("tile")),
   _node_name_tile_shortcut(xercesc::XMLString::transcode("tile-shortcut")),
   _node_name_x_offset(xercesc::XMLString::transcode("x-offset")),
@@ -77,6 +78,7 @@ Maze_config::~Maze_config()
 
   release(&_node_name_any);
   release(&_node_name_background);
+  release(&_node_name_brush);
   release(&_node_name_columns);
   release(&_node_name_contents);
   release(&_node_name_default_background);
@@ -86,9 +88,9 @@ Maze_config::~Maze_config()
   release(&_node_name_foreground);
   release(&_node_name_fractal);
   release(&_node_name_ignore);
-  release(&_node_name_pixmap);
   release(&_node_name_rows);
   release(&_node_name_shape);
+  release(&_node_name_solid);
   release(&_node_name_tile);
   release(&_node_name_tile_shortcut);
   release(&_node_name_x_offset);
@@ -140,7 +142,7 @@ Maze_config::reload(const xercesc::DOMElement *elem_config)
 }
 
 IBrush_factory *
-Maze_config::load_pixmap_fractal(const xercesc::DOMElement *elem_fractal) const
+Maze_config::load_brush_fractal(const xercesc::DOMElement *elem_fractal) const
 {
   const xercesc::DOMElement *elem_x_offset =
     get_single_child_element(elem_fractal, _node_name_x_offset, true);
@@ -169,7 +171,7 @@ Maze_config::load_pixmap_fractal(const xercesc::DOMElement *elem_fractal) const
 }
 
 IBrush_factory *
-Maze_config::load_pixmap_file(const xercesc::DOMElement *elem_file) const
+Maze_config::load_brush_file(const xercesc::DOMElement *elem_file) const
 {
   const XMLCh *node_value_file = elem_file->getTextContent();
   char *str_file_path = xercesc::XMLString::transcode(node_value_file);
@@ -182,31 +184,52 @@ Maze_config::load_pixmap_file(const xercesc::DOMElement *elem_file) const
 }
 
 IBrush_factory *
+Maze_config::load_brush_solid(const xercesc::DOMElement *elem_solid) const
+{
+  const XMLCh *node_value_solid = elem_solid->getTextContent();
+  char *str_solid_color = xercesc::XMLString::transcode(node_value_solid);
+  QColor solid_color(str_solid_color);
+  if (!solid_color.isValid()) {
+    std::stringstream msg;
+    msg << "invalid color specification string: " << str_solid_color;
+    xercesc::XMLString::release(&str_solid_color);
+    fatal(msg.str());
+  }
+  xercesc::XMLString::release(&str_solid_color);
+  IBrush_factory *factory = new Solid_brush_factory(solid_color);
+  if (!factory) {
+    fatal("not enough memory");
+  }
+  return factory;
+}
+
+IBrush_factory *
 Maze_config::reload_brush(const xercesc::DOMElement *elem_brush_ground)
 {
   if (!elem_brush_ground) {
     fatal("elem_brush_ground is null");
   }
-  const xercesc::DOMElement *elem_pixmap =
-    get_single_child_element(elem_brush_ground, _node_name_pixmap);
-  if (!elem_pixmap) {
-    fatal("for now, brush ground definition must contain pixmap definition");
+  const xercesc::DOMElement *elem_brush =
+    get_single_child_element(elem_brush_ground, _node_name_brush);
+  if (!elem_brush) {
+    fatal("missing brush element");
   }
+  const xercesc::DOMElement *elem_solid =
+    get_single_child_element(elem_brush, _node_name_solid, false);
   const xercesc::DOMElement *elem_file =
-    get_single_child_element(elem_pixmap, _node_name_file, false);
+    get_single_child_element(elem_brush, _node_name_file, false);
   const xercesc::DOMElement *elem_fractal =
-    get_single_child_element(elem_pixmap, _node_name_fractal, false);
-  if (elem_file && elem_fractal) {
-    fatal("pixmap definition must not contain both file and "
-          "fractal definition");
+    get_single_child_element(elem_brush, _node_name_fractal, false);
+  const uint16_t elems_count =
+    (elem_solid ? 1 : 0) + (elem_file ? 1 : 0) + (elem_fractal ? 1 : 0);
+  if (elems_count != 1) {
+    fatal("brush definition must contain exactly one of either solid or "
+          "file or fractal definition");
   }
-  if (!elem_file && !elem_fractal) {
-    fatal("for now, pixmap definition must contain either file or "
-          "fractal definition");
-  }
-  IBrush_factory *factory = elem_file ?
-    load_pixmap_file(elem_file) :
-    load_pixmap_fractal(elem_fractal);
+  IBrush_factory *factory =
+    elem_solid ? load_brush_solid(elem_solid) :
+    elem_file ? load_brush_file(elem_file) :
+    load_brush_fractal(elem_fractal);
   return factory;
 }
 

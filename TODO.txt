@@ -5,10 +5,12 @@
   result(*_cached_pixmap);"?
 * FIXME: Minor memory leak: Instances of IBrush_factory are not
   cleanly deleted when no more used.
+* Make it possible to reference globally defined brushes as
+  background / foreground (Syntax: <brush id="...">...</brush>
+  ... <foreground><brush ref="..." /></foreground>).
 * Add function to_string() to IBrush_factory.  Call it from
   within Tile::to_string().
 * Move ball configuration to beneath field definition.
-* Support solid color backgrounds / foregrounds.
 * Support Julia set fractals.
 * Classes Shape_symbols and Tile_symbols (and more symbol table
   classes to come) should derive from an abstract Symbol_table

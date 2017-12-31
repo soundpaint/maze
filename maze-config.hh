@@ -55,6 +55,7 @@ private:
 
   const XMLCh *_node_name_any;
   const XMLCh *_node_name_background;
+  const XMLCh *_node_name_brush;
   const XMLCh *_node_name_columns;
   const XMLCh *_node_name_contents;
   const XMLCh *_node_name_default_background;
@@ -64,9 +65,9 @@ private:
   const XMLCh *_node_name_foreground;
   const XMLCh *_node_name_fractal;
   const XMLCh *_node_name_ignore;
-  const XMLCh *_node_name_pixmap;
   const XMLCh *_node_name_rows;
   const XMLCh *_node_name_shape;
+  const XMLCh *_node_name_solid;
   const XMLCh *_node_name_tile;
   const XMLCh *_node_name_tile_shortcut;
   const XMLCh *_node_name_x_offset;
@@ -87,8 +88,9 @@ private:
   void reload_tiles(const xercesc::DOMElement *elem_config);
   void reload_field(const xercesc::DOMElement *elem_config);
   static const size_t text_content_as_size_t(const xercesc::DOMElement *elem);
-  IBrush_factory *load_pixmap_fractal(const xercesc::DOMElement *elem_fractal) const;
-  IBrush_factory *load_pixmap_file(const xercesc::DOMElement *elem_file) const;
+  IBrush_factory *load_brush_fractal(const xercesc::DOMElement *elem_fractal) const;
+  IBrush_factory *load_brush_file(const xercesc::DOMElement *elem_file) const;
+  IBrush_factory *load_brush_solid(const xercesc::DOMElement *elem_solid) const;
   void load_field_ignore_chars(const xercesc::DOMElement *elem_field,
                                std::set<Xml_string> *ignore_chars) const;
   void load_field_tile_shortcuts(const xercesc::DOMElement *elem_field,
