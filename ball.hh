@@ -1,6 +1,6 @@
 /*
  * Maze -- A maze / flipper game implementation for RPi with Sense Hat
- * Copyright (C) 2016, 2017  Jürgen Reuter
+ * Copyright (C) 2016, 2017, 2018 Jürgen Reuter
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -34,8 +34,9 @@
 class Ball
 {
 public:
-  Ball(const double px = 0.0, const double py = 0.0,
-       const double vx = 0.0, const double vy = 0.0);
+  Ball(const double px = 0.5, const double py = 0.5,
+       const double vx = 0.0, const double vy = 0.0,
+       const double mass = 1.0);
   virtual ~Ball();
   void update(const Sensors *sensors,
 	      const uint16_t width, const uint16_t height);
@@ -68,6 +69,7 @@ private:
   static /*const*/ QPixmap *create_default_pixmap();
   Point_3D *_position;
   Point_3D *_velocity;
+  const double _mass;
   const QPixmap *_pixmap;
   bool _is_in_goal;
   double _max_vx = 0.0;

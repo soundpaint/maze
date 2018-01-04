@@ -1,6 +1,6 @@
 /*
  * Maze -- A maze / flipper game implementation for RPi with Sense Hat
- * Copyright (C) 2016, 2017  Jürgen Reuter
+ * Copyright (C) 2016, 2017, 2018 Jürgen Reuter
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -28,6 +28,7 @@
 #include <set>
 #include <xercesc/dom/DOM.hpp>
 #include <QtGui/QBrush>
+#include <ball-init-data.hh>
 #include <brush-field.hh>
 #include <brush-factory-symbols.hh>
 #include <config.hh>
@@ -53,8 +54,11 @@ private:
   static const xml_string_to_xml_string_t::size_type BUCKET_COUNT = 5;
 
   const XMLCh *_node_name_any;
+  const XMLCh *_node_name_align;
   const XMLCh *_node_name_background;
+  const XMLCh *_node_name_ball;
   const XMLCh *_node_name_brush;
+  const XMLCh *_node_name_column;
   const XMLCh *_node_name_columns;
   const XMLCh *_node_name_contents;
   const XMLCh *_node_name_default_background;
@@ -64,13 +68,19 @@ private:
   const XMLCh *_node_name_foreground;
   const XMLCh *_node_name_fractal;
   const XMLCh *_node_name_ignore;
+  const XMLCh *_node_name_mass;
+  const XMLCh *_node_name_position;
+  const XMLCh *_node_name_row;
   const XMLCh *_node_name_rows;
   const XMLCh *_node_name_shape;
   const XMLCh *_node_name_solid;
   const XMLCh *_node_name_tile;
   const XMLCh *_node_name_tile_shortcut;
+  const XMLCh *_node_name_velocity;
+  const XMLCh *_node_name_x;
   const XMLCh *_node_name_x_offset;
   const XMLCh *_node_name_x_scale;
+  const XMLCh *_node_name_y;
   const XMLCh *_node_name_y_offset;
   const XMLCh *_node_name_y_scale;
   const XMLCh *_attr_name_id;
@@ -88,6 +98,7 @@ private:
   void reload_tiles(const xercesc::DOMElement *elem_config);
   void reload_field(const xercesc::DOMElement *elem_config);
   static const size_t text_content_as_size_t(const xercesc::DOMElement *elem);
+  static const double text_content_as_double(const xercesc::DOMElement *elem);
   IBrush_factory *load_brush_fractal(const Xml_string *id,
                                      const xercesc::DOMElement *elem_fractal) const;
   IBrush_factory *load_brush_file(const Xml_string *id,
@@ -102,13 +113,23 @@ private:
                              const bool require_definition) const;
   void load_field_ignore_chars(const xercesc::DOMElement *elem_field,
                                std::set<Xml_string> *ignore_chars) const;
+  void load_field_tile_shortcut(const xercesc::DOMElement *elem_tile_shortcut,
+                                xml_string_to_xml_string_t *shortcuts) const;
   void load_field_tile_shortcuts(const xercesc::DOMElement *elem_field,
-                                 xml_string_to_xml_string_t *shortcuts);
+                                 xml_string_to_xml_string_t *shortcuts) const;
   Brush_field *
   load_field_contents(const xercesc::DOMElement *elem_contents,
                       const size_t width, const size_t height,
                       std::set<Xml_string> *ignore_chars,
-                      xml_string_to_xml_string_t *shortcuts);
+                      xml_string_to_xml_string_t *shortcuts,
+                      std::vector<const Ball_init_data *> *balls);
+  const double load_field_ball_align(const xercesc::DOMElement *elem_align,
+                                     const XMLCh *_node_name_axis,
+                                     const double default_align) const;
+  void load_field_ball(const xercesc::DOMElement *elem_ball,
+                       std::vector<const Ball_init_data *> *balls) const;
+  void load_field_balls(const xercesc::DOMElement *elem_field,
+                        std::vector<const Ball_init_data *> *balls) const;
   void load_field(const xercesc::DOMElement *elem_field);
   const Shape *load_shape_definition(const xercesc::DOMElement *elem_shape,
                                      const XMLCh *attr_id) const;

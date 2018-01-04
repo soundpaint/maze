@@ -22,35 +22,40 @@
  * Author's web site: www.juergen-reuter.de
  */
 
-#ifndef MAZE_HH
-#define MAZE_HH
+#ifndef BALL_INIT_DATA_HH
+#define BALL_INIT_DATA_HH
 
-#include <pthread.h>
-#include <QtWidgets/QApplication>
-#include <maze-config.hh>
-#include <sensors.hh>
-#include <balls.hh>
-#include <main-window.hh>
-#include <simulation.hh>
+#include <inttypes.h>
 
-class Maze : public QApplication
+class Ball_init_data
 {
-  Q_OBJECT
 public:
-  explicit Maze(int &argc, char **argv);
-  virtual ~Maze();
-private slots:
-  void slot_last_window_closed();
+  Ball_init_data(const uint16_t column,
+                 const uint16_t row,
+                 const double align_x = 0.5,
+                 const double align_y = 0.5,
+                 const double velocity_x = 0.0,
+                 const double velocity_y = 0.0,
+                 const double mass = 1.0);
+  virtual ~Ball_init_data();
+  const uint16_t get_column() const;
+  const uint16_t get_row() const;
+  const double get_align_x() const;
+  const double get_align_y() const;
+  const double get_velocity_x() const;
+  const double get_velocity_y() const;
+  const double get_mass() const;
 private:
-  static const char *STYLE_SHEET;
-  static Simulation *_simulation;
-  Maze_config *_config;
-  Sensors *_sensors;
-  Balls *_balls;
-  Main_window *_main_window;
+  const uint16_t _column;
+  const uint16_t _row;
+  const double _align_x;
+  const double _align_y;
+  const double _velocity_x;
+  const double _velocity_y;
+  const double _mass;
 };
 
-#endif /* MAZE_HH */
+#endif /* BALL_INIT_DATA_HH */
 
 /*
  * Local variables:

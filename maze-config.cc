@@ -1,6 +1,6 @@
 /*
  * Maze -- A maze / flipper game implementation for RPi with Sense Hat
- * Copyright (C) 2016, 2017  Jürgen Reuter
+ * Copyright (C) 2016, 2017, 2018 Jürgen Reuter
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -39,8 +39,11 @@
 Maze_config::Maze_config(const char *path) :
   Config(path),
   _node_name_any(xercesc::XMLString::transcode("*")),
+  _node_name_align(xercesc::XMLString::transcode("align")),
   _node_name_background(xercesc::XMLString::transcode("background")),
+  _node_name_ball(xercesc::XMLString::transcode("ball")),
   _node_name_brush(xercesc::XMLString::transcode("brush")),
+  _node_name_column(xercesc::XMLString::transcode("column")),
   _node_name_columns(xercesc::XMLString::transcode("columns")),
   _node_name_contents(xercesc::XMLString::transcode("contents")),
   _node_name_default_background(xercesc::XMLString::transcode("default-background")),
@@ -50,13 +53,19 @@ Maze_config::Maze_config(const char *path) :
   _node_name_foreground(xercesc::XMLString::transcode("foreground")),
   _node_name_fractal(xercesc::XMLString::transcode("fractal")),
   _node_name_ignore(xercesc::XMLString::transcode("ignore")),
+  _node_name_mass(xercesc::XMLString::transcode("mass")),
+  _node_name_position(xercesc::XMLString::transcode("position")),
+  _node_name_row(xercesc::XMLString::transcode("row")),
   _node_name_rows(xercesc::XMLString::transcode("rows")),
   _node_name_shape(xercesc::XMLString::transcode("shape")),
   _node_name_solid(xercesc::XMLString::transcode("solid")),
   _node_name_tile(xercesc::XMLString::transcode("tile")),
   _node_name_tile_shortcut(xercesc::XMLString::transcode("tile-shortcut")),
+  _node_name_velocity(xercesc::XMLString::transcode("velocity")),
+  _node_name_x(xercesc::XMLString::transcode("x")),
   _node_name_x_offset(xercesc::XMLString::transcode("x-offset")),
   _node_name_x_scale(xercesc::XMLString::transcode("x-scale")),
+  _node_name_y(xercesc::XMLString::transcode("y")),
   _node_name_y_offset(xercesc::XMLString::transcode("y-offset")),
   _node_name_y_scale(xercesc::XMLString::transcode("y-scale")),
   _attr_name_id(xercesc::XMLString::transcode("id")),
@@ -80,8 +89,11 @@ Maze_config::~Maze_config()
   _field = 0;
 
   release(&_node_name_any);
+  release(&_node_name_align);
   release(&_node_name_background);
+  release(&_node_name_ball);
   release(&_node_name_brush);
+  release(&_node_name_column);
   release(&_node_name_columns);
   release(&_node_name_contents);
   release(&_node_name_default_background);
@@ -91,13 +103,19 @@ Maze_config::~Maze_config()
   release(&_node_name_foreground);
   release(&_node_name_fractal);
   release(&_node_name_ignore);
+  release(&_node_name_mass);
+  release(&_node_name_position);
+  release(&_node_name_row);
   release(&_node_name_rows);
   release(&_node_name_shape);
   release(&_node_name_solid);
   release(&_node_name_tile);
   release(&_node_name_tile_shortcut);
+  release(&_node_name_velocity);
+  release(&_node_name_x);
   release(&_node_name_x_offset);
   release(&_node_name_x_scale);
+  release(&_node_name_y);
   release(&_node_name_y_offset);
   release(&_node_name_y_scale);
   release(&_attr_name_id);
@@ -356,6 +374,39 @@ Maze_config::text_content_as_size_t(const xercesc::DOMElement *elem)
   return value;
 }
 
+const double
+Maze_config::text_content_as_double(const xercesc::DOMElement *elem)
+{
+  const XMLCh *node_value = elem->getTextContent();
+  char *node_value_as_c_star =
+    xercesc::XMLString::transcode(node_value);
+  char *endptr;
+  const double value = strtod(node_value_as_c_star, &endptr);
+  if (endptr != node_value_as_c_star + strlen(node_value_as_c_star)) {
+    std::stringstream msg;
+    msg << "in text value of node '" << elem->getNodeName() <<
+      "': unexpected characters following double value at position " <<
+      endptr - node_value_as_c_star;
+    fatal(msg.str());
+  }
+  if (errno == ERANGE) {
+    std::stringstream msg;
+    msg << "in text value of node '" << elem->getNodeName() <<
+      "': double value out of range ";
+    fatal(msg.str());
+  }
+  if (errno == EINVAL) {
+    std::stringstream msg;
+    msg << "in text value of node '" << elem->getNodeName() <<
+      "': either no digits seen or " <<
+      "programming error: strtod base out of range";
+    fatal(msg.str());
+  }
+  xercesc::XMLString::release(&node_value_as_c_star);
+  node_value_as_c_star = 0;
+  return value;
+}
+
 void
 Maze_config::load_field_ignore_chars(const xercesc::DOMElement *elem_field,
                                      std::set<Xml_string> *chars) const
@@ -400,8 +451,57 @@ Maze_config::load_field_ignore_chars(const xercesc::DOMElement *elem_field,
 }
 
 void
+Maze_config::load_field_tile_shortcut(const xercesc::DOMElement *elem_tile_shortcut,
+                                      xml_string_to_xml_string_t *shortcuts) const
+{
+  const XMLCh *attr_id = elem_tile_shortcut->getAttribute(_attr_name_id);
+  if (xercesc::XMLString::stringLen(attr_id) <= 0) {
+    fatal("missing or empty 'id' attribute on tile shortcut");
+  }
+  const Xml_string *str_id = new Xml_string(attr_id);
+  if (!str_id) {
+    fatal("not enough memory");
+  }
+  char *attr_value_id_as_c_star = str_id->transcode();
+  if (str_id->length() != 1) {
+    std::stringstream msg;
+    msg << "in tile-shortcut node '" << elem_tile_shortcut->getNodeName() <<
+      "': 'id' attribute value must have exactly 1 character, but has " <<
+      str_id->length() << " characters: '" <<
+      attr_value_id_as_c_star << "'";
+    xercesc::XMLString::release(&attr_value_id_as_c_star);
+    fatal(msg.str());
+  }
+  {
+    std::stringstream msg;
+    msg << "found shortcut: '" << attr_value_id_as_c_star << "'";
+    debug(msg.str());
+  }
+
+  if (shortcuts->count(str_id) > 0) {
+    std::stringstream msg;
+    msg << "in node '" << elem_tile_shortcut->getNodeName() <<
+      "': multiple declarations of shortcut with id='" <<
+      attr_value_id_as_c_star << "'";
+    xercesc::XMLString::release(&attr_value_id_as_c_star);
+    fatal(msg.str());
+  }
+  xercesc::XMLString::release(&attr_value_id_as_c_star);
+
+  const XMLCh *attr_ref = elem_tile_shortcut->getAttribute(_attr_name_ref);
+  if (xercesc::XMLString::stringLen(attr_ref) <= 0) {
+    fatal("missing or empty 'ref' attribute on tile shortcut");
+  }
+  const Xml_string *str_ref = new Xml_string(attr_ref);
+  if (!str_ref) {
+    fatal("not enough memory");
+  }
+  (*shortcuts)[str_id] = str_ref;
+}
+
+void
 Maze_config::load_field_tile_shortcuts(const xercesc::DOMElement *elem_field,
-                                       xml_string_to_xml_string_t *shortcuts)
+                                       xml_string_to_xml_string_t *shortcuts) const
 {
   const xercesc::DOMNodeList *node_list =
     get_children_by_tag_name(elem_field, _node_name_tile_shortcut);
@@ -414,50 +514,7 @@ Maze_config::load_field_tile_shortcuts(const xercesc::DOMElement *elem_field,
       if (!elem_tile_shortcut) {
 	fatal("unexpected null element");
       }
-
-      const XMLCh *attr_id = elem_tile_shortcut->getAttribute(_attr_name_id);
-      if (xercesc::XMLString::stringLen(attr_id) <= 0) {
-        fatal("missing or empty 'id' attribute on tile shortcut");
-      }
-      const Xml_string *str_id = new Xml_string(attr_id);
-      if (!str_id) {
-        fatal("not enough memory");
-      }
-      char *attr_value_id_as_c_star = str_id->transcode();
-      if (str_id->length() != 1) {
-        std::stringstream msg;
-        msg << "in tile-shortcut node '" << elem_tile_shortcut->getNodeName() <<
-          "': 'id' attribute value must have exactly 1 character, but has " <<
-          str_id->length() << " characters: '" <<
-          attr_value_id_as_c_star << "'";
-        xercesc::XMLString::release(&attr_value_id_as_c_star);
-        fatal(msg.str());
-      }
-      {
-        std::stringstream msg;
-        msg << "found shortcut: '" << attr_value_id_as_c_star << "'";
-        debug(msg.str());
-      }
-
-      if (shortcuts->count(str_id) > 0) {
-        std::stringstream msg;
-        msg << "in node '" << elem_tile_shortcut->getNodeName() <<
-          "': multiple declarations of shortcut with id='" <<
-          attr_value_id_as_c_star << "'";
-        xercesc::XMLString::release(&attr_value_id_as_c_star);
-        fatal(msg.str());
-      }
-      xercesc::XMLString::release(&attr_value_id_as_c_star);
-
-      const XMLCh *attr_ref = elem_tile_shortcut->getAttribute(_attr_name_ref);
-      if (xercesc::XMLString::stringLen(attr_ref) <= 0) {
-        fatal("missing or empty 'ref' attribute on tile shortcut");
-      }
-      const Xml_string *str_ref = new Xml_string(attr_ref);
-      if (!str_ref) {
-        fatal("not enough memory");
-      }
-      (*shortcuts)[str_id] = str_ref;
+      load_field_tile_shortcut(elem_tile_shortcut, shortcuts);
     }
     {
       std::stringstream msg;
@@ -482,7 +539,8 @@ Brush_field *
 Maze_config::load_field_contents(const xercesc::DOMElement *elem_contents,
                                  const size_t width, const size_t height,
                                  std::set<Xml_string> *ignore_chars,
-                                 xml_string_to_xml_string_t *shortcuts)
+                                 xml_string_to_xml_string_t *shortcuts,
+                                 std::vector<const Ball_init_data *> *balls)
 {
   const XMLCh *node_value_contents = elem_contents->getTextContent();
   char *node_value_contents_as_c_star =
@@ -535,17 +593,139 @@ Maze_config::load_field_contents(const xercesc::DOMElement *elem_contents,
   xercesc::XMLString::release(&node_value_contents_as_c_star);
   node_value_contents_as_c_star = 0;
 
-  Brush_field *brush_field = new Brush_field(width, height, field);
+  Brush_field *brush_field = new Brush_field(width, height, field, *balls);
   if (!brush_field) {
     fatal("not enough memory");
   }
   return brush_field;
 }
 
+const double
+Maze_config::load_field_ball_align(const xercesc::DOMElement *elem_align,
+                                   const XMLCh *_node_name_axis,
+                                   const double default_align) const
+{
+  if (elem_align) {
+    const xercesc::DOMElement *elem_align_axis =
+      get_single_child_element(elem_align, _node_name_axis, false);
+    double align;
+    if (elem_align_axis) {
+      align = text_content_as_double(elem_align_axis);
+    } else {
+      align = default_align;
+    }
+    if (align < 0.0) {
+      std::stringstream msg;
+      msg << "field ball align " << elem_align_axis->getNodeName() <<
+        ": align value must be positive";
+      fatal(msg.str());
+    }
+    if (align > 1.0) {
+      std::stringstream msg;
+      msg << "field ball align " << elem_align_axis->getNodeName() <<
+        ": align value must be not greater than 1.0";
+      fatal(msg.str());
+    }
+    return align;
+  } else {
+    return default_align;
+  }
+}
+
+void
+Maze_config::load_field_ball(const xercesc::DOMElement *elem_ball,
+                             std::vector<const Ball_init_data *> *balls) const
+{
+  const xercesc::DOMElement *elem_position =
+    get_single_child_element(elem_ball, _node_name_position, true);
+
+  const xercesc::DOMElement *elem_column =
+    get_single_child_element(elem_position, _node_name_column, true);
+  const uint16_t column = text_content_as_size_t(elem_column);
+
+  const xercesc::DOMElement *elem_row =
+    get_single_child_element(elem_position, _node_name_row, true);
+  const uint16_t row = text_content_as_size_t(elem_row);
+
+  const xercesc::DOMElement *elem_align =
+    get_single_child_element(elem_ball, _node_name_align, false);
+  const double default_align_x = 0.5;
+  const double align_x = load_field_ball_align(elem_align, _node_name_x,
+                                               default_align_x);
+  const double default_align_y = 0.5;
+  const double align_y = load_field_ball_align(elem_align, _node_name_y,
+                                               default_align_y);
+
+  const xercesc::DOMElement *elem_velocity =
+    get_single_child_element(elem_ball, _node_name_velocity, true);
+
+  const xercesc::DOMElement *elem_velocity_x =
+    get_single_child_element(elem_velocity, _node_name_x, true);
+  const double velocity_x = text_content_as_double(elem_velocity_x);
+
+  const xercesc::DOMElement *elem_velocity_y =
+    get_single_child_element(elem_velocity, _node_name_y, true);
+  const double velocity_y = text_content_as_double(elem_velocity_y);
+
+  const xercesc::DOMElement *elem_mass =
+    get_single_child_element(elem_ball, _node_name_mass, true);
+  const double mass = text_content_as_double(elem_mass);
+
+  const Ball_init_data *ball = new Ball_init_data(column, row,
+                                                  align_x, align_y,
+                                                  velocity_x, velocity_y,
+                                                  mass);
+  if (!ball) {
+    fatal("not enough memory");
+  }
+  balls->push_back(ball);
+}
+
+void
+Maze_config::load_field_balls(const xercesc::DOMElement *elem_field,
+                              std::vector<const Ball_init_data *> *balls) const
+{
+  const xercesc::DOMNodeList *node_list =
+    get_children_by_tag_name(elem_field, _node_name_ball);
+  if (node_list) {
+    const XMLSize_t length = node_list->getLength();
+    for (uint32_t node_index = 0; node_index < length; node_index++) {
+      xercesc::DOMNode *node = node_list->item(node_index);
+      xercesc::DOMElement *elem_ball =
+        dynamic_cast<xercesc::DOMElement *>(node);
+      if (!elem_ball) {
+	fatal("unexpected null element");
+      }
+      load_field_ball(elem_ball, balls);
+    }
+    {
+      std::stringstream msg;
+      msg << "found " << balls->size() << " ball(s):" << std::endl;
+      for (const Ball_init_data *ball : *balls) {
+        const uint16_t row = ball->get_row();
+        const uint16_t column = ball->get_column();
+        const double velocity_x = ball->get_velocity_x();
+        const double velocity_y = ball->get_velocity_y();
+        const double mass = ball->get_mass();
+        msg << "ball{pos=(row=" << row << ", col=" << column << ")), " <<
+          "velocity=(x=" << velocity_x << ", y=" << velocity_y << ")), " <<
+          "mass=" << mass << "}" << std::endl;
+      }
+      debug(msg.str());
+    }
+  } else {
+    Log::warn("no ball found");
+  }
+}
+
 void
 Maze_config::load_field(const xercesc::DOMElement *elem_field)
 {
   debug("'field('");
+
+  std::vector<const Ball_init_data *> balls;
+  load_field_balls(elem_field, &balls);
+
   const xercesc::DOMElement *elem_columns =
     get_single_child_element(elem_field, _node_name_columns, true);
   const size_t width = text_content_as_size_t(elem_columns);
@@ -572,8 +752,7 @@ Maze_config::load_field(const xercesc::DOMElement *elem_field)
     get_single_child_element(elem_field, _node_name_contents, true);
   _field =
     load_field_contents(elem_contents, width, height,
-                        &ignore_chars, &shortcuts);
-
+                        &ignore_chars, &shortcuts, &balls);
   debug("')'");
 }
 

@@ -1,6 +1,6 @@
 /*
  * Maze -- A maze / flipper game implementation for RPi with Sense Hat
- * Copyright (C) 2016, 2017  Jürgen Reuter
+ * Copyright (C) 2016, 2017, 2018 Jürgen Reuter
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -28,7 +28,10 @@
 const uint16_t
 Balls::DEFAULT_OVERSAMPLING = 100;
 
-Balls::Balls(Sensors *sensors, const uint8_t count)
+Balls::Balls(Sensors *sensors,
+             const std::vector<const Ball_init_data *> balls_init_data,
+             const uint16_t rows,
+             const uint16_t columns)
 {
   if (!sensors) {
     Log::fatal("Balls(): sensors is null");
@@ -38,12 +41,17 @@ Balls::Balls(Sensors *sensors, const uint8_t count)
   if (!_balls) {
     Log::fatal("Balls(): not enough memory");
   }
-  for (uint8_t i = 0; i < count; i++) {
-    const double x = 0.25 + 0.5 * i / count;
-    const double y = 0.20 + 0.5 * i / count;
-    const double vx = 0.00001;
-    const double vy = 0.000011;
-    _balls->push_back(new Ball(x, y, vx, vy));
+  for (const Ball_init_data *ball_init_data : balls_init_data) {
+    const uint16_t column = ball_init_data->get_column();
+    const uint16_t row = ball_init_data->get_row();
+    const double align_x = ball_init_data->get_align_x();
+    const double align_y = ball_init_data->get_align_y();
+    const double x = (column + align_x) / columns;
+    const double y = (row + align_y) / rows;
+    const double vx = ball_init_data->get_velocity_x();
+    const double vy = ball_init_data->get_velocity_y();
+    const double mass = ball_init_data->get_mass();
+    _balls->push_back(new Ball(x, y, vx, vy, mass));
   }
   _oversampling = DEFAULT_OVERSAMPLING;
 }

@@ -1,6 +1,6 @@
 /*
  * Maze -- A maze / flipper game implementation for RPi with Sense Hat
- * Copyright (C) 2016, 2017  Jürgen Reuter
+ * Copyright (C) 2016, 2017, 2018 Jürgen Reuter
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -62,7 +62,15 @@ Maze::Maze(int &argc, char **argv)
     Log::fatal("Maze(): not enough memory");
   }
 
-  _balls = new Balls(_sensors, 1);
+  const Brush_field *brush_field = _config->get_brush_field();
+  std::vector<const Ball_init_data *> balls_init_data =
+    brush_field->get_balls_init_data();
+  const uint16_t rows = brush_field->get_height();
+  const uint16_t columns = brush_field->get_width();
+  _balls = new Balls(_sensors,
+                     balls_init_data,
+                     rows,
+                     columns);
   if (!_balls) {
     Log::fatal("Maze(): not enough memory");
   }

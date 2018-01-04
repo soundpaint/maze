@@ -1,6 +1,6 @@
 /*
  * Maze -- A maze / flipper game implementation for RPi with Sense Hat
- * Copyright (C) 2016, 2017  Jürgen Reuter
+ * Copyright (C) 2016, 2017, 2018 Jürgen Reuter
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -32,13 +32,15 @@
 #include <QtGui/QBrush>
 #include <ifield-geometry-listener.hh>
 #include <tile.hh>
+#include <ball-init-data.hh>
 
 class Brush_field : public IField_geometry_listener
 {
 public:
   Brush_field(const uint16_t width,
               const uint16_t height,
-              const std::vector<Tile *> field);
+              const std::vector<Tile *> field,
+              const std::vector<const Ball_init_data *> balls);
   virtual ~Brush_field();
   const std::string to_string() const;
   const uint16_t get_width() const;
@@ -49,10 +51,12 @@ public:
 			   const double dx, const double dy) const;
   const bool matches_goal(const double x, const double y) const;
   virtual void geometry_changed(const uint16_t width, const uint16_t height);
+  const std::vector<const Ball_init_data *> get_balls_init_data() const;
 private:
   const uint16_t _width;
   const uint16_t _height;
   const std::vector<Tile *> _field;
+  const std::vector<const Ball_init_data *> _balls;
   const Tile *get_tile(const double x, const double y,
                        double * const tile_offset_x,
                        double * const tile_offset_y) const;

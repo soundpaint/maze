@@ -1,6 +1,6 @@
 /*
  * Maze -- A maze / flipper game implementation for RPi with Sense Hat
- * Copyright (C) 2016, 2017  Jürgen Reuter
+ * Copyright (C) 2016, 2017, 2018 Jürgen Reuter
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -34,7 +34,10 @@
 class Balls : public IBalls
 {
 public:
-  Balls(Sensors *sensors, const uint8_t count = 1);
+  Balls(Sensors *sensors,
+        const std::vector<const Ball_init_data *> balls_init_data,
+        const uint16_t rows,
+        const uint16_t columns);
   virtual ~Balls();
   void update(Playing_field *playing_field);
   const uint8_t get_count() const;

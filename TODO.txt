@@ -1,3 +1,10 @@
+* Source code formatting: Get rid of "\t" chars.
+* Bump to 2018 where appropriate.
+* Brush_field: Rename "width" => "columns" and "height" => "rows" for
+  the geometry of the tiles grid.  Purpose of this change is to
+  avoid confusion with the playing field widget's pixel width and
+  height.
+* Add version info in config.xml and verify it when parsing it.
 * All symbols should always have an id.  Anonymous symbols should
   automatically get a generated id.  That way, code may be
   simplified (no null-check in destructor and to_string();
@@ -10,7 +17,6 @@
   result(*_cached_pixmap);"?
 * FIXME: Minor memory leak: Instances of IBrush_factory are not
   cleanly deleted when no more used.
-* Move ball configuration to beneath field definition.
 * Support Julia set fractals.
 * Classes Brush_factory_symbols, Shape_symbols and Tile_symbols (and
   possibly even more symbol table classes to come) should derive from

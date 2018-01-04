@@ -1,6 +1,6 @@
 /*
  * Maze -- A maze / flipper game implementation for RPi with Sense Hat
- * Copyright (C) 2016, 2017  Jürgen Reuter
+ * Copyright (C) 2016, 2017, 2018 Jürgen Reuter
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -27,10 +27,12 @@
 
 Brush_field::Brush_field(const uint16_t width,
                          const uint16_t height,
-                         const std::vector<Tile *> field) :
+                         const std::vector<Tile *> field,
+                         std::vector<const Ball_init_data *> balls) :
   _width(width),
   _height(height),
-  _field(field)
+  _field(field),
+  _balls(balls)
 {
 }
 
@@ -163,6 +165,12 @@ Brush_field::matches_goal(const double x, const double y) const
 {
   // TODO: Consider geometry (width, height) of the ball.
   return get_potential(x, y) < 0.0;
+}
+
+const std::vector<const Ball_init_data *>
+Brush_field::get_balls_init_data() const
+{
+  return _balls;
 }
 
 /*

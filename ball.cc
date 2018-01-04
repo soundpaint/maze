@@ -1,6 +1,6 @@
 /*
  * Maze -- A maze / flipper game implementation for RPi with Sense Hat
- * Copyright (C) 2016, 2017  Jürgen Reuter
+ * Copyright (C) 2016, 2017, 2018 Jürgen Reuter
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -44,7 +44,9 @@ const uint16_t
 Ball::DEFAULT_PIXMAP_ORIGIN_Y = 7;
 
 Ball::Ball(const double px, const double py,
-	   const double vx, const double vy)
+           const double vx, const double vy,
+           const double mass) :
+  _mass(mass)
 {
   _position = new Point_3D(px, py, 0.0);
   if (!_position) {
@@ -77,6 +79,7 @@ Ball::~Ball()
   _position = 0;
   delete _velocity;
   _velocity = 0;
+  //_mass = 0.0;
   _is_in_goal = false;
   _max_vx = 0.0;
   _max_vy = 0.0;
