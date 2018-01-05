@@ -49,19 +49,19 @@ class Playing_field : public QWidget
 public:
   explicit Playing_field(Brush_field *brush_field,
                          const uint16_t minimum_width,
-			 const uint16_t minimum_height,
-			 IBalls *balls,
-			 QWidget *parent = 0);
+                         const uint16_t minimum_height,
+                         IBalls *balls,
+                         QWidget *parent = 0);
   virtual ~Playing_field();
   QSize minimumSizeHint() const Q_DECL_OVERRIDE;
   QSize sizeHint() const Q_DECL_OVERRIDE;
   void invalidate_rect(const double px, const double py,
-		       const uint16_t pixmap_width,
-		       const uint16_t pixmap_height,
-		       const uint16_t pixmap_origin_x,
-		       const uint16_t pixmap_origin_y);
+                       const uint16_t pixmap_width,
+                       const uint16_t pixmap_height,
+                       const uint16_t pixmap_origin_x,
+                       const uint16_t pixmap_origin_y);
   void invalidate_rect(const uint16_t px, const uint16_t py,
-		       const uint16_t width, const uint16_t height);
+                       const uint16_t width, const uint16_t height);
   const bool matches_goal(const double px, const double py) const;
   const bool is_exclusion_zone(const uint16_t x, const uint16_t y) const;
   const bool is_velocity_visible() const;
@@ -88,8 +88,8 @@ private:
   std::vector<IField_geometry_listener *> *_field_geometry_listeners;
   void check_update_geometry();
   QImage *create_background(const uint16_t width,
-			    const uint16_t height,
-			    const bool force_field_visible);
+                            const uint16_t height,
+                            const bool force_field_visible);
   void draw_balls(QPainter *painter, const QRect rect);
   void draw_velocities(QPainter *painter, const QRect rect);
 };

@@ -47,8 +47,8 @@ private:
   double *_gx, *_gy;
   static const double abs(const double x);
   const double convolute_with_kernel(const double *m,
-				     const uint32_t my0,
-				     const double *kernel) const;
+                                     const uint32_t my0,
+                                     const double *kernel) const;
 };
 
 #endif /* SOBEL_HH */

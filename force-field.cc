@@ -55,7 +55,7 @@ Force_field::create_potential_field(const Brush_field *brush_field) const
     for (uint16_t x = 0; x < _width; x++) {
       const double field_x = ((double)x) / _width;
       potential_field[y * _width + x] =
-	brush_field->get_potential(field_x, field_y);
+        brush_field->get_potential(field_x, field_y);
     }
   }
   return potential_field;
@@ -63,8 +63,8 @@ Force_field::create_potential_field(const Brush_field *brush_field) const
 
 void
 Force_field::load_field(const uint16_t x, const uint16_t y,
-			const Brush_field *brush_field,
-			const Sobel *sobel)
+                        const Brush_field *brush_field,
+                        const Sobel *sobel)
 {
   struct velocity_op_t velocity_op;
 
@@ -98,7 +98,7 @@ Force_field::load_field(const uint16_t x, const uint16_t y,
 
 void
 Force_field::load_field(const uint16_t x, const uint16_t y,
-			const Brush_field *brush_field)
+                        const Brush_field *brush_field)
 {
   struct velocity_op_t velocity_op;
   const double i_width = 1.0 / _width;
@@ -124,9 +124,9 @@ Force_field::load_field(const uint16_t x, const uint16_t y,
     const double p7 =
       brush_field->get_potential((x + 1) * i_width, (y + 1) * i_height);
     if ((p0 <= 1.0) || (p1 <= 1.0) || (p2 <= 1.0) || (p3 <= 1.0) ||
-	(p4 <= 1.0) || (p5 <= 1.0) || (p6 <= 1.0) || (p7 <= 1.0)) {
+        (p4 <= 1.0) || (p5 <= 1.0) || (p6 <= 1.0) || (p7 <= 1.0)) {
       velocity_op.theta =
-	brush_field->get_avg_tan(x * i_width, y * i_height, i_width, i_height);
+        brush_field->get_avg_tan(x * i_width, y * i_height, i_width, i_height);
       velocity_op.is_reflection = !std::isnan(velocity_op.theta);
     } else {
       velocity_op.is_reflection = false;
@@ -139,7 +139,7 @@ Force_field::load_field(const uint16_t x, const uint16_t y,
 
 void
 Force_field::load_field(const Brush_field *brush_field,
-			const uint16_t width, const uint16_t height)
+                        const uint16_t width, const uint16_t height)
 {
   if (width <= 0) {
     Log::fatal("Force_field::load_field(): width <= 0");
@@ -156,7 +156,7 @@ Force_field::load_field(const Brush_field *brush_field,
   }
   _op_field =
     (struct velocity_op_t *)calloc(_width * _height,
-				   sizeof(struct velocity_op_t));
+                                   sizeof(struct velocity_op_t));
   if (!_op_field) {
     Log::fatal("Force_field::load_field(): not enough memory");
   }

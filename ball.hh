@@ -39,7 +39,7 @@ public:
        const double mass = 1.0);
   virtual ~Ball();
   void update(const Sensors *sensors,
-	      const uint16_t width, const uint16_t height);
+              const uint16_t width, const uint16_t height);
   const Point_3D *get_position() const;
   const Point_3D *get_velocity() const;
   const QPixmap *get_pixmap() const;
@@ -76,9 +76,9 @@ private:
   double _max_vy = 0.0;
 
   const bool update_velocity(const struct velocity_op_t velocity_op,
-			     Point_3D *velocity) const;
+                             Point_3D *velocity) const;
   void precompute_forces(const uint16_t x, const uint16_t y,
-			 const Force_field *force_field);
+                         const Force_field *force_field);
   uint16_t _force_field_width;
   uint16_t _force_field_height;
   struct velocity_op_t *_op_force_field;

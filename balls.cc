@@ -110,13 +110,13 @@ Balls::update(Playing_field *playing_field)
 
     // schedule undrawing ball at old position
     playing_field->invalidate_rect(old_px, old_py,
-				   pixmap_width, pixmap_height,
-				   pixmap_origin_x, pixmap_origin_y);
+                                   pixmap_width, pixmap_height,
+                                   pixmap_origin_x, pixmap_origin_y);
 
     // schedule drawing ball at new position
     playing_field->invalidate_rect(new_px, new_py,
-				   pixmap_width, pixmap_height,
-				   pixmap_origin_x, pixmap_origin_y);
+                                   pixmap_width, pixmap_height,
+                                   pixmap_origin_x, pixmap_origin_y);
 
     if (playing_field->matches_goal(new_px, new_py)) {
       ball->set_is_in_goal(true);

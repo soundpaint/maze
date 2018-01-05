@@ -27,8 +27,8 @@
 #include <QtGui/QFont>
 
 Message_overlay::Message_overlay(const uint16_t interval_on,
-				 const uint16_t interval_off,
-				 QWidget *parent)
+                                 const uint16_t interval_off,
+                                 QWidget *parent)
   : QLabel(parent)
 {
   setWindowTitle(QString(""));

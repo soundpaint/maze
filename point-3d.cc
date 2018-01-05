@@ -119,7 +119,7 @@ Point_3D::with_length(const double length) const
   const double current_length = get_length();
   if (current_length == 0.0) {
     Log::fatal("Point_3D::with_length(): "
-	       "zero point does not have any direction for scaling");
+               "zero point does not have any direction for scaling");
   }
   return scale(length / current_length);
 }

@@ -31,7 +31,7 @@ public:
   Point_3D(const double x, const double y, const double z);
   virtual ~Point_3D();
   static Point_3D *from_polar(const double phi, const double theta,
-			      const double r);
+                              const double r);
   const double get_x() const;
   const double get_y() const;
   const double get_z() const;

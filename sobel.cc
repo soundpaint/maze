@@ -83,8 +83,8 @@ Sobel::~Sobel()
 
 const double
 Sobel::convolute_with_kernel(const double *matrix,
-			     const uint32_t my0,
-			     const double *kernel) const
+                             const uint32_t my0,
+                             const double *kernel) const
 {
   double sum = 0.0;
   for (uint8_t y = 0; y < SIZE; y++) {

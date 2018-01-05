@@ -1,4 +1,3 @@
-* Source code formatting: Get rid of "\t" chars.
 * Bump to 2018 where appropriate.
 * Brush_field: Rename "width" => "columns" and "height" => "rows" for
   the geometry of the tiles grid.  Purpose of this change is to

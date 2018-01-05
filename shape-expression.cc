@@ -126,7 +126,7 @@ Shape_terms::Shape_terms()
 {
   _terms =
     new std::vector<const Shape_factors *,
-		    std::allocator<const Shape_factors *>>();
+                    std::allocator<const Shape_factors *>>();
   if (!_terms) {
     Log::fatal("not enough memory");
   }

@@ -36,7 +36,7 @@ public:
   Force_field();
   virtual ~Force_field();
   void load_field(const Brush_field *brush_field,
-		  const uint16_t width, const uint16_t height);
+                  const uint16_t width, const uint16_t height);
   const double get_theta(const uint16_t x, const uint16_t y) const;
   const bool is_reflection(const uint16_t x, const uint16_t y) const;
   const bool is_exclusion_zone(const uint16_t x, const uint16_t y) const;
@@ -53,10 +53,10 @@ private:
   struct velocity_op_t *_op_field;
   double *create_potential_field(const Brush_field *brush_field) const;
   void load_field(const uint16_t x, const uint16_t y,
-		  const Brush_field *brush_field,
-		  const Sobel *sobel);
+                  const Brush_field *brush_field,
+                  const Sobel *sobel);
   void load_field(const uint16_t x, const uint16_t y,
-		  const Brush_field *brush_field);
+                  const Brush_field *brush_field);
 };
 
 #endif /* FORCE_FIELD_HH */

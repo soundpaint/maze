@@ -32,16 +32,16 @@ Simulation::Simulation(Balls *balls, Main_window *main_window)
   set_status(starting);
   if (!balls) {
     Log::fatal("Simulation::Simulation(): "
-	       "balls is null");
+               "balls is null");
   }
   _balls = balls;
   if (!main_window) {
     Log::fatal("Simulation::Simulation(): "
-	       "main_window is null");
+               "main_window is null");
   }
   _main_window = main_window;
   connect(this, SIGNAL(timeout()),
-	  this, SLOT(update()));
+          this, SLOT(update()));
   begin();
 }
 
@@ -80,7 +80,7 @@ Simulation::get_time_since_last_state_change() const
   uint64_t diff = diff_time * 1000 + diff_millitm;
   if (diff < 0) {
     Log::fatal("Simulation::has_current_status_for_longer_than(): "
-	       "time value overflow");
+               "time value overflow");
   }
   return diff;
 }
@@ -204,11 +204,11 @@ Simulation::update()
       break;
     case running:
       {
-	Playing_field *playing_field = _main_window->get_playing_field();
-	_balls->update(playing_field);
+        Playing_field *playing_field = _main_window->get_playing_field();
+        _balls->update(playing_field);
         if (_balls->all_balls_in_goal()) {
           set_status(stopping);
-	  _main_window->show_overlay_message("Game\nover!");
+          _main_window->show_overlay_message("Game\nover!");
         }
       }
       break;
@@ -217,20 +217,20 @@ Simulation::update()
       break;
     case stopping:
       {
-	const uint64_t elapsed_time = get_time_since_last_state_change();
-	if (elapsed_time >= 4200) {
-	  _main_window->hide_overlay_message();
-	  set_status(stopped);
-	}
+        const uint64_t elapsed_time = get_time_since_last_state_change();
+        if (elapsed_time >= 4200) {
+          _main_window->hide_overlay_message();
+          set_status(stopped);
+        }
       }
       break;
     case stopped:
       {
-	const uint64_t elapsed_time = get_time_since_last_state_change();
-	if (elapsed_time >= 1000) {
-	  _main_window->hide_overlay_message();
-	  set_status(exiting);
-	}
+        const uint64_t elapsed_time = get_time_since_last_state_change();
+        if (elapsed_time >= 1000) {
+          _main_window->hide_overlay_message();
+          set_status(exiting);
+        }
       }
       break;
     case exiting:

@@ -420,7 +420,7 @@ Maze_config::load_field_ignore_chars(const xercesc::DOMElement *elem_field,
       xercesc::DOMElement *elem_ignore =
         dynamic_cast<xercesc::DOMElement *>(node);
       if (!elem_ignore) {
-	fatal("unexpected null element");
+        fatal("unexpected null element");
       }
       const XMLCh *node_value_ignore = elem_ignore->getTextContent();
       const Xml_string str_ignore(node_value_ignore);
@@ -512,7 +512,7 @@ Maze_config::load_field_tile_shortcuts(const xercesc::DOMElement *elem_field,
       xercesc::DOMElement *elem_tile_shortcut =
         dynamic_cast<xercesc::DOMElement *>(node);
       if (!elem_tile_shortcut) {
-	fatal("unexpected null element");
+        fatal("unexpected null element");
       }
       load_field_tile_shortcut(elem_tile_shortcut, shortcuts);
     }
@@ -694,7 +694,7 @@ Maze_config::load_field_balls(const xercesc::DOMElement *elem_field,
       xercesc::DOMElement *elem_ball =
         dynamic_cast<xercesc::DOMElement *>(node);
       if (!elem_ball) {
-	fatal("unexpected null element");
+        fatal("unexpected null element");
       }
       load_field_ball(elem_ball, balls);
     }
@@ -775,7 +775,7 @@ Maze_config::reload_shapes(const xercesc::DOMElement *elem_config)
       xercesc::DOMElement *elem_shape =
         dynamic_cast<xercesc::DOMElement *>(node);
       if (!elem_shape) {
-	fatal("unexpected null element");
+        fatal("unexpected null element");
       }
       const Shape *shape = load_shape(elem_shape, true);
       const Xml_string *id = shape->get_id();
@@ -874,7 +874,7 @@ Maze_config::reload_brush_factories(const xercesc::DOMElement *elem_config)
       xercesc::DOMElement *elem_brush =
         dynamic_cast<xercesc::DOMElement *>(node);
       if (!elem_brush) {
-	fatal("unexpected null element");
+        fatal("unexpected null element");
       }
       IBrush_factory *brush_factory = load_brush(elem_brush, true);
       const Xml_string *id = brush_factory->get_id();
@@ -899,7 +899,7 @@ Maze_config::reload_tiles(const xercesc::DOMElement *elem_config)
       xercesc::DOMElement *elem_tile =
         dynamic_cast<xercesc::DOMElement *>(node);
       if (!elem_tile) {
-	fatal("unexpected null element");
+        fatal("unexpected null element");
       }
       Tile *tile = load_tile(elem_tile);
       const Xml_string *id = tile->get_id();

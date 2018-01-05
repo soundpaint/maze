@@ -75,13 +75,13 @@ void
 About_dialog::create_actions()
 {
   connect(_button_box,
-	  SIGNAL(accepted()),
-	  this,
-	  SLOT(accept()));
+          SIGNAL(accepted()),
+          this,
+          SLOT(accept()));
   connect(_button_box,
-	  SIGNAL(rejected()),
-	  this,
-	  SLOT(reject()));
+          SIGNAL(rejected()),
+          this,
+          SLOT(reject()));
 }
 
 /*

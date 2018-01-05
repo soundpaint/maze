@@ -35,8 +35,8 @@ class Message_overlay : public QLabel
   Q_OBJECT
 public:
   explicit Message_overlay(const uint16_t interval_on,
-			   const uint16_t interval_off,
-			   QWidget *parent);
+                           const uint16_t interval_off,
+                           QWidget *parent);
   virtual ~Message_overlay();
   void show(const char *message);
   void hide();

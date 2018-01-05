@@ -109,8 +109,8 @@ Ball::create_default_pixmap()
 
 void
 Ball::precompute_forces(const uint16_t x,
-			const uint16_t y,
-			const Force_field *force_field)
+                        const uint16_t y,
+                        const Force_field *force_field)
 {
   const uint32_t ff0 = y * _force_field_width + x;
   struct velocity_op_t *ball_op = &_op_force_field[ff0];
@@ -121,20 +121,20 @@ Ball::precompute_forces(const uint16_t x,
     if ((ball_y >= 0) && (ball_y < _force_field_height)) {
       int16_t ball_x = x - get_pixmap_origin_x();
       for (uint8_t pixmap_x = 0; pixmap_x < get_pixmap_width(); pixmap_x++) {
-	if ((ball_x >= 0) && (ball_x < _force_field_width)) {
-	  if (get_potential(pixmap_x, pixmap_y) > 0.0) {
-	    //std::cout << "y";
-	    ball_op->is_exclusion_zone |=
-	      force_field->is_exclusion_zone(ball_x, ball_y);
-	    if (force_field->is_reflection(ball_x, ball_y)) {
-	      reflection_count++;
-	      theta += force_field->get_theta(ball_x, ball_y);
-	    }
-	  } else {
-	    //std::cout << "n";
-	  }
-	}
-	ball_x++;
+        if ((ball_x >= 0) && (ball_x < _force_field_width)) {
+          if (get_potential(pixmap_x, pixmap_y) > 0.0) {
+            //std::cout << "y";
+            ball_op->is_exclusion_zone |=
+              force_field->is_exclusion_zone(ball_x, ball_y);
+            if (force_field->is_reflection(ball_x, ball_y)) {
+              reflection_count++;
+              theta += force_field->get_theta(ball_x, ball_y);
+            }
+          } else {
+            //std::cout << "n";
+          }
+        }
+        ball_x++;
       }
     }
     ball_y++;
@@ -175,7 +175,7 @@ Ball::precompute_forces(const Force_field *force_field)
   _force_field_height = force_field->get_height();
   _op_force_field = (struct velocity_op_t *)
     calloc(_force_field_width * _force_field_height,
-	   sizeof(struct velocity_op_t));
+           sizeof(struct velocity_op_t));
   if (!_op_force_field) {
     Log::fatal("Force_field::load_field(): not enough memory");
   }
@@ -195,7 +195,7 @@ Ball::abs(const double x)
 
 const bool
 Ball::update_velocity(const struct velocity_op_t velocity_op,
-		      Point_3D *velocity) const
+                      Point_3D *velocity) const
 {
   double *vx = velocity->get_rx();
   double *vy = velocity->get_ry();
@@ -225,7 +225,7 @@ Ball::update_velocity(const struct velocity_op_t velocity_op,
 
 void
 Ball::update(const Sensors *sensors,
-	     const uint16_t width, const uint16_t height)
+             const uint16_t width, const uint16_t height)
 {
   if (!sensors) {
     Log::fatal("Ball::update(): sensors is null");
@@ -275,19 +275,19 @@ Ball::update(const Sensors *sensors,
     // new position in force field => test for collision
     if (!velocity_op.is_exclusion_zone) {
       if (update_velocity(velocity_op, _velocity)) {
-	// collision => continue with previous position, but with
-	// updated velocity
+        // collision => continue with previous position, but with
+        // updated velocity
 
-	// step back to the center of the previous pixel (but only in
-	// one direction (px or py)) in order to avoid infinitive
-	// loops due to rounding errors on the edge between adjacent
-	// pixels.
-	const double alpha = 0.45 + 0.1 * ((double)rand() / RAND_MAX);
-	if (new_x != old_x) {
-	  *px = (old_x + alpha) / width;
-	} else {
-	  *py = (old_y + alpha) / height;
-	}
+        // step back to the center of the previous pixel (but only in
+        // one direction (px or py)) in order to avoid infinitive
+        // loops due to rounding errors on the edge between adjacent
+        // pixels.
+        const double alpha = 0.45 + 0.1 * ((double)rand() / RAND_MAX);
+        if (new_x != old_x) {
+          *px = (old_x + alpha) / width;
+        } else {
+          *py = (old_y + alpha) / height;
+        }
       }
     }
   }

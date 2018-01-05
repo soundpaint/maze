@@ -120,7 +120,7 @@ Status_line::Status_line(QWidget *parent) : QWidget(parent)
   _layout->addWidget(_button_toggle_ball_visibility);
 
   _label_keys = new QLabel(tr("[p]ause/play, [q]uit, [a]bout, [l]icense, "
-			      "\"?\"=help."));
+                              "\"?\"=help."));
   if (!_label_keys) {
     Log::fatal("not enough memory");
   }
@@ -178,29 +178,29 @@ void
 Status_line::create_actions()
 {
   connect(_button_escape,
-	  SIGNAL(clicked()),
-	  this,
-	  SLOT(slot_quit()));
+          SIGNAL(clicked()),
+          this,
+          SLOT(slot_quit()));
   connect(_button_pause,
-	  SIGNAL(clicked()),
-	  this,
-	  SLOT(slot_toggle_pause()));
+          SIGNAL(clicked()),
+          this,
+          SLOT(slot_toggle_pause()));
   connect(_dial_speed,
-	  SIGNAL(valueChanged(int)),
-	  this,
-	  SLOT(slot_speed_change()));
+          SIGNAL(valueChanged(int)),
+          this,
+          SLOT(slot_speed_change()));
   connect(_button_toggle_velocity_visibility,
-	  SIGNAL(clicked()),
-	  this,
-	  SLOT(slot_toggle_velocity_visibility()));
+          SIGNAL(clicked()),
+          this,
+          SLOT(slot_toggle_velocity_visibility()));
   connect(_button_toggle_force_field_visibility,
-	  SIGNAL(clicked()),
-	  this,
-	  SLOT(slot_toggle_force_field_visibility()));
+          SIGNAL(clicked()),
+          this,
+          SLOT(slot_toggle_force_field_visibility()));
   connect(_button_toggle_ball_visibility,
-	  SIGNAL(clicked()),
-	  this,
-	  SLOT(slot_toggle_ball_visibility()));
+          SIGNAL(clicked()),
+          this,
+          SLOT(slot_toggle_ball_visibility()));
 }
 
 void

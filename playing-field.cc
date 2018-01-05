@@ -30,10 +30,10 @@
 #include <log.hh>
 
 Playing_field::Playing_field(Brush_field *brush_field,
-			     const uint16_t minimum_width,
-			     const uint16_t minimum_height,
+                             const uint16_t minimum_width,
+                             const uint16_t minimum_height,
                              IBalls *balls,
-			     QWidget *parent)
+                             QWidget *parent)
   : QWidget(parent), _brush_field(brush_field)
 {
   _velocity_visible = false;
@@ -109,8 +109,8 @@ Playing_field::add_field_geometry_listener(IField_geometry_listener *listener)
 
 QImage *
 Playing_field::create_background(const uint16_t width,
-				 const uint16_t height,
-				 const bool force_field_visible)
+                                 const uint16_t height,
+                                 const bool force_field_visible)
 {
   if (width <= 0) {
     Log::fatal("Playing_field::create_background(): width <= 0");
@@ -131,33 +131,33 @@ Playing_field::create_background(const uint16_t width,
   QImage *image = new QImage(width, height, QImage::Format_RGB32);
   if (!image) {
     Log::fatal("Playing_field::create_background(): "
-	       "not enough memory");
+               "not enough memory");
   }
   QPainter painter(image);
   for (uint16_t x = 0; x < width; x++) {
     const double field_x = ((double)x) / width;
     for (uint16_t y = 0; y < height; y++) {
       if (force_field_visible) {
-	QColor color;
-	const Ball *ball = _balls->at(0);
-	if (!ball->is_reflection(x, y)) {
-	  color = QColor(0, 0, 0);
-	} else {
-	  int16_t theta = (int16_t)(ball->get_theta(x, y) / M_PI * 180.0);
-	  while (theta < 0) {
-	    theta += 360;
-	  }
-	  while (theta >= 360) {
-	    theta -= 360;
-	  }
-	  color = QColor::fromHsv(theta, 255, 255);
-	}
-	const QBrush color_brush = QBrush(color);
-      	painter.fillRect(x, y, 1, 1, color_brush);
+        QColor color;
+        const Ball *ball = _balls->at(0);
+        if (!ball->is_reflection(x, y)) {
+          color = QColor(0, 0, 0);
+        } else {
+          int16_t theta = (int16_t)(ball->get_theta(x, y) / M_PI * 180.0);
+          while (theta < 0) {
+            theta += 360;
+          }
+          while (theta >= 360) {
+            theta -= 360;
+          }
+          color = QColor::fromHsv(theta, 255, 255);
+        }
+        const QBrush color_brush = QBrush(color);
+        painter.fillRect(x, y, 1, 1, color_brush);
       } else {
-	const double field_y = ((double)y) / height;
-	const QBrush *brush = _brush_field->get_brush(field_x, field_y);
-	painter.fillRect(x, y, 1, 1, *brush);
+        const double field_y = ((double)y) / height;
+        const QBrush *brush = _brush_field->get_brush(field_x, field_y);
+        painter.fillRect(x, y, 1, 1, *brush);
       }
     }
   }
@@ -267,7 +267,7 @@ Playing_field::draw_velocities(QPainter *painter, const QRect rect)
       normed_ry = 0.0;
     }
     painter->drawLine((int)(px), (int)(py),
-		      (int)(px + normed_rx), (int)(py + normed_ry));
+                      (int)(px + normed_rx), (int)(py + normed_ry));
   }
 }
 
@@ -293,10 +293,10 @@ Playing_field::paintEvent(QPaintEvent *event)
 
 void
 Playing_field::invalidate_rect(const double px, const double py,
-			       const uint16_t pixmap_width,
-			       const uint16_t pixmap_height,
-			       const uint16_t pixmap_origin_x,
-			       const uint16_t pixmap_origin_y)
+                               const uint16_t pixmap_width,
+                               const uint16_t pixmap_height,
+                               const uint16_t pixmap_origin_x,
+                               const uint16_t pixmap_origin_y)
 {
   const uint16_t current_width = width();
   const uint16_t current_height = height();

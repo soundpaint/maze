@@ -345,7 +345,7 @@ Config::get_children_by_tag_name(const xercesc::DOMElement *parent,
 
 xercesc::DOMElement *
 Config::get_single_child_element(const xercesc::DOMElement *parent,
-				 const XMLCh *single_child_name,
+                                 const XMLCh *single_child_name,
                                  const bool required)
 {
   const xercesc::DOMNodeList *node_list =
