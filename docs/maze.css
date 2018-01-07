@@ -1,0 +1,45 @@
+/* maze.css CSS file */
+body {
+    background-color: #ffffff;
+    color: #703050;
+    font-family: sans-serif;
+}
+
+hr {
+    border: 0;
+    height: 20px;
+    background-image: repeating-radial-gradient(rgba(112, 48, 80, 0.75),
+                                                rgba(112, 48, 80, 0),
+                                                rgba(112, 48, 80, 0),
+                                                rgba(112, 48, 80, 0));
+}
+
+.define-term {
+    font-style: italic;
+    font-weight: bold;
+}
+
+.name {
+    font-variant: small-caps;
+}
+
+ul.citations {
+    list-style-type: none;
+}
+
+a.citation {
+    font-size: smaller;
+    vertical-align: super;
+}
+
+.citation-id {
+    font-family: monospace;
+}
+
+.citation-title {
+    font-style: italic;
+}
+
+a.citation-url {
+    font-family: monospace;
+}
