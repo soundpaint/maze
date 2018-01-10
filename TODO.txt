@@ -1,7 +1,3 @@
-* Brush_field: Rename "width" => "columns" and "height" => "rows" for
-  the geometry of the tiles grid.  Purpose of this change is to
-  avoid confusion with the playing field widget's pixel width and
-  height.
 * Add version info in config.xml and verify it when parsing it.
 * All symbols should always have an id.  Anonymous symbols should
   automatically get a generated id.  That way, code may be

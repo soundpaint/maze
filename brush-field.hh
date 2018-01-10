@@ -37,24 +37,24 @@
 class Brush_field : public IField_geometry_listener
 {
 public:
-  Brush_field(const uint16_t width,
-              const uint16_t height,
+  Brush_field(const uint16_t columns,
+              const uint16_t rows,
               const std::vector<Tile *> field,
               const std::vector<const Ball_init_data *> balls);
   virtual ~Brush_field();
   const std::string to_string() const;
-  const uint16_t get_width() const;
-  const uint16_t get_height() const;
+  const uint16_t get_columns() const;
+  const uint16_t get_rows() const;
   const QBrush *get_brush(const double x, const double y) const;
   const double get_potential(const double x, const double y) const;
   const double get_avg_tan(const double x0, const double y0,
                            const double dx, const double dy) const;
   const bool matches_goal(const double x, const double y) const;
-  virtual void geometry_changed(const uint16_t width, const uint16_t height);
+  virtual void geometry_changed(const uint16_t columns, const uint16_t rows);
   const std::vector<const Ball_init_data *> get_balls_init_data() const;
 private:
-  const uint16_t _width;
-  const uint16_t _height;
+  const uint16_t _columns;
+  const uint16_t _rows;
   const std::vector<Tile *> _field;
   const std::vector<const Ball_init_data *> _balls;
   const Tile *get_tile(const double x, const double y,

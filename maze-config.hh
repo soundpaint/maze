@@ -119,7 +119,7 @@ private:
                                  xml_string_to_xml_string_t *shortcuts) const;
   Brush_field *
   load_field_contents(const xercesc::DOMElement *elem_contents,
-                      const size_t width, const size_t height,
+                      const size_t columns, const size_t rows,
                       std::set<Xml_string> *ignore_chars,
                       xml_string_to_xml_string_t *shortcuts,
                       std::vector<const Ball_init_data *> *balls);

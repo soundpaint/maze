@@ -39,20 +39,23 @@
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 #include <ifield-geometry-listener.hh>
-#include <iballs.hh>
+#include <iplaying-field.hh>
+#include <balls.hh>
 #include <brush-field.hh>
 #include <force-field.hh>
 
-class Playing_field : public QWidget
+class Playing_field : public QWidget, public IPlaying_field
 {
   Q_OBJECT
 public:
   explicit Playing_field(Brush_field *brush_field,
                          const uint16_t minimum_width,
                          const uint16_t minimum_height,
-                         IBalls *balls,
+                         Balls *balls,
                          QWidget *parent = 0);
   virtual ~Playing_field();
+  virtual const uint16_t get_width() const;
+  virtual const uint16_t get_height() const;
   QSize minimumSizeHint() const Q_DECL_OVERRIDE;
   QSize sizeHint() const Q_DECL_OVERRIDE;
   void invalidate_rect(const double px, const double py,
@@ -76,10 +79,10 @@ protected:
   void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
 
 private:
-  Brush_field *_brush_field;
+  const Balls *_balls;
+  const Brush_field *_brush_field;
   Force_field *_force_field;
   uint16_t _minimum_width, _minimum_height;
-  IBalls *_balls;
   QImage *_background_std;
   QImage *_background_ff;
   bool _velocity_visible;

@@ -537,7 +537,7 @@ Maze_config::load_field_tile_shortcuts(const xercesc::DOMElement *elem_field,
 
 Brush_field *
 Maze_config::load_field_contents(const xercesc::DOMElement *elem_contents,
-                                 const size_t width, const size_t height,
+                                 const size_t columns, const size_t rows,
                                  std::set<Xml_string> *ignore_chars,
                                  xml_string_to_xml_string_t *shortcuts,
                                  std::vector<const Ball_init_data *> *balls)
@@ -581,10 +581,10 @@ Maze_config::load_field_contents(const xercesc::DOMElement *elem_contents,
       // alias_id is in set of characters to be ignored
     }
   }
-  if (field.size() != (width * height)) {
+  if (field.size() != (columns * rows)) {
     std::stringstream msg;
-    msg << "field dimensions mismatch: expected " << width << "×" << height <<
-      "=" << (width * height) << " elements, but found " << field.size() <<
+    msg << "field dimensions mismatch: expected " << columns << "×" << rows <<
+      "=" << (columns * rows) << " elements, but found " << field.size() <<
       " unignorable fields in this contents: '" <<
       node_value_contents_as_c_star << "'";
     fatal(msg.str());
@@ -593,7 +593,7 @@ Maze_config::load_field_contents(const xercesc::DOMElement *elem_contents,
   xercesc::XMLString::release(&node_value_contents_as_c_star);
   node_value_contents_as_c_star = 0;
 
-  Brush_field *brush_field = new Brush_field(width, height, field, *balls);
+  Brush_field *brush_field = new Brush_field(columns, rows, field, *balls);
   if (!brush_field) {
     fatal("not enough memory");
   }
@@ -728,11 +728,11 @@ Maze_config::load_field(const xercesc::DOMElement *elem_field)
 
   const xercesc::DOMElement *elem_columns =
     get_single_child_element(elem_field, _node_name_columns, true);
-  const size_t width = text_content_as_size_t(elem_columns);
+  const size_t columns = text_content_as_size_t(elem_columns);
 
   const xercesc::DOMElement *elem_rows =
     get_single_child_element(elem_field, _node_name_rows, true);
-  const size_t height = text_content_as_size_t(elem_rows);
+  const size_t rows = text_content_as_size_t(elem_rows);
 
   std::set<Xml_string> ignore_chars;
   load_field_ignore_chars(elem_field, &ignore_chars);
@@ -744,14 +744,14 @@ Maze_config::load_field(const xercesc::DOMElement *elem_field)
 
   {
     std::stringstream msg;
-    msg << "building playing field [" << width << "×" << height << "]";
+    msg << "building playing field [" << columns << "×" << rows << "]";
     debug(msg.str());
   }
 
   const xercesc::DOMElement *elem_contents =
     get_single_child_element(elem_field, _node_name_contents, true);
   _field =
-    load_field_contents(elem_contents, width, height,
+    load_field_contents(elem_contents, columns, rows,
                         &ignore_chars, &shortcuts, &balls);
   debug("')'");
 }

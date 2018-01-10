@@ -65,8 +65,8 @@ Maze::Maze(int &argc, char **argv)
   const Brush_field *brush_field = _config->get_brush_field();
   std::vector<const Ball_init_data *> balls_init_data =
     brush_field->get_balls_init_data();
-  const uint16_t rows = brush_field->get_height();
-  const uint16_t columns = brush_field->get_width();
+  const uint16_t rows = brush_field->get_rows();
+  const uint16_t columns = brush_field->get_columns();
   _balls = new Balls(_sensors,
                      balls_init_data,
                      rows,

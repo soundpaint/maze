@@ -143,6 +143,10 @@ Xml_document::parse(const std::string *path)
   if (!_document) {
     fatal("document is null (maybe XML file does not exist?)", path);
   }
+  if (!get_document_element()) {
+    fatal("document element is null (maybe XML file is not well-formed?)",
+          path);
+  }
 }
 
 xercesc::DOMElement *

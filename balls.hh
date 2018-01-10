@@ -29,9 +29,9 @@
 #include <inttypes.h>
 #include <sensors.hh>
 #include <ball.hh>
-#include <playing-field.hh>
+#include <iplaying-field.hh>
 
-class Balls : public IBalls
+class Balls
 {
 public:
   Balls(Sensors *sensors,
@@ -39,7 +39,7 @@ public:
         const uint16_t rows,
         const uint16_t columns);
   virtual ~Balls();
-  void update(Playing_field *playing_field);
+  void update(IPlaying_field *playing_field);
   const uint8_t get_count() const;
   Ball *at(const uint8_t index) const;
   const bool all_balls_in_goal() const;

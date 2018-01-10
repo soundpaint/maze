@@ -25,12 +25,12 @@
 #include <brush-field.hh>
 #include <log.hh>
 
-Brush_field::Brush_field(const uint16_t width,
-                         const uint16_t height,
+Brush_field::Brush_field(const uint16_t columns,
+                         const uint16_t rows,
                          const std::vector<Tile *> field,
                          std::vector<const Ball_init_data *> balls) :
-  _width(width),
-  _height(height),
+  _columns(columns),
+  _rows(rows),
   _field(field),
   _balls(balls)
 {
@@ -41,16 +41,16 @@ Brush_field::~Brush_field()
 }
 
 void
-Brush_field::geometry_changed(const uint16_t width, const uint16_t height)
+Brush_field::geometry_changed(const uint16_t columns, const uint16_t rows)
 {
   {
     std::stringstream str;
-    str << "brush field: geometry changed: width=" << width <<
-      ", height=" << height;
+    str << "brush field: geometry changed: columns=" << columns <<
+      ", rows=" << rows;
     Log::debug(str.str());
   }
   for (Tile *tile : _field) {
-    tile->geometry_changed(width, height);
+    tile->geometry_changed(columns, rows);
   }
 }
 
@@ -59,8 +59,8 @@ Brush_field::to_string() const
 {
   std::stringstream str;
   str << "Brush_field{" <<
-    "width=" << _width <<
-    ", height=" << _height <<
+    "columns=" << _columns <<
+    ", rows=" << _rows <<
     ", field={" << std::endl;
   for (const Tile *tile : _field) {
     str << "  " << tile->to_string() << std::endl;
@@ -70,15 +70,15 @@ Brush_field::to_string() const
 }
 
 const uint16_t
-Brush_field::get_width() const
+Brush_field::get_columns() const
 {
-  return _width;
+  return _columns;
 }
 
 const uint16_t
-Brush_field::get_height() const
+Brush_field::get_rows() const
 {
-  return _height;
+  return _rows;
 }
 
 const Tile *
@@ -98,19 +98,19 @@ Brush_field::get_tile(const double x, const double y,
     msg << "y=" << y;
     Log::fatal(msg.str());
   }
-  const double pos_x = x * _width;
-  const double pos_y = y * _height;
+  const double pos_x = x * _columns;
+  const double pos_y = y * _rows;
   const uint16_t tile_index_x = (uint16_t)(pos_x);
   const uint16_t tile_index_y = (uint16_t)(pos_y);
   const double __tile_offset_x = pos_x - tile_index_x;
   const double __tile_offset_y = pos_y - tile_index_y;
-  if ((tile_index_x < 0) || (tile_index_x >= _width)) {
+  if ((tile_index_x < 0) || (tile_index_x >= _columns)) {
     std::stringstream msg;
     msg << "tile_index_x=" << tile_index_x;
     Log::info(msg.str());
     Log::fatal("Brush_field::get_tile(): tile index x out of range");
   }
-  if ((tile_index_y < 0) || (tile_index_y >= _height)) {
+  if ((tile_index_y < 0) || (tile_index_y >= _rows)) {
     Log::fatal("Brush_field::get_tile(): tile index y out of range");
   }
   if ((__tile_offset_x < 0.0) || (__tile_offset_x >= 1.0)) {
@@ -119,7 +119,7 @@ Brush_field::get_tile(const double x, const double y,
   if ((__tile_offset_y < 0.0) || (__tile_offset_y >= 1.0)) {
     Log::fatal("Brush_field::get_tile(): tile offset y out of range");
   }
-  const uint16_t field_index = tile_index_y * _width + tile_index_x;
+  const uint16_t field_index = tile_index_y * _columns + tile_index_x;
   if ((field_index < 0) || (field_index >= _field.size())) {
     std::stringstream msg;
     msg << "Brush_field::get_tile(): field index out of range:" <<

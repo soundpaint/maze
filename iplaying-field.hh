@@ -22,22 +22,34 @@
  * Author's web site: www.juergen-reuter.de
  */
 
-#ifndef IBALLS_HH
-#define IBALLS_HH
+#ifndef IPLAYING_FIELD_HH
+#define IPLAYING_FIELD_HH
 
 #include <inttypes.h>
 #include <QtGui/QPixmap>
 #include <point-3d.hh>
 #include <ball.hh>
 
-class IBalls
+/*
+ * The IPlaying_field interface helps avoiding an otherwise cyclic
+ * inclusion dependency between balls.hh and playing-field.hh.
+ */
+class IPlaying_field
 {
 public:
-  virtual const uint8_t get_count() const = 0;
-  virtual Ball *at(const uint8_t index) const = 0;
+  virtual const uint16_t get_width() const = 0;
+  virtual const uint16_t get_height() const = 0;
+  virtual void invalidate_rect(const double px, const double py,
+                               const uint16_t pixmap_width,
+                               const uint16_t pixmap_height,
+                               const uint16_t pixmap_origin_x,
+                               const uint16_t pixmap_origin_y) = 0;
+  virtual const bool matches_goal(const double px, const double py) const = 0;
+protected:
+  ~IPlaying_field() {};
 };
 
-#endif /* IBALLS_HH */
+#endif /* IPLAYING_FIELD_HH */
 
 /*
  * Local variables:

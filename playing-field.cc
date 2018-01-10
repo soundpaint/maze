@@ -32,9 +32,11 @@
 Playing_field::Playing_field(Brush_field *brush_field,
                              const uint16_t minimum_width,
                              const uint16_t minimum_height,
-                             IBalls *balls,
-                             QWidget *parent)
-  : QWidget(parent), _brush_field(brush_field)
+                             Balls *balls,
+                             QWidget *parent) :
+  QWidget(parent),
+  _balls(balls),
+  _brush_field(brush_field)
 {
   _velocity_visible = false;
   _force_field_visible = false;
@@ -50,9 +52,8 @@ Playing_field::Playing_field(Brush_field *brush_field,
   if (!balls) {
     Log::fatal("Playing_field::Playing_field(): balls is null");
   }
-  _balls = balls;
 
-  if (!_brush_field) {
+  if (!brush_field) {
     Log::fatal("Playing_field::Playing_field(): brush_field is null");
   }
 
@@ -90,6 +91,9 @@ Playing_field::~Playing_field()
   delete _field_geometry_listeners;
   _field_geometry_listeners = 0;
 
+  delete _balls;
+  _balls = 0;
+
   delete _brush_field;
   _brush_field = 0;
 
@@ -99,6 +103,18 @@ Playing_field::~Playing_field()
   // Q objects will be deleted by Qt, just set them to 0
   _background_std = 0;
   _background_ff = 0;
+}
+
+const uint16_t
+Playing_field::get_width() const
+{
+  return width();
+}
+
+const uint16_t
+Playing_field::get_height() const
+{
+  return height();
 }
 
 void
