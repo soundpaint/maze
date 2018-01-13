@@ -33,6 +33,7 @@
 #include <fractals-brush-factory.hh>
 #include <pixmap-brush-factory.hh>
 #include <solid-brush-factory.hh>
+#include <symbol-table.tcc>
 
 #define CONFIG_SCHEMA_LOCATION "http://soundpaint.org/schema/maze-0.1/config.xsd"
 
@@ -70,9 +71,9 @@ Maze_config::Maze_config(const char *path) :
   _node_name_y_scale(xercesc::XMLString::transcode("y-scale")),
   _attr_name_id(xercesc::XMLString::transcode("id")),
   _attr_name_ref(xercesc::XMLString::transcode("ref")),
-  _brush_factories(new Brush_factory_symbols()),
-  _shapes(new Shape_symbols()),
-  _tiles(new Tile_symbols())
+  _brush_factories(new Symbol_table<IBrush_factory *>(&SYMBOL_TABLE_ID_BRUSH_FACTORIES)),
+  _shapes(new Symbol_table<Shape *>(&SYMBOL_TABLE_ID_SHAPES)),
+  _tiles(new Symbol_table<Tile *>(&SYMBOL_TABLE_ID_TILES))
 {
   Config::reload();
 }
@@ -121,6 +122,15 @@ Maze_config::~Maze_config()
   release(&_attr_name_id);
   release(&_attr_name_ref);
 }
+
+const std::string
+Maze_config::SYMBOL_TABLE_ID_BRUSH_FACTORIES("brush-factory");
+
+const std::string
+Maze_config::SYMBOL_TABLE_ID_SHAPES("shapes");
+
+const std::string
+Maze_config::SYMBOL_TABLE_ID_TILES("tiles");
 
 void
 Maze_config::release(const XMLCh **node_name)
@@ -777,7 +787,7 @@ Maze_config::reload_shapes(const xercesc::DOMElement *elem_config)
       if (!elem_shape) {
         fatal("unexpected null element");
       }
-      const Shape *shape = load_shape(elem_shape, true);
+      Shape *shape = load_shape(elem_shape, true);
       const Xml_string *id = shape->get_id();
       _shapes->add(id, shape);
     }
@@ -787,7 +797,7 @@ Maze_config::reload_shapes(const xercesc::DOMElement *elem_config)
   debug("')'");
 }
 
-const Shape *
+Shape *
 Maze_config::load_shape_definition(const xercesc::DOMElement *elem_shape,
                                    const XMLCh *attr_id) const
 {
@@ -811,20 +821,20 @@ Maze_config::load_shape_definition(const xercesc::DOMElement *elem_shape,
 
   const Shape_terms *shape_terms =
     load_shape_expression(elem_expression, false);
-  const Shape *shape = new Shape(str_id, shape_terms);
+  Shape *shape = new Shape(str_id, shape_terms);
   if (!shape) {
     fatal("not enough memory");
   }
   return shape;
 }
 
-const Shape *
+Shape *
 Maze_config::resolve_shape_reference(const xercesc::DOMElement *elem_shape,
                                      const XMLCh *attr_ref) const
 {
   // symbol reference
   Xml_string str_ref(attr_ref);
-  const Shape *shape = _shapes->lookup(&str_ref);
+  Shape *shape = _shapes->lookup(&str_ref);
   if (!shape) {
     std::stringstream msg;
     char *str_ref_as_c_star = str_ref.transcode();
@@ -835,7 +845,7 @@ Maze_config::resolve_shape_reference(const xercesc::DOMElement *elem_shape,
   return shape;
 }
 
-const Shape *
+Shape *
 Maze_config::load_shape(const xercesc::DOMElement *elem_shape,
                         const bool require_definition)
 {
@@ -853,7 +863,7 @@ Maze_config::load_shape(const xercesc::DOMElement *elem_shape,
   }
 
   const XMLCh *attr_ref = elem_shape->getAttribute(_attr_name_ref);
-  const Shape *shape =
+  Shape *shape =
     (xercesc::XMLString::stringLen(attr_ref) > 0) ?
     resolve_shape_reference(elem_shape, attr_ref) :
     load_shape_definition(elem_shape, attr_id);
@@ -978,7 +988,7 @@ Maze_config::load_tile(const xercesc::DOMElement *elem_tile)
   if (!elem_shape) {
     fatal("for now, tile definition must contain shape definition");
   }
-  const Shape *shape = load_shape(elem_shape, false);
+  Shape *shape = load_shape(elem_shape, false);
 
   const double foreground_potential = 0.0; // TODO
   const double background_potential = 0.0; // TODO

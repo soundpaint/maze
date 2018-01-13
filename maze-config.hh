@@ -30,11 +30,9 @@
 #include <QtGui/QBrush>
 #include <ball-init-data.hh>
 #include <brush-field.hh>
-#include <brush-factory-symbols.hh>
 #include <config.hh>
 #include <implicit-curve-compiler.hh>
-#include <shape-symbols.hh>
-#include <tile-symbols.hh>
+#include <symbol-table.hh>
 
 class Maze_config : Config
 {
@@ -46,6 +44,10 @@ protected:
   virtual void reload(const xercesc::DOMElement *elem_config);
   virtual void print_config();
 private:
+  static const std::string SYMBOL_TABLE_ID_BRUSH_FACTORIES;
+  static const std::string SYMBOL_TABLE_ID_SHAPES;
+  static const std::string SYMBOL_TABLE_ID_TILES;
+
   typedef std::unordered_map<const Xml_string *,
                              const Xml_string *,
                              Xml_string::hashing_functor,
@@ -85,9 +87,9 @@ private:
   const XMLCh *_node_name_y_scale;
   const XMLCh *_attr_name_id;
   const XMLCh *_attr_name_ref;
-  Brush_factory_symbols *_brush_factories;
-  Shape_symbols *_shapes;
-  Tile_symbols *_tiles;
+  Symbol_table<IBrush_factory *> *_brush_factories;
+  Symbol_table<Shape *> *_shapes;
+  Symbol_table<Tile *> *_tiles;
   IBrush_factory *_default_foreground_brush_factory;
   IBrush_factory *_default_background_brush_factory;
   Implicit_curve_compiler _implicit_curve_compiler;
@@ -131,12 +133,12 @@ private:
   void load_field_balls(const xercesc::DOMElement *elem_field,
                         std::vector<const Ball_init_data *> *balls) const;
   void load_field(const xercesc::DOMElement *elem_field);
-  const Shape *load_shape_definition(const xercesc::DOMElement *elem_shape,
-                                     const XMLCh *attr_id) const;
-  const Shape *resolve_shape_reference(const xercesc::DOMElement *elem_shape,
-                                       const XMLCh *attr_ref) const;
-  const Shape *load_shape(const xercesc::DOMElement *elem_shape,
-                          const bool require_id);
+  Shape *load_shape_definition(const xercesc::DOMElement *elem_shape,
+                               const XMLCh *attr_id) const;
+  Shape *resolve_shape_reference(const xercesc::DOMElement *elem_shape,
+                                 const XMLCh *attr_ref) const;
+  Shape *load_shape(const xercesc::DOMElement *elem_shape,
+                    const bool require_id);
   Tile *load_tile(const xercesc::DOMElement *elem_tile);
   const char *load_tile_id(const XMLCh *attr_id);
   const Shape_terms *load_shape_expression(const xercesc::DOMElement *elem_expression,

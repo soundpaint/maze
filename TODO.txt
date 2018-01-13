@@ -12,9 +12,6 @@
 * FIXME: Minor memory leak: Instances of IBrush_factory are not
   cleanly deleted when no more used.
 * Support Julia set fractals.
-* Classes Brush_factory_symbols, Shape_symbols and Tile_symbols (and
-  possibly even more symbol table classes to come) should derive from
-  an abstract Symbol_table class and thus avoid code duplication.
 * Make parser fully static.
 * Check: Shape_terms is not always a constant...
 * FIXME: Maze_config::load_shape() returns either a definition or a

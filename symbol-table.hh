@@ -1,6 +1,6 @@
 /*
  * Maze -- A maze / flipper game implementation for RPi with Sense Hat
- * Copyright (C) 2016, 2017  Jürgen Reuter
+ * Copyright (C) 2016, 2017, 2018 Jürgen Reuter
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -22,33 +22,35 @@
  * Author's web site: www.juergen-reuter.de
  */
 
-#ifndef TILE_SYMBOLS_HH
-#define TILE_SYMBOLS_HH
+#ifndef SYMBOL_TABLE_HH
+#define SYMBOL_TABLE_HH
 
+#include <string>
 #include <unordered_map>
-#include <tile.hh>
 #include <xml-string.hh>
 
-class Tile_symbols
+template<class T>
+class Symbol_table
 {
 public:
-  Tile_symbols();
-  virtual ~Tile_symbols();
-  void add(const Xml_string *id, Tile *tile);
+  Symbol_table(const std::string *table_id);
+  virtual ~Symbol_table();
+  void add(const Xml_string *id, T t);
   const bool exists(const Xml_string *id) const;
-  Tile *lookup(const Xml_string *id) const;
-  void dump() const;
+  T lookup(const Xml_string *id) const;
+  const std::string *to_string() const;
 private:
+  const std::string *_table_id;
   typedef std::unordered_map<const Xml_string *,
-                             Tile *,
+                             T,
                              Xml_string::hashing_functor,
                              Xml_string::equal_functor>
-  xml_string_to_tile_t;
-  static const xml_string_to_tile_t::size_type BUCKET_COUNT = 5;
-  xml_string_to_tile_t *_id_to_tile;
+  xml_string_to_t_t;
+  static const typename xml_string_to_t_t::size_type BUCKET_COUNT = 5;
+  xml_string_to_t_t *_symbols;
 };
 
-#endif /* TILE_SYMBOLS_HH */
+#endif /* SYMBOL_TABLE_HH */
 
 /*
  * Local variables:
