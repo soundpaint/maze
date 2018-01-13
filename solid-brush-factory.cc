@@ -52,7 +52,7 @@ Solid_brush_factory::create_brush(const uint16_t width, const uint16_t height)
   return _brush;
 }
 
-std::string
+std::string *
 Solid_brush_factory::to_string()
 {
   std::stringstream str;
@@ -60,7 +60,11 @@ Solid_brush_factory::to_string()
     "id=" << _id <<
     ", color=" << _brush.color().name().toStdString() <<
     "}";
-  return std::string(str.str());
+  std::string *result = new std::string(str.str());
+  if (!result) {
+    Log::fatal("not enough memory");
+  }
+  return result;
 }
 
 /*

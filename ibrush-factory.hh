@@ -33,7 +33,7 @@ class IBrush_factory
 public:
   virtual QBrush create_brush(const uint16_t width, const uint16_t height) = 0;
   virtual const Xml_string *get_id() const = 0;
-  virtual std::string to_string() = 0;
+  virtual std::string *to_string() = 0;
 };
 
 #endif /* IBRUSH_FACTORY_HH */

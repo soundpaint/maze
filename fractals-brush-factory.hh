@@ -45,7 +45,7 @@ public:
   virtual ~Fractals_brush_factory();
   const Xml_string *get_id() const;
   virtual QBrush create_brush(const uint16_t width, const uint16_t height);
-  virtual std::string to_string();
+  virtual std::string *to_string();
 private:
   const Xml_string *_id;
   const double _x0;

@@ -129,7 +129,7 @@ Fractals_brush_factory::create_mandelbrot_set(const uint16_t width,
   return pixmap;
 }
 
-std::string
+std::string *
 Fractals_brush_factory::to_string()
 {
   std::stringstream str;
@@ -138,7 +138,11 @@ Fractals_brush_factory::to_string()
     ", x0=" << _x0 << ", y0=" << _y0 <<
     ", x_scale=" << _x_scale << ", y_scale=" << _y_scale <<
     "}";
-  return std::string(str.str());
+  std::string *result = new std::string(str.str());
+  if (!result) {
+    Log::fatal("not enough memory");
+  }
+  return result;
 }
 
 /*

@@ -61,7 +61,7 @@ Pixmap_brush_factory::create_brush(const uint16_t width, const uint16_t height)
   return _brush;
 }
 
-std::string
+std::string *
 Pixmap_brush_factory::to_string()
 {
   QPixmap pixmap = _brush.texture();
@@ -71,7 +71,11 @@ Pixmap_brush_factory::to_string()
     ", width=" << pixmap.width() <<
     ", height=" << pixmap.height() <<
     "}";
-  return std::string(str.str());
+  std::string *result = new std::string(str.str());
+  if (!result) {
+    Log::fatal("not enough memory");
+  }
+  return result;
 }
 
 /*
