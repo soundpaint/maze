@@ -23,12 +23,62 @@ For updates and more info or contacting the author, visit:
 Author's web site: www.juergen-reuter.de
 -->
 <config>
-  <brush id="background_fractal">
+  <brush id="background_mandelbrot_1">
     <fractal>
+      <mandelbrot />
+      <max-iterations>256</max-iterations>
       <x-offset>-1.360</x-offset>
       <y-offset>-0.095</y-offset>
       <x-scale>+0.06125</x-scale>
       <y-scale>+0.06125</y-scale>
+    </fractal>
+  </brush>
+  <brush id="background_julia_1">
+    <fractal>
+      <julia>
+        <arg-n>7</arg-n>
+        <arg-c>
+          <real>+0.626</real>
+          <imag>+0.0</imag>
+        </arg-c>
+      </julia>
+      <max-iterations>4096</max-iterations>
+      <x-offset>-3.0</x-offset>
+      <y-offset>-3.0</y-offset>
+      <x-scale>+6.0</x-scale>
+      <y-scale>+6.0</y-scale>
+    </fractal>
+  </brush>
+  <brush id="background_julia_2">
+    <fractal>
+      <julia>
+        <arg-n>2</arg-n>
+        <arg-c>
+          <real>-0.4</real>
+          <imag>+0.6</imag>
+        </arg-c>
+      </julia>
+      <max-iterations>128</max-iterations>
+      <x-offset>-1.5</x-offset>
+      <y-offset>-0.75</y-offset>
+      <x-scale>+3.0</x-scale>
+      <y-scale>+1.5</y-scale>
+    </fractal>
+  </brush>
+  <brush id="background_julia_3">
+    <fractal>
+      <julia>
+        <arg-n>2</arg-n>
+        <arg-c>
+          <real>-0.8</real>
+          <imag>+0.156</imag>
+        </arg-c>
+      </julia>
+      <max-iterations>128</max-iterations>
+      <x-offset>-1.5</x-offset>
+      <y-offset>-0.75</y-offset>
+      <x-scale>+3.0</x-scale>
+      <y-scale>+1.5</y-scale>
     </fractal>
   </brush>
   <default-foreground>
@@ -37,7 +87,7 @@ Author's web site: www.juergen-reuter.de
     </brush>
   </default-foreground>
   <default-background>
-    <brush ref="background_fractal" />
+    <brush ref="background_julia_3" />
   </default-background>
   <shape id="empty_curve">
     <!-- 1 ≤ 0 -->
@@ -117,20 +167,20 @@ Author's web site: www.juergen-reuter.de
     <rows>16</rows>
     <contents>
       ┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼
-      ┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼
-      ┼┼┼┼╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳┼┼┼┼
-      ┼┼┼┼╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳┼┼┼┼
-      ┼┼┼┼┼┼┼┼┼┼┼╮╳╳╳╳╭┼┼╮╳╳╳0╳╳╳╳┼┼┼┼
-      ┼┼┼┼┼┼┼┼┼┼┼┼╳╳╳╳┼┼┼┼╳╳╳╳╳╳╳╳┼┼┼┼
-      ┼┼┼┼╳╳╳╳┼┼┼┼╳╳╳╳┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼
-      ┼┼┼┼╳╳╳╳╰┼┼╯╳╳╳╳╰┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼
-      ┼┼┼┼╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳┼┼┼┼
-      ┼┼┼┼╳o╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳┼┼┼┼
-      ┼┼┼┼╳╳╳╳╭┼┼┼┼┼┼┼┼┼┼┼┼┼┼╮╳╳╳╳┼┼┼┼
-      ┼┼┼┼╳╳╳╳╰┼┼┼┼┼┼┼┼┼┼┼┼┼┼╯╳╳╳╳┼┼┼┼
-      ┼┼┼┼╳╳╳╳╳╳╳╳┼┼┼┼╳╳╳╳╳╳╳╳╳╳╳╳┼┼┼┼
-      ┼┼┼┼╳╳╳╳╳╳╳╳┼┼┼┼╳╳╳╳╳╳╳╳╳╳╳╳┼┼┼┼
-      ┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼
+      ┼┼┼┼┼┼┼┼┼┼┼╯╳╳╳╳╰┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼
+      ┼┼╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳┼┼
+      ┼┼╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳┼┼
+      ┼┼┼┼┼┼┼┼┼┼┼╮╳╳╳╳╭┼┼╮╳╳╳╳╳0╳╳╳╳┼┼
+      ┼┼╳╳┼┼╳╳╳╳┼┼╳╳╳╳┼┼┼┼┼┼╮╳╳╳╳╳╳╳┼┼
+      ┼┼╳╳┼┼╳╳╭┼┼┼╳╳╳╳┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼
+      ┼┼╳╳╰╯╳╳╰┼┼╯╳╳╳╳╰┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼
+      ┼┼╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳┼┼
+      ┼┼╳╳╳o╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳┼┼
+      ┼┼╳╳╳╳╳╳╭┼┼┼┼┼┼┼┼┼┼┼┼┼┼╮╳╳╭╮╳╳┼┼
+      ┼┼╳╳╳╳╳╳╰┼┼┼┼┼┼┼┼┼┼┼┼┼┼╯╳╳╰╯╳╳┼┼
+      ┼┼╳╳╳╳╳╳╳╳╳╳┼┼┼┼╳╳╳╳╳╳╳╳╳╳╳╳╳╳┼┼
+      ┼┼╳╳╳╳╳╳╳╳╳╳┼┼┼┼╳╳╳╳╳╳╳╳╳╳╳╳╳╳┼┼
+      ┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼╮╳╳┼┼
       ┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼
     </contents>
     <ball>

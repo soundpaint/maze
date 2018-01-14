@@ -27,17 +27,14 @@
 
 #include <QtGui/QPixmap>
 #include <ibrush-factory.hh>
+#include <ifractal-set.hh>
 
 class Fractals_brush_factory : public IBrush_factory
 {
 public:
-  static QPixmap * const create_mandelbrot_set(const uint16_t width,
-                                               const uint16_t height,
-                                               const double x0 = 0.0,
-                                               const double y0 = 0.0,
-                                               const double x_scale = 1.0,
-                                               const double y_scale = 1.0);
   Fractals_brush_factory(const Xml_string *id,
+                         const IFractal_set *fractal_set,
+                         const uint16_t max_iterations = 256,
                          const double x0 = 0.0,
                          const double y0 = 0.0,
                          const double x_scale = 1.0,
@@ -48,13 +45,25 @@ public:
   virtual std::string *to_string();
 private:
   const Xml_string *_id;
+  const IFractal_set *_fractal_set;
+  const uint16_t _max_iterations;
   const double _x0;
   const double _y0;
   const double _x_scale;
   const double _y_scale;
   QPixmap *_cached_pixmap;
-  uint16_t _width_of_cached_pixmap;
-  uint16_t _height_of_cached_pixmap;
+  uint16_t _cached_pixmap_width;
+  uint16_t _cached_pixmap_height;
+  static const QBrush count_to_brush(const uint16_t count,
+                                     const uint16_t max_count);
+  static QPixmap * const create_fractal_pixmap(const IFractal_set *fractal_set,
+                                               const uint16_t max_iterations,
+                                               const uint16_t width,
+                                               const uint16_t height,
+                                               const double x0,
+                                               const double y0,
+                                               const double x_scale,
+                                               const double y_scale);
 };
 
 #endif /* FRACTALS_BRUSH_FACTORY_HH */

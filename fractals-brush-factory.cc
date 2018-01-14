@@ -26,21 +26,33 @@
 #include <QtGui/QColor>
 #include <QtGui/QPainter>
 #include <log.hh>
+#include <julia-set.hh>
+#include <mandelbrot-set.hh>
 
 Fractals_brush_factory::Fractals_brush_factory(const Xml_string *id,
+                                               const IFractal_set *fractal_set,
+                                               const uint16_t max_iterations,
                                                const double x0,
                                                const double y0,
                                                const double x_scale,
                                                const double y_scale) :
   _id(id),
+  _fractal_set(fractal_set),
+  _max_iterations(max_iterations),
   _x0(x0),
   _y0(y0),
   _x_scale(x_scale),
   _y_scale(y_scale)
 {
+  if (!id) {
+    Log::fatal("unexpected null id");
+  }
+  if (!fractal_set) {
+    Log::fatal("unexpected null fractal_set");
+  }
   _cached_pixmap = 0;
-  _width_of_cached_pixmap = 0;
-  _height_of_cached_pixmap = 0;
+  _cached_pixmap_width = 0;
+  _cached_pixmap_height = 0;
 }
 
 Fractals_brush_factory::~Fractals_brush_factory()
@@ -53,8 +65,10 @@ Fractals_brush_factory::~Fractals_brush_factory()
     delete _cached_pixmap;
     _cached_pixmap = 0;
   }
-  _width_of_cached_pixmap = 0;
-  _height_of_cached_pixmap = 0;
+  delete _fractal_set;
+  _fractal_set = 0;
+  _cached_pixmap_width = 0;
+  _cached_pixmap_height = 0;
 }
 
 const Xml_string *
@@ -67,25 +81,58 @@ QBrush
 Fractals_brush_factory::create_brush(const uint16_t width,
                                      const uint16_t height)
 {
-  if ((width != _width_of_cached_pixmap) ||
-      (height != _height_of_cached_pixmap) ||
+  if ((width != _cached_pixmap_width) ||
+      (height != _cached_pixmap_height) ||
       (!_cached_pixmap)) {
     if (_cached_pixmap) {
       delete _cached_pixmap;
       _cached_pixmap = 0;
     }
-    _cached_pixmap = create_mandelbrot_set(width, height,
-                                           _x0, _y0,
-                                           _x_scale, _y_scale);
-    _width_of_cached_pixmap = width;
-    _height_of_cached_pixmap = height;
+    _cached_pixmap =
+      create_fractal_pixmap(_fractal_set,
+                            _max_iterations,
+                            width, height,
+                            _x0, _y0,
+                            _x_scale, _y_scale);
+    _cached_pixmap_width = width;
+    _cached_pixmap_height = height;
   }
   QBrush result(*_cached_pixmap);
   return result;
 }
 
+const QBrush
+Fractals_brush_factory::count_to_brush(const uint16_t count,
+                                       const uint16_t max_count)
+{
+  // TODO: Add support for explicit configuration of color palette
+  // configuration and coloring algorithm.
+  const uint8_t saturation = 0x9f;
+  const uint8_t brightness = 0x7f;
+  const uint16_t start_hue = 0x120;
+  const uint16_t max_color_index = 256;
+  const QColor stop_color(0x5f, 0x5f, 0x5f);
+#if 0 // linear
+  const uint16_t color_index = (max_color_index * count) / max_count;
+#else // logarithmic
+  const uint16_t color_index =
+    (uint16_t)(max_color_index * log(count) / log(max_count));
+#endif
+  QColor color;
+  if (count < max_count) {
+    color = QColor::fromHsv((start_hue - color_index) & 0xff,
+                            saturation, brightness);
+  } else {
+    color = stop_color;
+  }
+  const QBrush brush = QBrush(color);
+  return brush;
+}
+
 QPixmap * const
-Fractals_brush_factory::create_mandelbrot_set(const uint16_t width,
+Fractals_brush_factory::create_fractal_pixmap(const IFractal_set *fractal_set,
+                                              const uint16_t max_iterations,
+                                              const uint16_t width,
                                               const uint16_t height,
                                               const double x0,
                                               const double y0,
@@ -105,25 +152,19 @@ Fractals_brush_factory::create_mandelbrot_set(const uint16_t width,
     const double img = y0 + y * scaled_y_scale;
     for (uint16_t x = 0; x < width; x++) {
       const double real = x0 + x * scaled_x_scale;
-      double z_real = 0.0;
-      double z_img = 0.0;
-      uint16_t count = 0;
-      while ((count < 256) &&
-             ((z_real * z_real) + (z_img * z_img) < 1000000.0)) {
-        const double z_real_new = z_real * z_real - z_img * z_img + real;
-        const double z_img_new = 2.0 * z_real * z_img + img;
-        z_real = z_real_new;
-        z_img = z_img_new;
-        count++;
+      std::complex<double> pos(real, img);
+      std::complex<double> z = pos;
+      uint16_t iteration_index = 0;
+      while ((iteration_index < max_iterations) &&
+             fractal_set->assume_unconverged(z)) {
+        z = fractal_set->next(z, pos);
+        iteration_index++;
       }
-      QColor color;
-      if (count < 256) {
-        color = QColor::fromHsv((0x120 - count) & 0xff, 0x5f, 0x5f);
-      } else {
-        color = QColor(0x5f, 0x5f, 0x5f);
-      }
-      const QBrush brush = QBrush(color);
+      const QBrush brush = count_to_brush(iteration_index, max_iterations);
       painter.fillRect(x, y, 1, 1, brush);
+      // TODO: Maybe faster:
+      //   painter.setBrush(brush);
+      //   painter.drawPoint(x, y);
     }
   }
   return pixmap;

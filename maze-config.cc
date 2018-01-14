@@ -41,6 +41,8 @@ Maze_config::Maze_config(const char *path) :
   Config(path),
   _node_name_any(xercesc::XMLString::transcode("*")),
   _node_name_align(xercesc::XMLString::transcode("align")),
+  _node_name_arg_c(xercesc::XMLString::transcode("arg-c")),
+  _node_name_arg_n(xercesc::XMLString::transcode("arg-n")),
   _node_name_background(xercesc::XMLString::transcode("background")),
   _node_name_ball(xercesc::XMLString::transcode("ball")),
   _node_name_brush(xercesc::XMLString::transcode("brush")),
@@ -54,8 +56,13 @@ Maze_config::Maze_config(const char *path) :
   _node_name_foreground(xercesc::XMLString::transcode("foreground")),
   _node_name_fractal(xercesc::XMLString::transcode("fractal")),
   _node_name_ignore(xercesc::XMLString::transcode("ignore")),
+  _node_name_imag(xercesc::XMLString::transcode("imag")),
+  _node_name_julia(xercesc::XMLString::transcode("julia")),
+  _node_name_mandelbrot(xercesc::XMLString::transcode("mandelbrot")),
   _node_name_mass(xercesc::XMLString::transcode("mass")),
+  _node_name_max_iterations(xercesc::XMLString::transcode("max-iterations")),
   _node_name_position(xercesc::XMLString::transcode("position")),
+  _node_name_real(xercesc::XMLString::transcode("real")),
   _node_name_row(xercesc::XMLString::transcode("row")),
   _node_name_rows(xercesc::XMLString::transcode("rows")),
   _node_name_shape(xercesc::XMLString::transcode("shape")),
@@ -91,6 +98,8 @@ Maze_config::~Maze_config()
 
   release(&_node_name_any);
   release(&_node_name_align);
+  release(&_node_name_arg_c);
+  release(&_node_name_arg_n);
   release(&_node_name_background);
   release(&_node_name_ball);
   release(&_node_name_brush);
@@ -104,8 +113,13 @@ Maze_config::~Maze_config()
   release(&_node_name_foreground);
   release(&_node_name_fractal);
   release(&_node_name_ignore);
+  release(&_node_name_imag);
+  release(&_node_name_julia);
+  release(&_node_name_mandelbrot);
   release(&_node_name_mass);
+  release(&_node_name_max_iterations);
   release(&_node_name_position);
+  release(&_node_name_real);
   release(&_node_name_row);
   release(&_node_name_rows);
   release(&_node_name_shape);
@@ -186,6 +200,48 @@ Maze_config::reload(const xercesc::DOMElement *elem_config)
   reload_field(elem_config);
 }
 
+const Julia_set *
+Maze_config::load_fractal_set_julia(const xercesc::DOMElement *elem_julia) const
+{
+  uint16_t arg_n;
+  const xercesc::DOMElement *elem_arg_n =
+    get_single_child_element(elem_julia, _node_name_arg_n, false);
+  if (elem_arg_n) {
+    const XMLCh *node_value_arg_n = elem_arg_n->getTextContent();
+    arg_n = parse_decimal_uint16(node_value_arg_n);
+  } else {
+    arg_n = 2;
+  }
+
+  const xercesc::DOMElement *elem_arg_c =
+    get_single_child_element(elem_julia, _node_name_arg_c, true);
+  const xercesc::DOMElement *elem_real =
+    get_single_child_element(elem_arg_c, _node_name_real, true);
+  const XMLCh *node_value_real = elem_real->getTextContent();
+  const double real = parse_double(node_value_real);
+  const xercesc::DOMElement *elem_imag =
+    get_single_child_element(elem_arg_c, _node_name_imag, true);
+  const XMLCh *node_value_imag = elem_imag->getTextContent();
+  const double imag = parse_double(node_value_imag);
+
+  const std::complex<double> arg_c(real, imag);
+  const Julia_set *julia_set = new Julia_set(arg_n, arg_c);
+  if (!julia_set) {
+    fatal("not enough memory");
+  }
+  return julia_set;
+}
+
+const Mandelbrot_set *
+Maze_config::load_fractal_set_mandelbrot(const xercesc::DOMElement *elem_mandelbrot) const
+{
+  const Mandelbrot_set *mandelbrot_set = new Mandelbrot_set();
+  if (!mandelbrot_set) {
+    fatal("not enough memory");
+  }
+  return mandelbrot_set;
+}
+
 IBrush_factory *
 Maze_config::load_brush_fractal(const Xml_string *id,
                                 const xercesc::DOMElement *elem_fractal) const
@@ -208,7 +264,34 @@ Maze_config::load_brush_fractal(const Xml_string *id,
   const XMLCh *node_value_y_scale = elem_y_scale->getTextContent();
   const double y_scale = parse_double(node_value_y_scale);
 
+  uint16_t max_iterations;
+  const xercesc::DOMElement *elem_max_iterations =
+    get_single_child_element(elem_fractal, _node_name_max_iterations, false);
+  if (elem_max_iterations) {
+    const XMLCh *node_value_max_iterations = elem_max_iterations->getTextContent();
+    max_iterations = parse_decimal_uint16(node_value_max_iterations);
+  } else {
+    max_iterations = 256;
+  }
+
+  const xercesc::DOMElement *elem_julia =
+    get_single_child_element(elem_fractal, _node_name_julia, false);
+  const xercesc::DOMElement *elem_mandelbrot =
+    get_single_child_element(elem_fractal, _node_name_mandelbrot, false);
+  const uint16_t elems_count =
+    (elem_julia ? 1 : 0) + (elem_mandelbrot ? 1 : 0);
+  if (elems_count != 1) {
+    fatal("fractal definition must contain exactly one of either julia or "
+          "mandelbrot definition");
+  }
+
+  const IFractal_set *fractal_set = elem_julia ?
+    (const IFractal_set *)load_fractal_set_julia(elem_julia) :
+    (const IFractal_set *)load_fractal_set_mandelbrot(elem_mandelbrot);
+
   IBrush_factory *factory = new Fractals_brush_factory(id,
+                                                       fractal_set,
+                                                       max_iterations,
                                                        x_offset, y_offset,
                                                        x_scale, y_scale);
   if (!factory) {
@@ -284,7 +367,6 @@ Maze_config::load_brush_definition(const xercesc::DOMElement *elem_brush,
     elem_solid ? load_brush_solid(str_id, elem_solid) :
     elem_file ? load_brush_file(str_id, elem_file) :
     load_brush_fractal(str_id, elem_fractal);
-  debug("')'");
   return factory;
 }
 

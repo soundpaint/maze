@@ -1,3 +1,14 @@
+* Extend config.xml syntax such that one can define a color palette for
+  fractals (and possibly other future entities):
+  * continous color palette by defining a gradient
+    (start color, stop color, number of colors inbetween)
+  * arbitrary color palette by explicitly listing all colors of the palette
+* Extend config.xml syntax such that one can define the coloring
+  algorithm for fractals:
+  * basic: use (scaled) iteration count as index into color table
+  * logarithmic: use (scaled) log(iteration count) as index into color table
+  * histogram coloring (cp. Wikipedia article "Mandelbrot set")
+  * continuous coloring (cp. Wikipedia article "Mandelbrot set")
 * Add version info in config.xml and verify it when parsing it.
 * All symbols should always have an id.  Anonymous symbols should
   automatically get a generated id.  That way, code may be
@@ -11,7 +22,6 @@
   result(*_cached_pixmap);"?
 * FIXME: Minor memory leak: Instances of IBrush_factory are not
   cleanly deleted when no more used.
-* Support Julia set fractals.
 * Make parser fully static.
 * Check: Shape_terms is not always a constant...
 * FIXME: Maze_config::load_shape() returns either a definition or a

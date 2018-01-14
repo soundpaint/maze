@@ -30,6 +30,8 @@
 #include <QtGui/QBrush>
 #include <ball-init-data.hh>
 #include <brush-field.hh>
+#include <julia-set.hh>
+#include <mandelbrot-set.hh>
 #include <config.hh>
 #include <implicit-curve-compiler.hh>
 #include <symbol-table.hh>
@@ -57,6 +59,8 @@ private:
 
   const XMLCh *_node_name_any;
   const XMLCh *_node_name_align;
+  const XMLCh *_node_name_arg_c;
+  const XMLCh *_node_name_arg_n;
   const XMLCh *_node_name_background;
   const XMLCh *_node_name_ball;
   const XMLCh *_node_name_brush;
@@ -70,8 +74,13 @@ private:
   const XMLCh *_node_name_foreground;
   const XMLCh *_node_name_fractal;
   const XMLCh *_node_name_ignore;
+  const XMLCh *_node_name_imag;
+  const XMLCh *_node_name_julia;
+  const XMLCh *_node_name_mandelbrot;
   const XMLCh *_node_name_mass;
+  const XMLCh *_node_name_max_iterations;
   const XMLCh *_node_name_position;
+  const XMLCh *_node_name_real;
   const XMLCh *_node_name_row;
   const XMLCh *_node_name_rows;
   const XMLCh *_node_name_shape;
@@ -101,6 +110,10 @@ private:
   void reload_field(const xercesc::DOMElement *elem_config);
   static const size_t text_content_as_size_t(const xercesc::DOMElement *elem);
   static const double text_content_as_double(const xercesc::DOMElement *elem);
+  const Julia_set *
+  load_fractal_set_julia(const xercesc::DOMElement *elem_julia) const;
+  const Mandelbrot_set *
+  load_fractal_set_mandelbrot(const xercesc::DOMElement *elem_mandelbrot) const;
   IBrush_factory *load_brush_fractal(const Xml_string *id,
                                      const xercesc::DOMElement *elem_fractal) const;
   IBrush_factory *load_brush_file(const Xml_string *id,
