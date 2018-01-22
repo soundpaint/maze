@@ -30,16 +30,14 @@
 class Julia_set : public IFractal_set
 {
 public:
-  Julia_set(const uint16_t n, const std::complex<double> c);
+  Julia_set(const uint16_t n, const complex_t c);
   virtual ~Julia_set();
-  virtual bool assume_unconverged(const std::complex<double> z) const;
-  virtual const std::complex<double>
-  next(const std::complex<double> z,
-       const std::complex<double> pos) const;
+  virtual bool assume_unconverged(const complex_t z) const;
+  virtual const complex_t next(const complex_t z, const complex_t pos) const;
   virtual std::string *to_string();
 private:
   const uint16_t _n;
-  const std::complex<double> _c;
+  const complex_t _c;
 };
 
 #endif /* JULIA_SET_HH */

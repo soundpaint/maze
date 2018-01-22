@@ -26,7 +26,7 @@
 #include <cmath>
 #include <log.hh>
 
-Julia_set::Julia_set(const uint16_t n, const std::complex<double> c) :
+Julia_set::Julia_set(const uint16_t n, const complex_t c) :
   _n(n),
   _c(c)
 {
@@ -37,16 +37,31 @@ Julia_set::~Julia_set()
 }
 
 bool
-Julia_set::assume_unconverged(const std::complex<double> z) const
+Julia_set::assume_unconverged(const complex_t z) const
 {
+#if USE_STD_COMPLEX
   return std::norm(z) < 4.0;
+#else
+  return z.norm() < 4.0;
+#endif
 }
 
-const std::complex<double>
-Julia_set::next(const std::complex<double> z,
-                const std::complex<double> pos) const
+const Julia_set::complex_t
+Julia_set::next(const complex_t z, const complex_t pos) const
 {
+#if USE_STD_COMPLEX
   return pow(z, _n) + _c;
+#else
+  const double x0 = z.real();
+  const double y0 = z.imag();
+  const double cx = _c.real();
+  const double cy = _c.imag();
+  const double len = pow(x0*x0 + y0*y0, _n / 2);
+  const double arg = _n * atan2(y0, x0);
+  const double x1 = len * cos(arg) + cx;
+  const double y1 = len * sin(arg) + cy;
+  return {x1, y1};
+#endif
 }
 
 std::string *

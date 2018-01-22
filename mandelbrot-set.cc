@@ -34,16 +34,29 @@ Mandelbrot_set::~Mandelbrot_set()
 }
 
 bool
-Mandelbrot_set::assume_unconverged(const std::complex<double> z) const
+Mandelbrot_set::assume_unconverged(const complex_t z) const
 {
+#if USE_STD_COMPLEX
   return std::norm(z) < 1000000.0;
+#else
+  return z.norm() < 1000000.0;
+#endif
 }
 
-const std::complex<double>
-Mandelbrot_set::next(const std::complex<double> z,
-                     const std::complex<double> pos) const
+const Mandelbrot_set::complex_t
+Mandelbrot_set::next(const complex_t z, const complex_t pos) const
 {
+#if USE_STD_COMPLEX
   return z * z + pos;
+#else
+  const double z_real = z.real();
+  const double z_imag = z.imag();
+  const double pos_real = pos.real();
+  const double pos_imag = pos.imag();
+  const double next_real = z_real * z_real - z_imag * z_imag + pos_real;
+  const double next_imag = 2.0 * z_real * z_imag + pos_imag;
+  return {next_real, next_imag};
+#endif
 }
 
 std::string *

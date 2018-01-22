@@ -224,7 +224,7 @@ Maze_config::load_fractal_set_julia(const xercesc::DOMElement *elem_julia) const
   const XMLCh *node_value_imag = elem_imag->getTextContent();
   const double imag = parse_double(node_value_imag);
 
-  const std::complex<double> arg_c(real, imag);
+  const IFractal_set::complex_t arg_c = {real, imag};
   const Julia_set *julia_set = new Julia_set(arg_n, arg_c);
   if (!julia_set) {
     fatal("not enough memory");

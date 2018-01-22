@@ -27,13 +27,28 @@
 
 #include <complex>
 
+#define USE_STD_COMPLEX 0
+
 class IFractal_set
 {
 public:
-  virtual bool assume_unconverged(const std::complex<double> z) const = 0;
-  virtual const std::complex<double>
-  next(const std::complex<double> z,
-       const std::complex<double> pos) const = 0;
+#if USE_STD_COMPLEX
+  typedef std::complex<double> complex_t;
+#else
+  struct complex_t {
+    double _real;
+    double _imag;
+    const double real() const { return _real; }
+    const double imag() const { return _imag; }
+    const double norm() const
+    {
+      return _real * _real + _imag * _imag;
+    }
+  };
+#endif
+  virtual bool assume_unconverged(const complex_t z) const = 0;
+  virtual const complex_t
+  next(const complex_t z, const complex_t pos) const = 0;
   virtual std::string *to_string() = 0;
 public:
   virtual ~IFractal_set() {};

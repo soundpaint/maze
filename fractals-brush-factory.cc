@@ -28,6 +28,7 @@
 #include <log.hh>
 #include <julia-set.hh>
 #include <mandelbrot-set.hh>
+#include <chrono>
 
 Fractals_brush_factory::Fractals_brush_factory(const Xml_string *id,
                                                const IFractal_set *fractal_set,
@@ -139,6 +140,15 @@ Fractals_brush_factory::create_fractal_pixmap(const IFractal_set *fractal_set,
                                               const double x_scale,
                                               const double y_scale)
 {
+  std::chrono::time_point<std::chrono::system_clock> start, end;
+  start = std::chrono::system_clock::now();
+  std::time_t start_time = std::chrono::system_clock::to_time_t(start);
+  {
+    std::stringstream str;
+    str << "started computation of fractal at " << std::ctime(&start_time);
+    Log::debug(str.str());
+  }
+
   QPixmap * const pixmap = new QPixmap(width, height);
   if (!pixmap) {
     Log::fatal("not enough memory");
@@ -149,11 +159,11 @@ Fractals_brush_factory::create_fractal_pixmap(const IFractal_set *fractal_set,
   const double scaled_x_scale = x_scale / width;
   const double scaled_y_scale = y_scale / height;
   for (uint16_t y = 0; y < height; y++) {
-    const double img = y0 + y * scaled_y_scale;
+    const double imag = y0 + y * scaled_y_scale;
     for (uint16_t x = 0; x < width; x++) {
       const double real = x0 + x * scaled_x_scale;
-      std::complex<double> pos(real, img);
-      std::complex<double> z = pos;
+      IFractal_set::complex_t pos = {real, imag};
+      IFractal_set::complex_t z = pos;
       uint16_t iteration_index = 0;
       while ((iteration_index < max_iterations) &&
              fractal_set->assume_unconverged(z)) {
@@ -167,6 +177,17 @@ Fractals_brush_factory::create_fractal_pixmap(const IFractal_set *fractal_set,
       //   painter.drawPoint(x, y);
     }
   }
+
+  end = std::chrono::system_clock::now();
+  std::chrono::duration<double> elapsed_seconds = end-start;
+  std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+  {
+    std::stringstream str;
+    str << "finished computation of fractal at " << std::ctime(&end_time)
+        << "elapsed time: " << elapsed_seconds.count() << "s";
+    Log::debug(str.str());
+  }
+
   return pixmap;
 }
 

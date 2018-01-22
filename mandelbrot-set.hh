@@ -32,13 +32,9 @@ class Mandelbrot_set : public IFractal_set
 public:
   Mandelbrot_set();
   virtual ~Mandelbrot_set();
-  virtual bool assume_unconverged(const std::complex<double> z) const;
-  virtual const std::complex<double>
-  next(const std::complex<double> z,
-       const std::complex<double> pos) const;
+  virtual bool assume_unconverged(const complex_t z) const;
+  virtual const complex_t next(const complex_t z, const complex_t pos) const;
   virtual std::string *to_string();
-private:
-  const std::complex<double> _c;
 };
 
 #endif /* MANDELBROT_SET_HH */
