@@ -42,7 +42,7 @@ About_dialog::About_dialog(QWidget *parent) : QDialog(parent)
   }
   _about_text->setReadOnly(true);
   _about_text->setDocumentTitle(QString(tr("About")));
-  _about_text->setMinimumSize(240, 60);
+  _about_text->setMinimumSize(480, 320);
 
   _about_document = new QTextDocument(_about_text);
   if (!_about_document) {
