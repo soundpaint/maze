@@ -26,6 +26,8 @@
 #include <force-field.hh>
 #include <log.hh>
 
+#define USE_IMPLICIT_CURVES 1
+
 Force_field::Force_field()
 {
   _width = 0;
@@ -59,6 +61,27 @@ Force_field::create_potential_field(const Brush_field *brush_field) const
     }
   }
   return potential_field;
+}
+
+void
+Force_field::load_field_border()
+{
+  for (uint16_t x = 0; x < _width; x++) {
+    _op_field[x].theta = 0.0;
+    _op_field[_height * _width - _width + x].theta = 0.0;
+    _op_field[x].is_reflection = true;
+    _op_field[_height * _width - _width + x].is_reflection = true;
+    _op_field[x].is_exclusion_zone = true;
+    _op_field[_height * _width - _width + x].is_exclusion_zone = true;
+  }
+  for (uint16_t y = 0; y < _height; y++) {
+    _op_field[y * _width].theta = 0.0;
+    _op_field[y * _width + _width - 1].theta = 0.0;
+    _op_field[y * _width].is_reflection = true;
+    _op_field[y * _width + _width - 1].is_reflection = true;
+    _op_field[y * _width].is_exclusion_zone = true;
+    _op_field[y * _width + _width - 1].is_exclusion_zone = true;
+  }
 }
 
 void
@@ -161,13 +184,14 @@ Force_field::load_field(const Brush_field *brush_field,
     Log::fatal("Force_field::load_field(): not enough memory");
   }
 
-#if 1
+#if USE_IMPLICIT_CURVES // use implicit curves
+  load_field_border();
   for (uint16_t x = 1; x < _width - 1; x++) {
     for (uint16_t y = 1; y < _height - 1; y++) {
       load_field(x, y, brush_field);
     }
   }
-#else
+#else // use sobel
   Sobel *sobel = new Sobel(width, height);
   if (!sobel) {
     Log::fatal("Force_field::load_field(): not enough memory");

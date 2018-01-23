@@ -52,6 +52,7 @@ private:
   };
   struct velocity_op_t *_op_field;
   double *create_potential_field(const Brush_field *brush_field) const;
+  void load_field_border();
   void load_field(const uint16_t x, const uint16_t y,
                   const Brush_field *brush_field,
                   const Sobel *sobel);
