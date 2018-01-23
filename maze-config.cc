@@ -1072,7 +1072,7 @@ Maze_config::load_tile(const xercesc::DOMElement *elem_tile)
   }
   Shape *shape = load_shape(elem_shape, false);
 
-  const double foreground_potential = 0.0; // TODO
+  const double foreground_potential = 1.0; // TODO
   const double background_potential = 0.0; // TODO
 
   // FIXME: Memory leak: Currently, nobody feels responsible
