@@ -64,6 +64,7 @@ Status_line::Status_line(QWidget *parent) : QWidget(parent)
   if (!_button_pause) {
     Log::fatal("not enough memory");
   }
+  _button_pause->setText(tr("Pause / Play"));
   _button_pause->setIcon(*_icon_pause);
   _button_pause->setIconSize(_pixmap_pause->rect().size());
   _button_pause->setToolTip(tr("pause / play"));
@@ -73,6 +74,7 @@ Status_line::Status_line(QWidget *parent) : QWidget(parent)
   if (!_button_escape) {
     Log::fatal("not enough memory");
   }
+  _button_escape->setText(tr("Quit"));
   _button_escape->setIcon(*_icon_escape);
   _button_escape->setIconSize(_pixmap_escape->rect().size());
   _button_escape->setToolTip(tr("quit"));
@@ -90,6 +92,7 @@ Status_line::Status_line(QWidget *parent) : QWidget(parent)
   if (!_button_toggle_velocity_visibility) {
     Log::fatal("not enough memory");
   }
+  _button_toggle_velocity_visibility->setText(tr("Show / Hide Velocity"));
   _button_toggle_velocity_visibility->setIcon(*_icon_show_velocity);
   _button_toggle_velocity_visibility->
     setIconSize(_pixmap_show_velocity->rect().size());
@@ -101,6 +104,7 @@ Status_line::Status_line(QWidget *parent) : QWidget(parent)
   if (!_button_toggle_force_field_visibility) {
     Log::fatal("not enough memory");
   }
+  _button_toggle_force_field_visibility->setText(tr("Show / Hide Force"));
   _button_toggle_force_field_visibility->setIcon(*_icon_show_force_field);
   _button_toggle_force_field_visibility->
     setIconSize(_pixmap_show_force_field->rect().size());
@@ -112,6 +116,7 @@ Status_line::Status_line(QWidget *parent) : QWidget(parent)
   if (!_button_toggle_ball_visibility) {
     Log::fatal("not enough memory");
   }
+  _button_toggle_ball_visibility->setText(tr("Show / Hide Ball"));
   _button_toggle_ball_visibility->setIcon(*_icon_hide_ball);
   _button_toggle_ball_visibility->
     setIconSize(_pixmap_hide_ball->rect().size());
