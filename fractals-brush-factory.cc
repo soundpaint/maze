@@ -30,6 +30,8 @@
 #include <mandelbrot-set.hh>
 #include <chrono>
 
+#define LINEAR_COLOR_SHADE 0
+
 Fractals_brush_factory::Fractals_brush_factory(const Xml_string *id,
                                                const IFractal_set *fractal_set,
                                                const uint16_t max_iterations,
@@ -113,9 +115,9 @@ Fractals_brush_factory::count_to_brush(const uint16_t count,
   const uint16_t start_hue = 0x120;
   const uint16_t max_color_index = 256;
   const QColor stop_color(0x5f, 0x5f, 0x5f);
-#if 0 // linear
+#if LINEAR_COLOR_SHADE // linear color shade
   const uint16_t color_index = (max_color_index * count) / max_count;
-#else // logarithmic
+#else // logarithmic color shade
   const uint16_t color_index =
     (uint16_t)(max_color_index * log(count) / log(max_count));
 #endif

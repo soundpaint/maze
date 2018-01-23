@@ -28,6 +28,8 @@
 #include <QtGui/QScreen>
 #include <log.hh>
 
+#define FULL_SCREEN_MODE 0
+
 Main_window::Main_window(const Maze_config *config, Balls *balls,
                          QWidget *parent)
   : QMainWindow(parent)
@@ -36,7 +38,7 @@ Main_window::Main_window(const Maze_config *config, Balls *balls,
     Log::fatal("Main_window(): balls is null");
   }
 
-#if 0 // full-screen mode
+#if FULL_SCREEN_MODE // full-screen mode
   setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
   setCursor(Qt::BlankCursor);
   const QScreen *screen = qApp->primaryScreen();

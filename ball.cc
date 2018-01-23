@@ -25,6 +25,8 @@
 #include <ball.hh>
 #include <log.hh>
 
+#define HAVE_SENSE_HAT 0
+
 // TODO: Deploy z coordinates to consider position energy.
 // -jr 2016-02-01
 
@@ -231,7 +233,7 @@ Ball::update(const Sensors *sensors,
     Log::fatal("Ball::update(): sensors is null");
   }
 
-#if 0
+#if HAVE_SENSE_HAT
   double pitch = sensors->get_pitch();
   double roll = sensors->get_roll();
 #else
