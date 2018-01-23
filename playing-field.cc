@@ -153,11 +153,14 @@ Playing_field::create_background(const uint16_t width,
   for (uint16_t x = 0; x < width; x++) {
     const double field_x = ((double)x) / width;
     for (uint16_t y = 0; y < height; y++) {
+      const double field_y = ((double)y) / height;
       if (force_field_visible) {
         QColor color;
         const Ball *ball = _balls->at(0);
         if (!ball->is_reflection(x, y)) {
           color = QColor(0, 0, 0);
+        } else if (_brush_field->get_potential(field_x, field_y) > 0.5) {
+          color = QColor(255, 255, 255);
         } else {
           int16_t theta = (int16_t)(ball->get_theta(x, y) / M_PI * 180.0);
           while (theta < 0) {
@@ -171,7 +174,6 @@ Playing_field::create_background(const uint16_t width,
         const QBrush color_brush = QBrush(color);
         painter.fillRect(x, y, 1, 1, color_brush);
       } else {
-        const double field_y = ((double)y) / height;
         const QBrush *brush = _brush_field->get_brush(field_x, field_y);
         painter.fillRect(x, y, 1, 1, *brush);
       }
