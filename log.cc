@@ -60,18 +60,8 @@ Log::warn(const std::string msg)
 void
 Log::info(const std::string msg)
 {
-  info(msg, false);
-}
-
-void
-Log::info(const std::string msg, const bool omitLineFeed)
-{
   pthread_mutex_lock(&_serialize_lock);
-  std::cout << "[info] " << msg << "\r";
-  if (!omitLineFeed) {
-    std::cout << "\n";
-  }
-  std::cout << std::flush;
+  std::cout << "[info] " << msg << std::endl << std::flush;
   pthread_mutex_unlock(&_serialize_lock);
 }
 
@@ -81,17 +71,6 @@ Log::debug(const std::string msg)
   pthread_mutex_lock(&_serialize_lock);
   std::cout << "[debug] " << msg << std::endl << std::flush;
   pthread_mutex_unlock(&_serialize_lock);
-}
-
-Log&
-Log::endl()
-{
-  *_out << "[" << _label << "]" << _buffer.str();
-  // _buffer = std::stringstream();
-  if (_abort) {
-    exit(EXIT_FAILURE);
-  }
-  return *this;
 }
 
 Log::Log(const char *label, std::ostream *out, const bool abort)

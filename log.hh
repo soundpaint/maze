@@ -41,14 +41,7 @@ public:
   static void error(const std::string msg);
   static void warn(const std::string msg);
   static void info(const std::string msg);
-  static void info(const std::string msg, const bool omitLineFeed);
   static void debug(const std::string msg);
-  Log& endl();
-  template<class T> Log& operator<<(const T &arg)
-  {
-    _buffer << arg;
-    return *this;
-  }
 private:
   static pthread_mutex_t _serialize_lock;
   const char *_label;
