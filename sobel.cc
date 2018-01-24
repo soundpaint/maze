@@ -172,7 +172,7 @@ Sobel::get_edge_orientation(const uint16_t x, const uint16_t y) const
   const double gy = _height * get_gy(x, y);
   double theta;
   if ((gx == 0.0) && (gy == 0.0)) {
-    theta = nan("");
+    theta = std::nan("");
   } else {
     theta = atan2(gy, gx);
   }

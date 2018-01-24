@@ -23,7 +23,6 @@
  */
 
 #include <implicit-curve-parser.hh>
-#include <math.h>
 #include <log.hh>
 
 Implicit_curve_parser::Implicit_curve_parser()
@@ -119,7 +118,7 @@ Implicit_curve_parser::parse_const_term(double *value)
     *value = consume_token()->get_double_value();
     result = true;
   } else {
-    //*value = nan(0);
+    //*value = std::nan("");
     *value = 0.0;
     result = false;
   }
