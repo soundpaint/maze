@@ -37,6 +37,7 @@ public:
   const Xml_string *get_id() const;
   const Shape_terms *get_terms() const;
   const bool is_inside(const double x, const double y) const;
+  const double get_avg_tan(const double x, const double y) const;
 private:
   const Xml_string *_id;
   const Shape_terms *_shape_terms;

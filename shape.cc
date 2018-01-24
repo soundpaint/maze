@@ -74,6 +74,12 @@ Shape::is_inside(const double x, const double y) const
   return _shape_terms->is_inside(x, y);
 }
 
+const double
+Shape::get_avg_tan(const double x, const double y) const
+{
+  return _shape_terms->get_avg_tan(x, y);
+}
+
 /*
  * Local variables:
  *   mode: c++

@@ -23,6 +23,7 @@
  */
 
 #include <shape-expression.hh>
+#include <cmath>
 #include <log.hh>
 
 Shape_prime::Shape_prime(const Implicit_curve *implicit_curve,
@@ -49,6 +50,13 @@ const bool
 Shape_prime::is_inside(const double x, const double y) const
 {
   return _implicit_curve->is_inside(x, y) != is_negated();
+}
+
+const double
+Shape_prime::get_avg_tan(const double x, const double y) const
+{
+  const double raw_theta = _implicit_curve->get_avg_tan(x, y);
+  return is_negated() ? -raw_theta : raw_theta;
 }
 
 Shape_unary_expression::Shape_unary_expression() :
@@ -97,7 +105,6 @@ void
 Shape_factors::add_factor(const Shape_unary_expression *factor)
 {
   _factors->push_back(factor);
-  //return 0; // TODO
 }
 
 const int
@@ -122,6 +129,30 @@ Shape_factors::is_inside(const double x, const double y) const
   return true;
 }
 
+const double
+Shape_factors::get_avg_tan(const double x, const double y) const
+{
+  if (size() == 0) {
+    return std::nan("");
+  }
+  const bool inside = is_inside(x, y);
+  uint16_t count = 0;
+  double theta = 0.0;
+  for (const Shape_unary_expression *factor : *_factors) {
+    if (factor->is_inside(x, y) == inside) {
+      const double factor_theta = factor->get_avg_tan(x, y);
+      if (!std::isnan(factor_theta)) {
+        theta += factor_theta;
+        count++;
+      }
+    }
+  }
+  if (!count) {
+    return std::nan("");
+  }
+  return theta / count;
+}
+
 Shape_terms::Shape_terms()
 {
   _terms =
@@ -144,7 +175,6 @@ void
 Shape_terms::add_term(const Shape_factors *term)
 {
   _terms->push_back(term);
-  //return 0; // TODO
 }
 
 const int
@@ -167,6 +197,30 @@ Shape_terms::is_inside(const double x, const double y) const
       return !is_negated();
   }
   return is_negated();
+}
+
+const double
+Shape_terms::get_avg_tan(const double x, const double y) const
+{
+  if (size() == 0) {
+    return std::nan("");
+  }
+  const bool inside = is_inside(x, y);
+  uint16_t count = 0;
+  double theta = 0.0;
+  for (const Shape_factors *term : *_terms) {
+    if (term->is_inside(x, y) == inside) {
+      const double term_theta = term->get_avg_tan(x, y);
+      if (!std::isnan(term_theta)) {
+        theta += term_theta;
+        count++;
+      }
+    }
+  }
+  if (!count) {
+    return std::nan("");
+  }
+  return (is_negated() ? -theta : theta) / count;
 }
 
 /*

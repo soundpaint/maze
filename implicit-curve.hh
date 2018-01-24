@@ -38,6 +38,7 @@ public:
                  const double weight_term_const);
   virtual ~Implicit_curve();
   const bool is_inside(const double x, const double y) const;
+  const double get_avg_tan(const double x, const double y) const;
   const std::string to_string() const;
 private:
   const Bivariate_quadratic_function *_function;

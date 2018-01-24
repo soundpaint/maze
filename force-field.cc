@@ -149,7 +149,7 @@ Force_field::load_field(const uint16_t x, const uint16_t y,
     if ((p0 <= 1.0) || (p1 <= 1.0) || (p2 <= 1.0) || (p3 <= 1.0) ||
         (p4 <= 1.0) || (p5 <= 1.0) || (p6 <= 1.0) || (p7 <= 1.0)) {
       velocity_op.theta =
-        brush_field->get_avg_tan(x * i_width, y * i_height, i_width, i_height);
+        brush_field->get_avg_tan(x * i_width, y * i_height);
       velocity_op.is_reflection = !std::isnan(velocity_op.theta);
     } else {
       velocity_op.is_reflection = false;

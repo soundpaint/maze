@@ -97,16 +97,6 @@ Tile::geometry_changed(const uint16_t width, const uint16_t height)
   }
 }
 
-const double
-Tile::get_potential(const double x, const double y) const
-{
-  if (_shape->is_inside(x, y)) {
-    return _foreground_potential;
-  } else {
-    return _background_potential;
-  }
-}
-
 const QBrush *
 Tile::get_brush(const double x, const double y) const
 {
@@ -120,13 +110,19 @@ return brush;
 }
 
 const double
-Tile::get_avg_tan(const double tile_offset_x,
-                  const double tile_offset_y,
-                  const double dx,
-                  const double dy) const
+Tile::get_potential(const double x, const double y) const
 {
-  // TODO
-  return 0.0;
+  if (_shape->is_inside(x, y)) {
+    return _foreground_potential;
+  } else {
+    return _background_potential;
+  }
+}
+
+const double
+Tile::get_avg_tan(const double x, const double y) const
+{
+  return _shape->get_avg_tan(x, y);
 }
 
 const Xml_string *

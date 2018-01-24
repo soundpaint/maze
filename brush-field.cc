@@ -151,13 +151,12 @@ Brush_field::get_potential(const double x, const double y) const
 }
 
 const double
-Brush_field::get_avg_tan(const double x0, const double y0,
-                         const double dx, const double dy) const
+Brush_field::get_avg_tan(const double x, const double y) const
 {
   double tile_offset_x;
   double tile_offset_y;
-  const Tile *tile = get_tile(x0, y0, &tile_offset_x, &tile_offset_y);
-  return tile->get_avg_tan(tile_offset_x, tile_offset_y, dx, dy);
+  const Tile *tile = get_tile(x, y, &tile_offset_x, &tile_offset_y);
+  return tile->get_avg_tan(tile_offset_x, tile_offset_y);
 }
 
 const bool

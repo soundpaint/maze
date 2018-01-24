@@ -38,6 +38,7 @@ public:
                                const double weight_term_const);
   virtual ~Bivariate_quadratic_function();
   const bool is_inside(const double x, const double y) const;
+  const double get_avg_tan(const double x, const double y) const;
   const std::string to_string() const;
   const Bivariate_quadratic_function *create_d_dx() const;
   const Bivariate_quadratic_function *create_d_dy() const;

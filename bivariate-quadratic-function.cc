@@ -23,7 +23,8 @@
  */
 
 #include <bivariate-quadratic-function.hh>
-#include <string.h>
+#include <string>
+#include <cmath>
 #include <log.hh>
 
 Bivariate_quadratic_function::Bivariate_quadratic_function(const double weight_term_yy,
@@ -55,6 +56,27 @@ Bivariate_quadratic_function::is_inside(const double x, const double y) const
     _weight_term_y * y +
     _weight_term_x * x +
     _weight_term_const <= 0.0;
+}
+
+const double
+Bivariate_quadratic_function::get_avg_tan(const double x, const double y) const
+{
+  // F_x(x, y) := df(x, y) / dx = w_xy * y + 2.0 * w_xx * x + w_x
+  // F_y(x, y) := df(x, y) / dy = 2.0 * w_yy * y + w_xy * x + w_y
+  //
+  // norm vector: n(x0, y0) = (F_x(x0, y0), F_y(x, y0))^T
+  //
+  const double fx =
+    _weight_term_xy * y + 2.0 * _weight_term_xx * x + _weight_term_x;
+  const double fy =
+    2.0 * _weight_term_yy * y + _weight_term_xy * x + _weight_term_y;
+  double theta;
+  if ((fx == 0.0) && (fy == 0.0)) {
+    theta = std::nan("");
+  } else {
+    theta = std::atan2(fy, fx);
+  }
+  return theta;
 }
 
 const Bivariate_quadratic_function *

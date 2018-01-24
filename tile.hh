@@ -43,12 +43,9 @@ public:
        const Shape *shape);
   virtual ~Tile();
   const std::string to_string() const;
-  const double get_potential(const double x, const double y) const;
   const QBrush *get_brush(const double x, const double y) const;
-  const double get_avg_tan(const double tile_offset_x,
-                           const double tile_offset_y,
-                           const double dx,
-                           const double dy) const;
+  const double get_potential(const double x, const double y) const;
+  const double get_avg_tan(const double x, const double y) const;
   const Xml_string *get_id() const;
   const Shape *get_shape() const;
   void geometry_changed(const uint16_t width, const uint16_t height);

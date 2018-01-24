@@ -47,8 +47,7 @@ public:
   const uint16_t get_rows() const;
   const QBrush *get_brush(const double x, const double y) const;
   const double get_potential(const double x, const double y) const;
-  const double get_avg_tan(const double x0, const double y0,
-                           const double dx, const double dy) const;
+  const double get_avg_tan(const double x, const double y) const;
   const bool matches_goal(const double x, const double y) const;
   virtual void geometry_changed(const uint16_t columns, const uint16_t rows);
   const std::vector<const Ball_init_data *> get_balls_init_data() const;

@@ -101,6 +101,12 @@ Implicit_curve::is_inside(const double x, const double y) const
   return _function->is_inside(x, y);
 }
 
+const double
+Implicit_curve::get_avg_tan(const double x, const double y) const
+{
+  return _function->get_avg_tan(x, y);
+}
+
 const std::string
 Implicit_curve::to_string() const
 {
