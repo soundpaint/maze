@@ -29,6 +29,12 @@
 #include <ball.hh>
 #include <log.hh>
 
+#define BACKGROUND_MODE_NORMAL 0
+#define BACKGROUND_MODE_FORCES 1
+#define BACKGROUND_MODE_REFLECTIONS 2
+
+#define BACKGROUND_MODE BACKGROUND_MODE_NORMAL
+
 Playing_field::Playing_field(Brush_field *brush_field,
                              const uint16_t minimum_width,
                              const uint16_t minimum_height,
@@ -70,12 +76,8 @@ Playing_field::Playing_field(Brush_field *brush_field,
   setBackgroundRole(QPalette::Base);
   setAutoFillBackground(true);
 
-  _background_std = create_background(minimum_width, minimum_height, false);
-  if (!_background_std) {
-    Log::fatal("Playing_field(): not enough memory");
-  }
-  _background_ff = create_background(minimum_width, minimum_height, true);
-  if (!_background_ff) {
+  _background = create_background(minimum_width, minimum_height);
+  if (!_background) {
     Log::fatal("Playing_field(): not enough memory");
   }
 }
@@ -101,8 +103,7 @@ Playing_field::~Playing_field()
   _force_field = 0;
 
   // Q objects will be deleted by Qt, just set them to 0
-  _background_std = 0;
-  _background_ff = 0;
+  _background = 0;
 }
 
 const uint16_t
@@ -123,10 +124,85 @@ Playing_field::add_field_geometry_listener(IField_geometry_listener *listener)
   _field_geometry_listeners->push_back(listener);
 }
 
+void
+Playing_field::create_background_normal(const uint16_t width,
+                                        const uint16_t height,
+                                        QPainter *painter)
+{
+  for (uint16_t x = 0; x < width; x++) {
+    const double field_x = ((double)x) / width;
+    for (uint16_t y = 0; y < height; y++) {
+      const double field_y = ((double)y) / height;
+      const QBrush *brush = _brush_field->get_brush(field_x, field_y);
+      painter->fillRect(x, y, 1, 1, *brush);
+    }
+  }
+}
+
+void
+Playing_field::create_background_forces(const uint16_t width,
+                                        const uint16_t height,
+                                        QPainter *painter)
+{
+  for (uint16_t x = 0; x < width; x++) {
+    const double field_x = ((double)x) / width;
+    for (uint16_t y = 0; y < height; y++) {
+      const double field_y = ((double)y) / height;
+      QColor color;
+      const Ball *ball = _balls->at(0);
+      if (!ball->is_reflection(x, y)) {
+        color = QColor(0, 0, 0);
+      } else if (_brush_field->get_potential(field_x, field_y) > 0.5) {
+        color = QColor(255, 255, 255);
+      } else {
+        int16_t theta = (int16_t)(ball->get_theta(x, y) / M_PI * 180.0);
+        while (theta < 0) {
+          theta += 360;
+        }
+        while (theta >= 360) {
+          theta -= 360;
+        }
+        color = QColor::fromHsv(theta, 255, 255);
+      }
+      const QBrush color_brush = QBrush(color);
+      painter->fillRect(x, y, 1, 1, color_brush);
+    }
+  }
+}
+
+void
+Playing_field::create_background_reflections(const uint16_t width,
+                                             const uint16_t height,
+                                             QPainter *painter)
+{
+  for (uint16_t x = 0; x < width; x++) {
+    //const double field_x = ((double)x) / width;
+    for (uint16_t y = 0; y < height; y++) {
+      //const double field_y = ((double)y) / height;
+      QColor color;
+      const Ball *ball = _balls->at(0);
+      if (!ball->is_reflection(x, y)) {
+        if (!ball->is_exclusion_zone(x, y)) {
+          color = QColor(0, 0, 0);
+        } else {
+          color = QColor(255, 0, 0);
+        }
+      } else {
+        if (!ball->is_exclusion_zone(x, y)) {
+          color = QColor(0, 255, 0);
+        } else {
+          color = QColor(255, 255, 255);
+        }
+      }
+      const QBrush color_brush = QBrush(color);
+      painter->fillRect(x, y, 1, 1, color_brush);
+    }
+  }
+}
+
 QImage *
 Playing_field::create_background(const uint16_t width,
-                                 const uint16_t height,
-                                 const bool force_field_visible)
+                                 const uint16_t height)
 {
   if (width <= 0) {
     Log::fatal("Playing_field::create_background(): width <= 0");
@@ -140,7 +216,6 @@ Playing_field::create_background(const uint16_t width,
     msg << "[create_background]";
     msg << " width=" << width;
     msg << ", height=" << height;
-    msg << ", force_field_visible=" << force_field_visible;
     Log::info(msg.str());
   }
 
@@ -150,34 +225,12 @@ Playing_field::create_background(const uint16_t width,
                "not enough memory");
   }
   QPainter painter(image);
-  for (uint16_t x = 0; x < width; x++) {
-    const double field_x = ((double)x) / width;
-    for (uint16_t y = 0; y < height; y++) {
-      const double field_y = ((double)y) / height;
-      if (force_field_visible) {
-        QColor color;
-        const Ball *ball = _balls->at(0);
-        if (!ball->is_reflection(x, y)) {
-          color = QColor(0, 0, 0);
-        } else if (_brush_field->get_potential(field_x, field_y) > 0.5) {
-          color = QColor(255, 255, 255);
-        } else {
-          int16_t theta = (int16_t)(ball->get_theta(x, y) / M_PI * 180.0);
-          while (theta < 0) {
-            theta += 360;
-          }
-          while (theta >= 360) {
-            theta -= 360;
-          }
-          color = QColor::fromHsv(theta, 255, 255);
-        }
-        const QBrush color_brush = QBrush(color);
-        painter.fillRect(x, y, 1, 1, color_brush);
-      } else {
-        const QBrush *brush = _brush_field->get_brush(field_x, field_y);
-        painter.fillRect(x, y, 1, 1, *brush);
-      }
-    }
+  if (BACKGROUND_MODE == BACKGROUND_MODE_NORMAL) {
+    create_background_normal(width, height, &painter);
+  } else if (BACKGROUND_MODE == BACKGROUND_MODE_FORCES) {
+    create_background_forces(width, height, &painter);
+  } else { // (BACKGROUND_MODE == BACKGROUND_MODE_REFLECTIONS)
+    create_background_reflections(width, height, &painter);
   }
   return image;
 }
@@ -199,8 +252,8 @@ Playing_field::check_update_geometry()
 {
   const uint16_t current_width = width();
   const uint16_t current_height = height();
-  if ((current_width != _background_std->width()) ||
-      (current_height != _background_std->height())) {
+  if ((current_width != _background->width()) ||
+      (current_height != _background->height())) {
     for (IField_geometry_listener *listener : *_field_geometry_listeners) {
       listener->geometry_changed(current_width, current_height);
     }
@@ -226,20 +279,12 @@ Playing_field::geometry_changed(const uint16_t width, const uint16_t height)
     Ball *ball = _balls->at(i);
     ball->precompute_forces(_force_field);
   }
-  Log::debug("(re-)create standard background");
-  if (_background_std) {
-    delete _background_std;
+  Log::debug("(re-)create background");
+  if (_background) {
+    delete _background;
   }
-  _background_std = create_background(width, height, false);
-  if (!_background_std) {
-    Log::fatal("Playing_field::paintEvent(): not enough memory");
-  }
-  Log::debug("(re-)create background with forces display");
-  if (_background_ff) {
-    delete _background_ff;
-  }
-  _background_ff = create_background(width, height, true);
-  if (!_background_ff) {
+  _background = create_background(width, height);
+  if (!_background) {
     Log::fatal("Playing_field::paintEvent(): not enough memory");
   }
 }
@@ -295,11 +340,7 @@ Playing_field::paintEvent(QPaintEvent *event)
   check_update_geometry();
   const QRect rect = event->rect();
   QPainter painter(this);
-  if (_force_field_visible) {
-    painter.drawImage(rect, *_background_ff, rect);
-  } else {
-    painter.drawImage(rect, *_background_std, rect);
-  }
+  painter.drawImage(rect, *_background, rect);
   if (_ball_visible) {
     draw_balls(&painter, rect);
   }

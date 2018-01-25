@@ -83,16 +83,23 @@ private:
   const Brush_field *_brush_field;
   Force_field *_force_field;
   uint16_t _minimum_width, _minimum_height;
-  QImage *_background_std;
-  QImage *_background_ff;
+  QImage *_background;
   bool _velocity_visible;
   bool _force_field_visible;
   bool _ball_visible;
   std::vector<IField_geometry_listener *> *_field_geometry_listeners;
   void check_update_geometry();
+  void create_background_normal(const uint16_t width,
+                                const uint16_t height,
+                                QPainter *painter);
+  void create_background_forces(const uint16_t width,
+                                const uint16_t height,
+                                QPainter *painter);
+  void create_background_reflections(const uint16_t width,
+                                     const uint16_t height,
+                                     QPainter *painter);
   QImage *create_background(const uint16_t width,
-                            const uint16_t height,
-                            const bool force_field_visible);
+                            const uint16_t height);
   void draw_balls(QPainter *painter, const QRect rect);
   void draw_velocities(QPainter *painter, const QRect rect);
 };
