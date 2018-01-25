@@ -74,7 +74,7 @@ Bivariate_quadratic_function::get_avg_tan(const double x, const double y) const
   if ((fx == 0.0) && (fy == 0.0)) {
     theta = std::nan("");
   } else {
-    theta = std::atan2(fy, fx);
+    theta = M_PI - std::atan2(fy, fx);
   }
   return theta;
 }
