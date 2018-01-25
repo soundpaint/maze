@@ -255,14 +255,22 @@ Ball::update(const Sensors *sensors,
   *py += *vy;
 
   if (*px < MIN_X) {
-    Log::fatal("px < MIN");
+    Log::error("px < MIN");
+    *px -= *vx;
+    *vx = -*vx;
   } else if (*px > MAX_X) {
-    Log::fatal("px > MAX");
+    Log::error("px > MAX");
+    *px -= *vx;
+    *vx = -*vx;
   }
   if (*py < MIN_Y) {
-    Log::fatal("py < MIN");
+    Log::error("py < MIN");
+    *py -= *vy;
+    *vy = -*vy;
   } else if (*py > MAX_Y) {
-    Log::fatal("py > MAX");
+    Log::error("py > MAX");
+    *py -= *vy;
+    *vy = -*vy;
   }
 
   double new_px = *px;
