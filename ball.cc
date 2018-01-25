@@ -117,7 +117,9 @@ Ball::precompute_forces(const uint16_t x,
   const uint32_t ff0 = y * _force_field_width + x;
   struct velocity_op_t *ball_op = &_op_force_field[ff0];
   uint16_t reflection_count = 0;
-  double theta = 0;
+  // For arithmetically averaging angles, we have to consider them as
+  // 2D coordinates on a circle, and then compute the average point.
+  double theta_x = 0.0, theta_y = 0.0;
   int16_t ball_y = y - get_pixmap_origin_y();
   for (uint8_t pixmap_y = 0; pixmap_y < get_pixmap_height(); pixmap_y++) {
     if ((ball_y >= 0) && (ball_y < _force_field_height)) {
@@ -130,7 +132,9 @@ Ball::precompute_forces(const uint16_t x,
               force_field->is_exclusion_zone(ball_x, ball_y);
             if (force_field->is_reflection(ball_x, ball_y)) {
               reflection_count++;
-              theta += force_field->get_theta(ball_x, ball_y);
+              double theta = force_field->get_theta(ball_x, ball_y);
+              theta_x += cos(theta);
+              theta_y += sin(theta);
             }
           } else {
             //std::cout << "n";
@@ -141,12 +145,8 @@ Ball::precompute_forces(const uint16_t x,
     }
     ball_y++;
   }
-#if 1
-  theta = force_field->get_theta(x, y);
-  reflection_count = force_field->is_reflection(x, y) ? 1 : 0;
-#endif
   if (reflection_count > 0) {
-    theta /= (double)reflection_count;
+    const double theta = atan2(theta_y, theta_x);
     ball_op->theta = theta;
     ball_op->m00 = 1.0 * -cos(2.0 * theta);
     ball_op->m01 = 1.0 * +sin(2.0 * theta);
