@@ -41,16 +41,16 @@ Brush_field::~Brush_field()
 }
 
 void
-Brush_field::geometry_changed(const uint16_t columns, const uint16_t rows)
+Brush_field::geometry_changed(const uint16_t width, const uint16_t height)
 {
   {
     std::stringstream str;
-    str << "brush field: geometry changed: columns=" << columns <<
-      ", rows=" << rows;
+    str << "brush field: geometry changed: width=" << width <<
+      ", height=" << height;
     Log::debug(str.str());
   }
   for (Tile *tile : _field) {
-    tile->geometry_changed(columns, rows);
+    tile->geometry_changed(width, height);
   }
 }
 

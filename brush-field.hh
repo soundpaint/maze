@@ -49,7 +49,7 @@ public:
   const double get_potential(const double x, const double y) const;
   const double get_avg_tan(const double x, const double y) const;
   const bool matches_goal(const double x, const double y) const;
-  virtual void geometry_changed(const uint16_t columns, const uint16_t rows);
+  virtual void geometry_changed(const uint16_t width, const uint16_t height);
   const std::vector<const Ball_init_data *> get_balls_init_data() const;
 private:
   const uint16_t _columns;
