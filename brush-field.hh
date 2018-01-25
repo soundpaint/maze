@@ -56,9 +56,14 @@ private:
   const uint16_t _rows;
   const std::vector<Tile *> _field;
   const std::vector<const Ball_init_data *> _balls;
+  double _tile_pixel_width, _tile_pixel_height;
   const Tile *get_tile(const double x, const double y,
                        double * const tile_offset_x,
-                       double * const tile_offset_y) const;
+                       double * const tile_offset_y,
+                       bool *left_border,
+                       bool *top_border,
+                       bool *right_border,
+                       bool *bottom_border) const;
 };
 
 #endif /* BRUSH_FIELD_HH */
