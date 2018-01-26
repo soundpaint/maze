@@ -137,8 +137,9 @@ Force_field::load_field(const uint16_t x, const uint16_t y,
   struct velocity_op_t velocity_op;
   const double i_width = 1.0 / _width;
   const double i_height = 1.0 / _height;
-  if (is_exclusion_zone(x * i_width, y * i_height, brush_field)) {
-    velocity_op.is_exclusion_zone = true;
+  velocity_op.is_exclusion_zone =
+    is_exclusion_zone(x * i_width, y * i_height, brush_field);
+  if (velocity_op.is_exclusion_zone) {
     const bool p0 =
       is_exclusion_zone((x - 1) * i_width, (y - 1) * i_height, brush_field);
     const bool p1 =
@@ -155,15 +156,14 @@ Force_field::load_field(const uint16_t x, const uint16_t y,
       is_exclusion_zone((x + 0) * i_width, (y + 1) * i_height, brush_field);
     const bool p7 =
       is_exclusion_zone((x + 1) * i_width, (y + 1) * i_height, brush_field);
-    if (p0 || p1 || p2 || p3 || p4 || p5 || p6 || p7) {
-      velocity_op.theta =
-        brush_field->get_avg_tan(x * i_width, y * i_height);
+    const bool have_neighbour_in_exclusion_zone =
+      p0 || p1 || p2 || p3 || p4 || p5 || p6 || p7;
+    if (have_neighbour_in_exclusion_zone) {
+      velocity_op.theta = brush_field->get_avg_tan(x * i_width, y * i_height);
       velocity_op.is_reflection = !std::isnan(velocity_op.theta);
     } else {
       velocity_op.is_reflection = false;
     }
-  } else {
-    velocity_op.is_exclusion_zone = false;
   }
   _op_field[y * _width + x] = velocity_op;
 }
