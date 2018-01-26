@@ -185,11 +185,11 @@ Author's web site: www.juergen-reuter.de
     </contents>
     <ball>
       <position>
-        <row>8</row>
+        <row>4</row>
         <column>12</column>
       </position>
       <velocity>
-        <x>0.00001</x>
+        <x>0.000020</x>
         <y>0.000011</y>
       </velocity>
       <mass>1.0</mass>
