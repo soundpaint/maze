@@ -66,17 +66,21 @@ Force_field::create_potential_field(const Brush_field *brush_field) const
 void
 Force_field::load_field_border()
 {
+  const double theta_right = 0.0;
+  const double theta_down = 0.5 * M_PI;
+  const double theta_left = M_PI;
+  const double theta_up = -0.5 * M_PI;
   for (uint16_t x = 0; x < _width; x++) {
-    _op_field[x].theta = 0.0;
-    _op_field[_height * _width - _width + x].theta = 0.0;
+    _op_field[x].theta = theta_up;
+    _op_field[_height * _width - _width + x].theta = theta_down;
     _op_field[x].is_reflection = true;
     _op_field[_height * _width - _width + x].is_reflection = true;
     _op_field[x].is_exclusion_zone = true;
     _op_field[_height * _width - _width + x].is_exclusion_zone = true;
   }
   for (uint16_t y = 0; y < _height; y++) {
-    _op_field[y * _width].theta = 0.0;
-    _op_field[y * _width + _width - 1].theta = 0.0;
+    _op_field[y * _width].theta = theta_left;
+    _op_field[y * _width + _width - 1].theta = theta_right;
     _op_field[y * _width].is_reflection = true;
     _op_field[y * _width + _width - 1].is_reflection = true;
     _op_field[y * _width].is_exclusion_zone = true;
