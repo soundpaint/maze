@@ -56,6 +56,8 @@ private:
   void load_field(const uint16_t x, const uint16_t y,
                   const Brush_field *brush_field,
                   const Sobel *sobel);
+  const bool is_exclusion_zone(const double x, const double y,
+                               const Brush_field *brush_field) const;
   void load_field(const uint16_t x, const uint16_t y,
                   const Brush_field *brush_field);
 };

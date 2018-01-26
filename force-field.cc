@@ -123,6 +123,13 @@ Force_field::load_field(const uint16_t x, const uint16_t y,
   _op_field[y * _width + x] = velocity_op;
 }
 
+const bool
+Force_field::is_exclusion_zone(const double x, const double y,
+                               const Brush_field *brush_field) const
+{
+  return brush_field->get_potential(x, y) == 1.0;
+}
+
 void
 Force_field::load_field(const uint16_t x, const uint16_t y,
                         const Brush_field *brush_field)
@@ -130,28 +137,25 @@ Force_field::load_field(const uint16_t x, const uint16_t y,
   struct velocity_op_t velocity_op;
   const double i_width = 1.0 / _width;
   const double i_height = 1.0 / _height;
-  const double potential = 
-    brush_field->get_potential(x * i_width, y * i_height);
-  if (potential > 0.0) {
+  if (is_exclusion_zone(x * i_width, y * i_height, brush_field)) {
     velocity_op.is_exclusion_zone = true;
-    const double p0 =
-      brush_field->get_potential((x - 1) * i_width, (y - 1) * i_height);
-    const double p1 =
-      brush_field->get_potential((x + 0) * i_width, (y - 1) * i_height);
-    const double p2 =
-      brush_field->get_potential((x + 1) * i_width, (y - 1) * i_height);
-    const double p3 =
-      brush_field->get_potential((x - 1) * i_width, (y + 0) * i_height);
-    const double p4 =
-      brush_field->get_potential((x + 1) * i_width, (y + 0) * i_height);
-    const double p5 =
-      brush_field->get_potential((x - 1) * i_width, (y + 1) * i_height);
-    const double p6 =
-      brush_field->get_potential((x + 0) * i_width, (y + 1) * i_height);
-    const double p7 =
-      brush_field->get_potential((x + 1) * i_width, (y + 1) * i_height);
-    if ((p0 <= 1.0) || (p1 <= 1.0) || (p2 <= 1.0) || (p3 <= 1.0) ||
-        (p4 <= 1.0) || (p5 <= 1.0) || (p6 <= 1.0) || (p7 <= 1.0)) {
+    const bool p0 =
+      is_exclusion_zone((x - 1) * i_width, (y - 1) * i_height, brush_field);
+    const bool p1 =
+      is_exclusion_zone((x + 0) * i_width, (y - 1) * i_height, brush_field);
+    const bool p2 =
+      is_exclusion_zone((x + 1) * i_width, (y - 1) * i_height, brush_field);
+    const bool p3 =
+      is_exclusion_zone((x - 1) * i_width, (y + 0) * i_height, brush_field);
+    const bool p4 =
+      is_exclusion_zone((x + 1) * i_width, (y + 0) * i_height, brush_field);
+    const bool p5 =
+      is_exclusion_zone((x - 1) * i_width, (y + 1) * i_height, brush_field);
+    const bool p6 =
+      is_exclusion_zone((x + 0) * i_width, (y + 1) * i_height, brush_field);
+    const bool p7 =
+      is_exclusion_zone((x + 1) * i_width, (y + 1) * i_height, brush_field);
+    if (p0 || p1 || p2 || p3 || p4 || p5 || p6 || p7) {
       velocity_op.theta =
         brush_field->get_avg_tan(x * i_width, y * i_height);
       velocity_op.is_reflection = !std::isnan(velocity_op.theta);
