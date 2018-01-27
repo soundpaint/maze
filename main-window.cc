@@ -28,7 +28,7 @@
 #include <QtGui/QScreen>
 #include <log.hh>
 
-#define FULL_SCREEN_MODE 0
+#define FULL_SCREEN_MODE 1
 
 Main_window::Main_window(const Maze_config *config, Balls *balls,
                          QWidget *parent)
@@ -39,15 +39,15 @@ Main_window::Main_window(const Maze_config *config, Balls *balls,
   }
 
 #if FULL_SCREEN_MODE // full-screen mode
-  setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
+  showFullScreen();
   setCursor(Qt::BlankCursor);
   const QScreen *screen = qApp->primaryScreen();
   const QRect geometry = screen->geometry();
   const uint16_t width = geometry.width();
   const uint16_t height = geometry.height();
 #else // window mode
-  const uint16_t width = 1300;
-  const uint16_t height = 600;
+  const uint16_t width = 800;
+  const uint16_t height = 640;
 #endif
 
   setWindowTitle(tr("Maze"));
