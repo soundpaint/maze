@@ -57,7 +57,7 @@ Maze::Maze(int &argc, char **argv)
     Log::fatal("Maze(): not enough memory");
   }
 
-  _sensors = new Sensors();
+  _sensors = new Sensors(this);
   if (!_sensors) {
     Log::fatal("Maze(): not enough memory");
   }

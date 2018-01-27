@@ -28,54 +28,105 @@
 //#include <QtGui/QCursor>
 #include <log.hh>
 
-Sensors::Sensors()
+Sensors::Sensors(QObject *parent) : QTimer(parent)
 {
   _pitch = 0;
   _roll = 0;
-  _yaw = 0;
+  _accel_x = 0;
+  _accel_y = 0;
+
+  start(10);
+
+  _settings = new RTIMUSettings("RTIMULib");
+  if (!_settings) {
+    Log::fatal("Sensors::Sensors(): not enough memory");
+  }
+
+  _imu = RTIMU::createIMU(_settings);
+  if ((_imu == NULL) || (_imu->IMUType() == RTIMU_TYPE_NULL)) {
+    Log::warn("Sensors::Sensors(): no IMU found => sensors will not work");
+  } else {
+    _imu->IMUInit();
+    _imu->setSlerpPower(0.02);
+    _imu->setGyroEnable(true);
+    _imu->setAccelEnable(true);
+    _imu->setCompassEnable(true);
+  }
+  _display_timer = RTMath::currentUSecsSinceEpoch();
+  QObject::connect(this, SIGNAL(timeout()),
+                   this, SLOT(sample_and_hold()));
+  QObject::connect(this, SIGNAL(sample_updated(double, double, double, double, double)),
+                   parent, SLOT(slot_update_sensors_display(double, double, double, double, double)));
 }
 
 Sensors::~Sensors()
 {
+  if (_imu) {
+    delete _imu;
+    _imu = 0;
+  }
+
+  if (_settings) {
+    delete _settings;
+    _settings = 0;
+  }
+
+  _display_timer = 0;
   _pitch = 0;
   _roll = 0;
-  _yaw = 0;
+  _accel_x = 0;
+  _accel_y = 0;
 }
 
 void
 Sensors::sample_and_hold()
 {
-  const QPoint pos = // QCursor::pos();
-    QPoint(_field_width / 2, _field_height / 2);
-  const double pitch = atan(pos.x() - _field_width / 2);
-  const double roll = atan(pos.y() - _field_height / 2);
-  _pitch = (int)(0.5 + floor(180.0 * pitch / M_PI));
-  _roll = (int)(0.5 + floor(180.0 * roll / M_PI));
+  const uint64_t now = RTMath::currentUSecsSinceEpoch();
+  if ((now - _display_timer) > 100000) {
+    if (_imu->IMURead()) {
+      const RTIMU_DATA imuData = _imu->getIMUData();
+      _pitch = imuData.fusionPose.x(); // * RTMATH_RAD_TO_DEGREE;
+      _roll = imuData.fusionPose.y(); // * RTMATH_RAD_TO_DEGREE;
+      _accel_x = imuData.accel.x();
+      _accel_y = imuData.accel.y();
+      _temperature = imuData.temperature;
 
-  // DEBUG START
-  _pitch = 3;
-  _roll = 1;
-  // DEBUG STOP
-
-  _yaw = 0;
+      // update sensors status display (TODO)
+      emit sample_updated(_pitch, _roll, _accel_x, _accel_y,
+                          _temperature);
+    }
+    _display_timer = now;
+  }
 }
 
-const uint16_t
+const RTFLOAT
 Sensors::get_pitch() const
 {
   return _pitch;
 }
 
-const uint16_t
+const RTFLOAT
 Sensors::get_roll() const
 {
   return _roll;
 }
 
-const uint16_t
-Sensors::get_yaw() const
+const RTFLOAT
+Sensors::get_accel_x() const
 {
-  return _yaw;
+  return _accel_x;
+}
+
+const RTFLOAT
+Sensors::get_accel_y() const
+{
+  return _accel_y;
+}
+
+const RTFLOAT
+Sensors::get_temperature() const
+{
+  return _temperature;
 }
 
 void

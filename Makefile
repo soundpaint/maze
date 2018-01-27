@@ -21,6 +21,7 @@
 # Author's web site: www.juergen-reuter.de
 
 include qt5.mk
+include rtimu.mk
 
 MY_BIN_FILES = maze
 
@@ -29,7 +30,7 @@ MY_GEN_SRC_FILES = \
 
 MY_QT5_OBJ_FILES = \
   about-dialog.o license-dialog.o main-window.o maze.o message-overlay.o \
-  playing-field.o simulation.o status-line.o
+  playing-field.o sensors.o simulation.o status-line.o
 
 MY_MOC_FILES = $(patsubst %.o,%.moc.o,$(MY_QT5_OBJ_FILES))
 
@@ -40,21 +41,22 @@ MY_OBJ_FILES = \
   implicit-curve.o implicit-curve-compiler.o implicit-curve-ast.o \
   implicit-curve-parser.o implicit-curve-parser-token.o \
   implicit-curve-tokenizer.o julia-set.o log.o mandelbrot-set.o maze-config.o \
-  pixmap-brush-factory.o point-3d.o sensors.o shape.o shape-expression.o \
-  sobel.o solid-brush-factory.o tile.o xml-document.o \
-  xml-node-list.o xml-string.o xml-utils.o \
+  pixmap-brush-factory.o point-3d.o shape.o shape-expression.o sobel.o \
+  solid-brush-factory.o tile.o xml-document.o xml-node-list.o xml-string.o \
+  xml-utils.o \
   $(MY_QT5_OBJ_FILES)
 
 LIB_OBJ_FILES =
 
 MY_INCLUDE_DIRS = \
   -I$(QT5_INCLUDE_DIR) \
+  -I$(RTIMULIB_INCLUDE_DIR) \
   -I.
 
 MY_LIB_DIRS =
 
 MY_LIBS = \
-  -lpthread -lxerces-c -lxalan-c -lxalanMsg -lQt5Core -lQt5Widgets -lQt5Gui -lm
+  -lpthread -lxerces-c -lxalan-c -lxalanMsg -lQt5Core -lQt5Widgets -lQt5Gui -lm -lRTIMULib
 
 LOCAL_CXX_OPTS = \
   -fPIC

@@ -25,25 +25,42 @@
 #ifndef SENSORS_HH
 #define SENSORS_HH
 
+#include <QtCore/QTimer>
+#include <RTIMULib.h>
 #include <ifield-geometry-listener.hh>
 
-class Sensors : public IField_geometry_listener
+class Sensors : public QTimer, public IField_geometry_listener
 {
+  Q_OBJECT
 public:
-  Sensors();
+  Sensors(QObject *parent = 0);
   virtual ~Sensors();
-  void sample_and_hold();
-  const uint16_t get_pitch() const;
-  const uint16_t get_roll() const;
-  const uint16_t get_yaw() const;
+  const RTFLOAT get_pitch() const;
+  const RTFLOAT get_roll() const;
+  const RTFLOAT get_accel_x() const;
+  const RTFLOAT get_accel_y() const;
+  const RTFLOAT get_temperature() const;
   virtual void geometry_changed(const uint16_t width,
                                 const uint16_t height);
+private slots:
+  void sample_and_hold();
+signals:
+  void sample_updated(const RTFLOAT pitch,
+                      const RTFLOAT roll,
+                      const RTFLOAT accel_x,
+                      const RTFLOAT accel_y,
+                      const RTFLOAT temperature);
 private:
   uint16_t _field_width;
   uint16_t _field_height;
-  uint16_t _pitch;
-  uint16_t _roll;
-  uint16_t _yaw;
+  uint64_t _display_timer;
+  RTIMUSettings *_settings;
+  RTIMU *_imu;
+  RTFLOAT _pitch;
+  RTFLOAT _roll;
+  RTFLOAT _accel_x;
+  RTFLOAT _accel_y;
+  RTFLOAT _temperature;
 };
 
 #endif /* SENSORS_HH */
