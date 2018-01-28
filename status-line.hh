@@ -40,6 +40,7 @@
 #include <playing-field.hh>
 #include <about-dialog.hh>
 #include <license-dialog.hh>
+#include <sensors-display.hh>
 #include <isimulation.hh>
 #include <balls.hh>
 
@@ -50,6 +51,7 @@ public:
   explicit Status_line(QWidget *parent);
   virtual ~Status_line();
   void set_simulation(ISimulation *simulation);
+  Sensors_display *get_sensors_display();
 public slots:
   void slot_quit();
   void slot_toggle_pause();
@@ -86,6 +88,7 @@ private:
   QIcon *_icon_show_ball;
   QIcon *_icon_hide_ball;
   QLabel *_label_keys;
+  Sensors_display *_sensors_display;
   About_dialog *_about_dialog;
   License_dialog *_license_dialog;
   void create_actions();

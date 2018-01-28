@@ -28,15 +28,10 @@
 const uint16_t
 Balls::DEFAULT_OVERSAMPLING = 100;
 
-Balls::Balls(Sensors *sensors,
-             const std::vector<const Ball_init_data *> balls_init_data,
+Balls::Balls(const std::vector<const Ball_init_data *> balls_init_data,
              const uint16_t rows,
              const uint16_t columns)
 {
-  if (!sensors) {
-    Log::fatal("Balls(): sensors is null");
-  }
-  _sensors = sensors;
   _balls = new std::vector<Ball *>();
   if (!_balls) {
     Log::fatal("Balls(): not enough memory");
@@ -54,6 +49,7 @@ Balls::Balls(Sensors *sensors,
     _balls->push_back(new Ball(x, y, vx, vy, mass));
   }
   _oversampling = DEFAULT_OVERSAMPLING;
+  _sensors = 0;
 }
 
 Balls::~Balls()
@@ -64,6 +60,12 @@ Balls::~Balls()
   delete _balls;
   _balls = 0;
   _oversampling = 0;
+}
+
+void
+Balls::set_sensors(Sensors *sensors)
+{
+  _sensors = sensors;
 }
 
 const uint8_t
@@ -100,8 +102,10 @@ Balls::update(IPlaying_field *playing_field)
     const double old_px = ball->get_position()->get_x();
     const double old_py = ball->get_position()->get_y();
 
-    for (uint16_t i = 0; i < _oversampling; i++) {
-      ball->update(_sensors, width, height);
+    if (_sensors) {
+      for (uint16_t i = 0; i < _oversampling; i++) {
+        ball->update(_sensors, width, height);
+      }
     }
 
     const double new_px = ball->get_position()->get_x();

@@ -34,11 +34,11 @@
 class Balls
 {
 public:
-  Balls(Sensors *sensors,
-        const std::vector<const Ball_init_data *> balls_init_data,
+  Balls(const std::vector<const Ball_init_data *> balls_init_data,
         const uint16_t rows,
         const uint16_t columns);
   virtual ~Balls();
+  void set_sensors(Sensors *sensors);
   void update(IPlaying_field *playing_field);
   const uint8_t get_count() const;
   Ball *at(const uint8_t index) const;

@@ -25,15 +25,17 @@
 #include <sensors.hh>
 #include <cmath>
 #include <QtCore/QPoint>
-//#include <QtGui/QCursor>
 #include <log.hh>
+
+#define DEMO_ACCELERATION 0
 
 Sensors::Sensors(QObject *parent) : QTimer(parent)
 {
-  _pitch = 0;
-  _roll = 0;
-  _accel_x = 0;
-  _accel_y = 0;
+  _sensors_ok = false;
+  _pitch = 0.0;
+  _roll = 0.0;
+  _accel_x = 0.0;
+  _accel_y = 0.0;
 
   start(10);
 
@@ -46,6 +48,7 @@ Sensors::Sensors(QObject *parent) : QTimer(parent)
   if ((_imu == NULL) || (_imu->IMUType() == RTIMU_TYPE_NULL)) {
     Log::warn("Sensors::Sensors(): no IMU found => sensors will not work");
   } else {
+    _sensors_ok = true;
     _imu->IMUInit();
     _imu->setSlerpPower(0.02);
     _imu->setGyroEnable(true);
@@ -72,10 +75,11 @@ Sensors::~Sensors()
   }
 
   _display_timer = 0;
-  _pitch = 0;
-  _roll = 0;
-  _accel_x = 0;
-  _accel_y = 0;
+  _sensors_ok = false;
+  _pitch = 0.0;
+  _roll = 0.0;
+  _accel_x = 0.0;
+  _accel_y = 0.0;
 }
 
 void
@@ -83,18 +87,30 @@ Sensors::sample_and_hold()
 {
   const uint64_t now = RTMath::currentUSecsSinceEpoch();
   if ((now - _display_timer) > 100000) {
-    if (_imu->IMURead()) {
-      const RTIMU_DATA imuData = _imu->getIMUData();
-      _pitch = imuData.fusionPose.x(); // * RTMATH_RAD_TO_DEGREE;
-      _roll = imuData.fusionPose.y(); // * RTMATH_RAD_TO_DEGREE;
-      _accel_x = imuData.accel.x();
-      _accel_y = imuData.accel.y();
-      _temperature = imuData.temperature;
-
-      // update sensors status display (TODO)
-      emit sample_updated(_pitch, _roll, _accel_x, _accel_y,
-                          _temperature);
+    if (_sensors_ok) {
+      if (_imu->IMURead()) {
+        const RTIMU_DATA imuData = _imu->getIMUData();
+        _pitch = imuData.fusionPose.x(); // * RTMATH_RAD_TO_DEGREE;
+        _roll = imuData.fusionPose.y(); // * RTMATH_RAD_TO_DEGREE;
+        _accel_x = imuData.accel.x();
+        _accel_y = imuData.accel.y();
+        _temperature = imuData.temperature;
+      }
+#if DEMO_ACCELERATION
+    } else {
+      _accel_x += 0.01;
+      if (_accel_x >= 1.0) {
+        _accel_x = -1.0;
+      }
+      _accel_y += 0.02;
+      if (_accel_y >= 1.0) {
+        _accel_y = -1.0;
+      }
+#endif
     }
+    // update sensors status display
+    emit sample_updated(_pitch, _roll, _accel_x, _accel_y,
+                        _temperature);
     _display_timer = now;
   }
 }

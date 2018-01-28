@@ -26,7 +26,6 @@
 #include <log.hh>
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QApplication>
-#include <main-window.hh>
 
 Status_line::Status_line(QWidget *parent) : QWidget(parent)
 {
@@ -131,6 +130,12 @@ Status_line::Status_line(QWidget *parent) : QWidget(parent)
   }
   _layout->addWidget(_label_keys);
 
+  _sensors_display = new Sensors_display(this);
+  if (!_sensors_display) {
+    Log::fatal("not enough memory");
+  }
+  _layout->addWidget(_sensors_display);
+
   create_actions();
 }
 
@@ -167,6 +172,12 @@ Status_line::~Status_line()
   _button_toggle_force_field_visibility = 0;
   _button_toggle_ball_visibility = 0;
   _simulation = 0;
+}
+
+Sensors_display *
+Status_line::get_sensors_display()
+{
+  return _sensors_display;
 }
 
 void

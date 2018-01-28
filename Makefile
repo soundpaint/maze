@@ -30,7 +30,7 @@ MY_GEN_SRC_FILES = \
 
 MY_QT5_OBJ_FILES = \
   about-dialog.o license-dialog.o main-window.o maze.o message-overlay.o \
-  playing-field.o sensors.o simulation.o status-line.o
+  playing-field.o sensors.o sensors-display.o simulation.o status-line.o
 
 MY_MOC_FILES = $(patsubst %.o,%.moc.o,$(MY_QT5_OBJ_FILES))
 

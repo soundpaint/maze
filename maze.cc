@@ -57,18 +57,12 @@ Maze::Maze(int &argc, char **argv)
     Log::fatal("Maze(): not enough memory");
   }
 
-  _sensors = new Sensors(this);
-  if (!_sensors) {
-    Log::fatal("Maze(): not enough memory");
-  }
-
   const Brush_field *brush_field = _config->get_brush_field();
   std::vector<const Ball_init_data *> balls_init_data =
     brush_field->get_balls_init_data();
   const uint16_t rows = brush_field->get_rows();
   const uint16_t columns = brush_field->get_columns();
-  _balls = new Balls(_sensors,
-                     balls_init_data,
+  _balls = new Balls(balls_init_data,
                      rows,
                      columns);
   if (!_balls) {
@@ -80,6 +74,13 @@ Maze::Maze(int &argc, char **argv)
   if (!_main_window) {
     Log::fatal("Maze(): not enough memory");
   }
+
+  _sensors =
+    new Sensors(_main_window->get_status_line()->get_sensors_display());
+  if (!_sensors) {
+    Log::fatal("Maze(): not enough memory");
+  }
+  _balls->set_sensors(_sensors);
 
   _main_window->get_playing_field()->add_field_geometry_listener(_sensors);
 

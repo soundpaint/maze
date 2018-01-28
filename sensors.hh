@@ -45,15 +45,16 @@ public:
 private slots:
   void sample_and_hold();
 signals:
-  void sample_updated(const RTFLOAT pitch,
-                      const RTFLOAT roll,
-                      const RTFLOAT accel_x,
-                      const RTFLOAT accel_y,
-                      const RTFLOAT temperature);
+  void sample_updated(const double pitch,
+                      const double roll,
+                      const double accel_x,
+                      const double accel_y,
+                      const double temperature);
 private:
   uint16_t _field_width;
   uint16_t _field_height;
   uint64_t _display_timer;
+  bool _sensors_ok;
   RTIMUSettings *_settings;
   RTIMU *_imu;
   RTFLOAT _pitch;
