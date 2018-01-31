@@ -45,3 +45,10 @@ Running
 * Xerces-C++ library (e.g. Ubuntu package libxerces-c3.1)
 
 * Xalan library (e.g. Ubuntu package libxalan-c111)
+
+Note: You can (as with every X application) run maze without X window
+directly from text console with the command
+
+  startx /home/pi/maze -- -nocursor -depth 16
+
+(assuming that you have put the maze binary into your home directory).
