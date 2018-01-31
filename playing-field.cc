@@ -46,11 +46,6 @@ Playing_field::Playing_field(Brush_field *brush_field,
   _force_field_visible = false;
   _ball_visible = true;
 
-  _field_geometry_listeners = new std::vector<IField_geometry_listener *>();
-  if (!_field_geometry_listeners) {
-    Log::fatal("not enough memory");
-  }
-
   if (!balls) {
     Log::fatal("Playing_field::Playing_field(): balls is null");
   }
@@ -58,6 +53,13 @@ Playing_field::Playing_field(Brush_field *brush_field,
   if (!brush_field) {
     Log::fatal("Playing_field::Playing_field(): brush_field is null");
   }
+
+  _field_geometry_listeners = new std::vector<IField_geometry_listener *>();
+  if (!_field_geometry_listeners) {
+    Log::fatal("not enough memory");
+  }
+  add_field_geometry_listener(brush_field);
+  add_field_geometry_listener(this);
 
   _force_field = new Force_field();
   if (!_force_field) {
@@ -235,19 +237,9 @@ Playing_field::check_update_geometry()
       (current_height != _background->height());
   }
   if (need_update) {
-    _brush_field->geometry_changed(current_width, current_height);
     for (IField_geometry_listener *listener : *_field_geometry_listeners) {
       listener->geometry_changed(current_width, current_height);
     }
-
-    /*
-     * Unfortunately, we can not add this Playing-field object instance to
-     * the vector of listeners, since a class can not inherit from both,
-     * a QWidget and an additional interface like the listener interface.
-     * Therefore, we must -- in addition to the above for loop -- call
-     * method geometry_changed() explicitly on this class.
-     */
-    geometry_changed(current_width, current_height);
   }
 }
 

@@ -44,7 +44,8 @@
 #include <brush-field.hh>
 #include <force-field.hh>
 
-class Playing_field : public QWidget, public IPlaying_field
+class Playing_field :
+  public QWidget, public IPlaying_field, public IField_geometry_listener
 {
   Q_OBJECT
 public:
