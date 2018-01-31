@@ -49,15 +49,11 @@ class Playing_field : public QWidget, public IPlaying_field
   Q_OBJECT
 public:
   explicit Playing_field(Brush_field *brush_field,
-                         const uint16_t minimum_width,
-                         const uint16_t minimum_height,
                          Balls *balls,
                          QWidget *parent = 0);
   virtual ~Playing_field();
   virtual const uint16_t get_width() const;
   virtual const uint16_t get_height() const;
-  QSize minimumSizeHint() const Q_DECL_OVERRIDE;
-  QSize sizeHint() const Q_DECL_OVERRIDE;
   void invalidate_rect(const double px, const double py,
                        const uint16_t pixmap_width,
                        const uint16_t pixmap_height,
@@ -80,9 +76,8 @@ protected:
 
 private:
   const Balls *_balls;
-  const Brush_field *_brush_field;
+  Brush_field *_brush_field;
   Force_field *_force_field;
-  uint16_t _minimum_width, _minimum_height;
   QImage *_background;
   bool _velocity_visible;
   bool _force_field_visible;

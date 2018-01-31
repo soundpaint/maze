@@ -28,27 +28,14 @@
 #include <QtGui/QScreen>
 #include <log.hh>
 
-#define FULL_SCREEN_MODE 1
-
-Main_window::Main_window(const Maze_config *config, Balls *balls,
+Main_window::Main_window(IProgress_info *progress_info,
+                         const Maze_config *config, Balls *balls,
                          QWidget *parent)
   : QMainWindow(parent)
 {
   if (!balls) {
     Log::fatal("Main_window(): balls is null");
   }
-
-#if FULL_SCREEN_MODE // full-screen mode
-  showFullScreen();
-  setCursor(Qt::BlankCursor);
-  const QScreen *screen = qApp->primaryScreen();
-  const QRect geometry = screen->geometry();
-  const uint16_t width = geometry.width();
-  const uint16_t height = geometry.height();
-#else // window mode
-  const uint16_t width = 800;
-  const uint16_t height = 640;
-#endif
 
   setWindowTitle(tr("Maze"));
   const QIcon icon("main-window-icon.png");
@@ -66,15 +53,17 @@ Main_window::Main_window(const Maze_config *config, Balls *balls,
   _central_widget->setLayout(_central_widget_layout);
   setCentralWidget(_central_widget);
 
+  progress_info->show_message("creating brush field...");
   Brush_field *brush_field = config->get_brush_field();
-  brush_field->geometry_changed(width, height);
 
-  _playing_field = new Playing_field(brush_field, width, height, balls, this);
+  progress_info->show_message("creating playing field...");
+  _playing_field = new Playing_field(brush_field, balls, this);
   if (!_playing_field) {
     Log::fatal("Main_window::Main_window(): not enough memory");
   }
   _central_widget_layout->addWidget(_playing_field, 1.0);
 
+  progress_info->show_message("creating status line...");
   _status_line = new Status_line(this);
   if (!_status_line) {
     Log::fatal("Main_window::Main_window(): not enough memory");

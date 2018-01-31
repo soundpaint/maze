@@ -22,38 +22,25 @@
  * Author's web site: www.juergen-reuter.de
  */
 
-#ifndef MAZE_HH
-#define MAZE_HH
+#ifndef SPLASH_SCREEN_HH
+#define SPLASH_SCREEN_HH
 
-#include <pthread.h>
+#include <QtWidgets/QSplashScreen>
 #include <QtWidgets/QApplication>
-#include <splash-screen.hh>
-#include <maze-config.hh>
-#include <sensors.hh>
-#include <balls.hh>
-#include <main-window.hh>
-#include <simulation.hh>
+#include <iprogress-info.hh>
 
-class Maze : public QApplication
+class Splash_screen : public QSplashScreen, public IProgress_info
 {
   Q_OBJECT
 public:
-  explicit Maze(int &argc, char **argv);
-  virtual ~Maze();
-  void init(IProgress_info *progress_info);
-  Main_window *get_main_window() const;
-private slots:
-  void slot_last_window_closed();
+  Splash_screen(QApplication *app, QPixmap pixmap);
+  virtual ~Splash_screen();
+  void show_message(const QString & message);
 private:
-  static const char *STYLE_SHEET;
-  static Simulation *_simulation;
-  Maze_config *_config;
-  Sensors *_sensors;
-  Balls *_balls;
-  Main_window *_main_window;
+  QApplication *_app;
 };
 
-#endif /* MAZE_HH */
+#endif /* SPLASH_SCREEN_HH */
 
 /*
  * Local variables:

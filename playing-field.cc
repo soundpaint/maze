@@ -36,8 +36,6 @@
 #define BACKGROUND_MODE BACKGROUND_MODE_NORMAL
 
 Playing_field::Playing_field(Brush_field *brush_field,
-                             const uint16_t minimum_width,
-                             const uint16_t minimum_height,
                              Balls *balls,
                              QWidget *parent) :
   QWidget(parent),
@@ -47,8 +45,6 @@ Playing_field::Playing_field(Brush_field *brush_field,
   _velocity_visible = false;
   _force_field_visible = false;
   _ball_visible = true;
-  _minimum_width = minimum_width;
-  _minimum_height = minimum_height;
 
   _field_geometry_listeners = new std::vector<IField_geometry_listener *>();
   if (!_field_geometry_listeners) {
@@ -67,19 +63,11 @@ Playing_field::Playing_field(Brush_field *brush_field,
   if (!_force_field) {
     Log::fatal("Playing_field::Playing_field(): not enough memory");
   }
-  _force_field->load_field(_brush_field, minimum_width, minimum_height);
-  for (uint8_t i = 0; i < _balls->get_count(); i++) {
-    Ball *ball = _balls->at(i);
-    ball->precompute_forces(_force_field);
-  }
 
   setBackgroundRole(QPalette::Base);
   setAutoFillBackground(true);
 
-  _background = create_background(minimum_width, minimum_height);
-  if (!_background) {
-    Log::fatal("Playing_field(): not enough memory");
-  }
+  _background = 0;
 }
 
 Playing_field::~Playing_field()
@@ -87,8 +75,6 @@ Playing_field::~Playing_field()
   _velocity_visible = false;
   _force_field_visible = false;
   _ball_visible = false;
-  _minimum_width = 0;
-  _minimum_height = 0;
 
   delete _field_geometry_listeners;
   _field_geometry_listeners = 0;
@@ -235,25 +221,21 @@ Playing_field::create_background(const uint16_t width,
   return image;
 }
 
-QSize
-Playing_field::sizeHint() const
-{
-  return QSize(_minimum_width, _minimum_height);
-}
-
-QSize
-Playing_field::minimumSizeHint() const
-{
-  return QSize(_minimum_width, _minimum_height);
-}
-
 void
 Playing_field::check_update_geometry()
 {
   const uint16_t current_width = width();
   const uint16_t current_height = height();
-  if ((current_width != _background->width()) ||
-      (current_height != _background->height())) {
+  bool need_update = false;
+  if (!_background) {
+    need_update = true;
+  } else {
+    need_update =
+      (current_width != _background->width()) ||
+      (current_height != _background->height());
+  }
+  if (need_update) {
+    _brush_field->geometry_changed(current_width, current_height);
     for (IField_geometry_listener *listener : *_field_geometry_listeners) {
       listener->geometry_changed(current_width, current_height);
     }
@@ -272,6 +254,12 @@ Playing_field::check_update_geometry()
 void
 Playing_field::geometry_changed(const uint16_t width, const uint16_t height)
 {
+  {
+    std::stringstream msg;
+    msg << "[playing_field] new geometry: " <<
+      "width=" << width << ", height=" << height;
+    Log::debug(msg.str());
+  }
   Log::debug("loading force field");
   _force_field->load_field(_brush_field, width, height);
   Log::debug("compute forces field onto ball");
@@ -282,6 +270,7 @@ Playing_field::geometry_changed(const uint16_t width, const uint16_t height)
   Log::debug("(re-)create background");
   if (_background) {
     delete _background;
+    _background = 0;
   }
   _background = create_background(width, height);
   if (!_background) {
@@ -340,7 +329,9 @@ Playing_field::paintEvent(QPaintEvent *event)
   check_update_geometry();
   const QRect rect = event->rect();
   QPainter painter(this);
-  painter.drawImage(rect, *_background, rect);
+  if (_background) {
+    painter.drawImage(rect, *_background, rect);
+  }
   if (_ball_visible) {
     draw_balls(&painter, rect);
   }

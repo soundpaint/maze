@@ -34,6 +34,7 @@
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
+#include <iprogress-info.hh>
 #include <maze-config.hh>
 #include <playing-field.hh>
 #include <message-overlay.hh>
@@ -44,7 +45,8 @@ class Main_window : public QMainWindow
 {
   Q_OBJECT
 public:
-  explicit Main_window(const Maze_config *config,
+  explicit Main_window(IProgress_info *progress_info,
+                       const Maze_config *config,
                        Balls *balls, QWidget *parent = 0);
   virtual ~Main_window();
   Playing_field *get_playing_field();

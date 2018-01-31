@@ -22,11 +22,14 @@
  * Author's web site: www.juergen-reuter.de
  */
 
-#include <cmath>
 #include <maze.hh>
+#include <QtWidgets/QSplashScreen>
+#include <cmath>
 #include <unistd.h>
 #include <log.hh>
 #include <playing-field.hh>
+
+#define FULL_SCREEN_MODE 1
 
 Simulation *
 Maze::_simulation;
@@ -49,6 +52,11 @@ Maze::STYLE_SHEET =
 Maze::Maze(int &argc, char **argv)
   : QApplication(argc, argv, 0)
 {
+}
+
+void
+Maze::init(IProgress_info *progress_info)
+{
   srand(1);
   _main_window = 0;
 
@@ -57,11 +65,13 @@ Maze::Maze(int &argc, char **argv)
     Log::fatal("Maze(): not enough memory");
   }
 
+  progress_info->show_message("creating brush field...");
   const Brush_field *brush_field = _config->get_brush_field();
   std::vector<const Ball_init_data *> balls_init_data =
     brush_field->get_balls_init_data();
   const uint16_t rows = brush_field->get_rows();
   const uint16_t columns = brush_field->get_columns();
+  progress_info->show_message("init balls...");
   _balls = new Balls(balls_init_data,
                      rows,
                      columns);
@@ -69,33 +79,47 @@ Maze::Maze(int &argc, char **argv)
     Log::fatal("Maze(): not enough memory");
   }
 
+  progress_info->show_message("creating main window...");
   setStyleSheet(STYLE_SHEET);
-  _main_window = new Main_window(_config, _balls);
+  _main_window = new Main_window(progress_info, _config, _balls);
   if (!_main_window) {
     Log::fatal("Maze(): not enough memory");
   }
 
+  progress_info->show_message("init sensors...");
   _sensors =
     new Sensors(_main_window->get_status_line()->get_sensors_display());
   if (!_sensors) {
     Log::fatal("Maze(): not enough memory");
   }
   _balls->set_sensors(_sensors);
-
   _main_window->get_playing_field()->add_field_geometry_listener(_sensors);
 
+  progress_info->show_message("init simulation...");
   _simulation = new Simulation(_balls, _main_window);
   if (!_simulation) {
     Log::fatal("Maze(): not enough memory");
   }
   _simulation->start(50);
-
   _main_window->get_status_line()->set_simulation(_simulation);
 
-  //_main_window->showFullScreen();
+  progress_info->show_message("starting game...");
+
+#if FULL_SCREEN_MODE // full-screen mode
+  _main_window->setCursor(Qt::BlankCursor);
+  _main_window->showFullScreen();
+#else // window mode
+  _main_window->resize(800, 640);
   _main_window->show();
+#endif
 
   _simulation->start();
+}
+
+Main_window *
+Maze::get_main_window() const
+{
+  return _main_window;
 }
 
 Maze::~Maze()
@@ -120,8 +144,16 @@ Maze::slot_last_window_closed()
 int main(int argc, char *argv[])
 {
   Maze *maze = new Maze(argc, argv);
+  QPixmap splash_pixmap("./main-window-icon.png");
+  Splash_screen *splash_screen = new Splash_screen(maze, splash_pixmap);
+  splash_screen->show();
+  maze->processEvents();
+  maze->init(splash_screen);
+  splash_screen->finish(maze->get_main_window());
   int result = maze->exec();
 
+  delete splash_screen;
+  splash_screen = 0;
   delete maze;
   maze = 0;
 

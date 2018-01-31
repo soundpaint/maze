@@ -22,38 +22,23 @@
  * Author's web site: www.juergen-reuter.de
  */
 
-#ifndef MAZE_HH
-#define MAZE_HH
+#ifndef IPROGRESS_INFO_HH
+#define IPROGRESS_INFO_HH
 
-#include <pthread.h>
-#include <QtWidgets/QApplication>
-#include <splash-screen.hh>
-#include <maze-config.hh>
-#include <sensors.hh>
-#include <balls.hh>
-#include <main-window.hh>
-#include <simulation.hh>
+#include <QtCore/QString>
 
-class Maze : public QApplication
+/*
+ * A data sink used to display progress information to the user.
+ */
+class IProgress_info
 {
-  Q_OBJECT
 public:
-  explicit Maze(int &argc, char **argv);
-  virtual ~Maze();
-  void init(IProgress_info *progress_info);
-  Main_window *get_main_window() const;
-private slots:
-  void slot_last_window_closed();
-private:
-  static const char *STYLE_SHEET;
-  static Simulation *_simulation;
-  Maze_config *_config;
-  Sensors *_sensors;
-  Balls *_balls;
-  Main_window *_main_window;
+  virtual void show_message(const QString &message) = 0;
+protected:
+  ~IProgress_info() {};
 };
 
-#endif /* MAZE_HH */
+#endif /* IPROGRESS_INFO_HH */
 
 /*
  * Local variables:
