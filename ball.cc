@@ -229,6 +229,9 @@ void
 Ball::update(const Sensors *sensors,
              const uint16_t width, const uint16_t height)
 {
+  if (!width || !height) {
+    Log::fatal("Ball::update(): playing field has empty extent");
+  }
   if (!sensors) {
     Log::fatal("Ball::update(): sensors is null");
   }
