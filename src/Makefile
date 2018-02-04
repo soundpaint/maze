@@ -26,6 +26,17 @@ include ../defs.mk
 include qt5.mk
 include rtimu.mk
 
+SH = sh -c
+CPP = c++
+MY_CXX_OPTS = -std=c++11 -Wall -g -O0 $(LOCAL_CXX_OPTS)
+MY_LD_OPTS = $(LOCAL_LD_OPTS)
+
+LOCAL_CXX_OPTS = \
+  -fPIC
+
+LOCAL_LD_OPTS = \
+  -fPIC $(MY_MOC_FILES)
+
 MY_BIN_FILES = $(BUILD_BIN)/maze
 
 MY_QT5_OBJ_FILES = \
@@ -60,17 +71,50 @@ MY_LIB_DIRS =
 MY_LIBS = \
   -lpthread -lxerces-c -lxalan-c -lxalanMsg -lQt5Core -lQt5Widgets -lQt5Gui -lm -lRTIMULib
 
-LOCAL_CXX_OPTS = \
-  -fPIC
-
-LOCAL_LD_OPTS = \
-  -fPIC $(MY_MOC_FILES)
+CONFIG_XML=$(BUILD_BIN)/config.xml
+ICONS_SRC=$(wildcard $(ART_WORK)/*.png)
 
 all: $(MY_BIN_FILES)
 
-include common.mk
+$(BUILD_SRC):
+	mkdir -p $@
 
-.SECONDARY: #keep intermediate files
+$(BUILD_OBJ):
+	mkdir -p $@
+
+$(BUILD_BIN):
+	mkdir -p $@
+
+$(CONFIG_XML):
+	cp -pf $(SRC)/config.xml $@
+	cp -pf $(ICONS_SRC) $(BUILD_BIN) #TODO: Move this to art-work Makefile
+
+$(BUILD_OBJ)/%.o: %.cc | $(BUILD_OBJ)
+	$(CPP) $(MY_INCLUDE_DIRS) $(MY_CXX_OPTS) -c -o $@ $<
+
+$(BUILD_OBJ)/%.moc.o: $(BUILD_SRC)/%.moc.cc | $(BUILD_OBJ)
+	$(CPP) $(MY_INCLUDE_DIRS) $(MY_CXX_OPTS) -c -o $@ $<
+
+$(BUILD_SRC)/%.moc.cc: %.hh | $(BUILD_SRC)
+	moc -I. -o $@ $<
+
+$(MY_BIN_FILES): $(MY_OBJ_FILES) $(MY_MOC_FILES) $(CONFIG_XML) | $(BUILD_BIN)
+	$(CPP) $(MY_CXX_OPTS) $(MY_INCLUDE_DIRS) $(LIB_OBJ_FILES) $(MY_OBJ_FILES) $(MY_LD_OPTS) $(MY_LIB_DIRS) $(MY_LIBS) -o $@
+
+objclean:
+	rm -f $(MY_OBJ_FILES) $(MY_BIN_FILES) $(MY_MOC_FILES)
+
+bkpclean:
+	rm -f *~
+
+coreclean:
+	rm -f core core.* vgcore.*
+
+clean: objclean
+
+distclean: objclean bkpclean coreclean
+
+.SECONDARY: $(MY_OBJ_FILES)
 
 .SUFFIXES:
 
