@@ -72,7 +72,6 @@ MY_LIBS = \
   -lpthread -lxerces-c -lxalan-c -lxalanMsg -lQt5Core -lQt5Widgets -lQt5Gui -lm -lRTIMULib
 
 CONFIG_XML=$(BUILD_BIN)/config.xml
-ICONS_SRC=$(wildcard $(ART_WORK)/*.png)
 
 all: $(MY_BIN_FILES)
 
@@ -87,7 +86,6 @@ $(BUILD_BIN):
 
 $(CONFIG_XML):
 	cp -pf $(SRC)/config.xml $@
-	cp -pf $(ICONS_SRC) $(BUILD_BIN) #TODO: Move this to art-work Makefile
 
 $(BUILD_OBJ)/%.o: %.cc | $(BUILD_OBJ)
 	$(CPP) $(MY_INCLUDE_DIRS) $(MY_CXX_OPTS) -c -o $@ $<

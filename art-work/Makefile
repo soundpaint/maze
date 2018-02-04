@@ -24,9 +24,11 @@ include ../defs.mk
 
 ROOT=..
 BUILD_BIN=$(BUILD)/bin
-SRC=$(wildcard *.dia)
-OBJ_PNG=$(patsubst %,$(BUILD_BIN)/%,$(SRC:.dia=.png))
-OBJ=$(OBJ_PNG)
+SRC_DIA=$(wildcard *.dia)
+OBJ_DIA_PNG=$(patsubst %,$(BUILD_BIN)/%,$(SRC_DIA:.dia=.png))
+SRC_PNG=$(wildcard *.png)
+OBJ_PNG=$(patsubst %,$(BUILD_BIN)/%,$(SRC_PNG))
+OBJ=$(OBJ_DIA_PNG) $(OBJ_PNG)
 
 all: $(OBJ)
 
@@ -36,11 +38,14 @@ $(BUILD_BIN):
 $(BUILD_BIN)/%.png: %.dia | $(BUILD_BIN)
 	dia --export=$@ $<
 
+$(BUILD_BIN)/%.png: %.png | $(BUILD_BIN)
+	cp -pf $< $@
+
 coreclean:
 	rm -f core core.* vgcore.*
 
 objclean:
-	rm -rf $(OBJ_PNG)
+	rm -rf $(OBJ)
 
 bkpclean:
 	rm -f *~
