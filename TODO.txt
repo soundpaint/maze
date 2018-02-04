@@ -1,3 +1,7 @@
+* FIXME: Horizontal movement is faster than vertical movement,
+  depending on the window dimensions.
+* FIXME: Determination of sensor values from Sense Hat.
+* Make splash screen show progress in more detail.
 * Extend config.xml syntax such that one can define a color palette for
   fractals (and possibly other future entities):
   * continous color palette by defining a gradient

@@ -48,7 +48,7 @@ License_dialog::License_dialog(QWidget *parent) : QDialog(parent)
   if (!_license_document) {
     Log::fatal("License_dialog::License_dialog(): not enough memory");
   }
-  _license_document->setHtml(QString((const char *)COPYING_html));
+  _license_document->setHtml(QString((const char *)___html_COPYING_html));
 
   _license_text->setDocument(_license_document);
   _layout->addWidget(_license_text);

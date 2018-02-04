@@ -30,23 +30,23 @@
 Status_line::Status_line(QWidget *parent) : QWidget(parent)
 {
   _simulation = 0;
-  _pixmap_pause = new QPixmap("build/art-work/pause.png");
+  _pixmap_pause = new QPixmap("pause.png");
   _icon_pause = new QIcon(*_pixmap_pause);
-  _pixmap_play = new QPixmap("build/art-work/play.png");
+  _pixmap_play = new QPixmap("play.png");
   _icon_play = new QIcon(*_pixmap_play);
-  _pixmap_escape = new QPixmap("build/art-work/escape.png");
+  _pixmap_escape = new QPixmap("escape.png");
   _icon_escape = new QIcon(*_pixmap_escape);
-  _pixmap_show_velocity = new QPixmap("build/art-work/velocity-off.png");
+  _pixmap_show_velocity = new QPixmap("velocity-off.png");
   _icon_show_velocity = new QIcon(*_pixmap_show_velocity);
-  _pixmap_hide_velocity = new QPixmap("build/art-work/velocity-on.png");
+  _pixmap_hide_velocity = new QPixmap("velocity-on.png");
   _icon_hide_velocity = new QIcon(*_pixmap_hide_velocity);
-  _pixmap_show_force_field = new QPixmap("build/art-work/forces-off.png");
+  _pixmap_show_force_field = new QPixmap("forces-off.png");
   _icon_show_force_field = new QIcon(*_pixmap_show_force_field);
-  _pixmap_hide_force_field = new QPixmap("build/art-work/forces-on.png");
+  _pixmap_hide_force_field = new QPixmap("forces-on.png");
   _icon_hide_force_field = new QIcon(*_pixmap_hide_force_field);
-  _pixmap_show_ball = new QPixmap("build/art-work/ball-off.png");
+  _pixmap_show_ball = new QPixmap("ball-off.png");
   _icon_show_ball = new QIcon(*_pixmap_show_ball);
-  _pixmap_hide_ball = new QPixmap("build/art-work/ball-on.png");
+  _pixmap_hide_ball = new QPixmap("ball-on.png");
   _icon_hide_ball = new QIcon(*_pixmap_hide_ball);
   _label_keys = 0;
 

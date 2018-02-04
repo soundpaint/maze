@@ -104,6 +104,13 @@ Author's web site: www.juergen-reuter.de
   <shape id="solid_tile">
     <!-- - 1 ≤ 0 -->
     <implicit-curve>-1</implicit-curve>
+    <!--<implicit-curve>x*y-0.125</implicit-curve>-->
+    <!--
+    <or>
+      <implicit-curve>x*x-0.125</implicit-curve>
+      <implicit-curve>y*y-0.125</implicit-curve>
+    </or>
+    -->
   </shape>
   <shape id="circle_in_upper_left_corner">
     <!-- (x-1)² + (y-1)² ≤ 1 -->

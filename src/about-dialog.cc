@@ -48,7 +48,7 @@ About_dialog::About_dialog(QWidget *parent) : QDialog(parent)
   if (!_about_document) {
     Log::fatal("About_dialog::About_dialog(): not enough memory");
   }
-  _about_document->setHtml(QString((const char *)ABOUT_html));
+  _about_document->setHtml(QString((const char *)___html_ABOUT_html));
 
   _about_text->setDocument(_about_document);
   _layout->addWidget(_about_text);

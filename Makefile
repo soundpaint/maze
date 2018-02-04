@@ -20,66 +20,34 @@
 #
 # Author's web site: www.juergen-reuter.de
 
-include qt5.mk
-include rtimu.mk
+include defs.mk
+ROOT=.
 
-MY_BIN_FILES = maze
+all:
+	cd art-work ; make all
+	cd src ; make all
 
-MY_GEN_SRC_FILES = \
-  ABOUT.h COPYING.h
+objclean:
+	rm -rf $(BUILD)
 
-MY_QT5_OBJ_FILES = \
-  about-dialog.o license-dialog.o main-window.o maze.o message-overlay.o \
-  playing-field.o sensors.o sensors-display.o simulation.o splash-screen.o \
-  status-line.o
+bkpclean:
+	cd art-work ; make bkpclean
+	cd src ; make bkpclean
+	rm -f *~
 
-MY_MOC_FILES = $(patsubst %.o,%.moc.o,$(MY_QT5_OBJ_FILES))
+coreclean:
+	rm -f core core.*
 
-MY_OBJ_FILES = \
-  $(MY_GEN_SRC_FILES) \
-  ball.o ball-init-data.o balls.o bivariate-quadratic-function.o \
-  brush-field.o config.o force-field.o fractals-brush-factory.o \
-  implicit-curve.o implicit-curve-compiler.o implicit-curve-ast.o \
-  implicit-curve-parser.o implicit-curve-parser-token.o \
-  implicit-curve-tokenizer.o julia-set.o log.o mandelbrot-set.o maze-config.o \
-  pixmap-brush-factory.o point-3d.o shape.o shape-expression.o sobel.o \
-  solid-brush-factory.o tile.o xml-document.o xml-node-list.o xml-string.o \
-  xml-utils.o \
-  $(MY_QT5_OBJ_FILES)
+clean: objclean
 
-LIB_OBJ_FILES =
+distclean: objclean bkpclean coreclean
 
-MY_INCLUDE_DIRS = \
-  -I$(QT5_INCLUDE_DIR) \
-  -I$(RTIMULIB_INCLUDE_DIR) \
-  -I.
-
-MY_LIB_DIRS =
-
-MY_LIBS = \
-  -lpthread -lxerces-c -lxalan-c -lxalanMsg -lQt5Core -lQt5Widgets -lQt5Gui -lm -lRTIMULib
-
-LOCAL_CXX_OPTS = \
-  -fPIC
-
-LOCAL_LD_OPTS = \
-  -fPIC $(MY_MOC_FILES)
-
-all: $(MY_BIN_FILES)
-
-ABOUT.h: ABOUT.html
-	xxd -i $< > $@
-
-COPYING.h: COPYING.html
-	xxd -i $< > $@
-
-include common.mk
-
-.SECONDARY: #keep intermediate files
-
-.SUFFIXES:
-
-#  Local Variables:
-#    coding:utf-8
-#    mode:Makefile
-#  End:
+tarball: distclean
+	@TGZ_DATE=`date +%Y-%m-%d_%H-%M-%S` ; \
+	PROJECT_NAME=maze ; \
+	PROJECT_PATH=`basename \`pwd\`` ; \
+	TGZ_PREFIX=$$PROJECT_NAME\_$$TGZ_DATE ; cd .. ; \
+	tar cvf ./$$TGZ_PREFIX.tar.bz2 \
+		--exclude=untracked_files \
+		--transform=s/$$PROJECT_PATH/$$TGZ_PREFIX/ \
+		--bzip2 $$PROJECT_PATH
