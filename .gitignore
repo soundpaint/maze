@@ -1,8 +1,10 @@
-# object files
-*.o
-ABOUT.h
-COPYING.h
-maze
+# build files
+build
 
 # emacs backup files
 *~
+
+# core files
+core
+core.*
+vgcore.*
