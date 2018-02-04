@@ -20,41 +20,23 @@
 #
 # Author's web site: www.juergen-reuter.de
 
-SH = sh -c
-CPP = c++
-MY_CXX_OPTS = -std=c++11 -Wall -g -O0 $(LOCAL_CXX_OPTS)
-MY_LD_OPTS = $(LOCAL_LD_OPTS)
+ROOT=..
+
+include ../defs.mk
+
+MY_SRC_FILES = $(wildcard *.html)
+MY_OBJ_FILES = $(patsubst %.html,$(BUILD_SRC)/%.h,$(MY_SRC_FILES))
+
+all: $(MY_OBJ_FILES)
 
 $(BUILD_SRC):
 	mkdir -p $@
 
-$(BUILD_OBJ):
-	mkdir -p $@
-
-$(BUILD_BIN):
-	mkdir -p $@
-
-CONFIG_XML=$(BUILD_BIN)/config.xml
-ICONS_SRC=$(wildcard $(ART_WORK)/*.png)
-
-$(CONFIG_XML):
-	cp -pf $(SRC)/config.xml $@
-	cp -pf $(ICONS_SRC) $(BUILD_BIN) #TODO: Move this to art-work Makefile
-
-$(BUILD_OBJ)/%.o: %.cc | $(BUILD_OBJ)
-	$(CPP) $(MY_INCLUDE_DIRS) $(MY_CXX_OPTS) -c -o $@ $<
-
-$(BUILD_OBJ)/%.moc.o: $(BUILD_SRC)/%.moc.cc | $(BUILD_OBJ)
-	$(CPP) $(MY_INCLUDE_DIRS) $(MY_CXX_OPTS) -c -o $@ $<
-
-$(BUILD_SRC)/%.moc.cc: %.hh | $(BUILD_SRC)
-	moc -I. -o $@ $<
-
-$(MY_BIN_FILES): $(MY_OBJ_FILES) $(MY_MOC_FILES) $(CONFIG_XML) | $(BUILD_BIN)
-	$(CPP) $(MY_CXX_OPTS) $(MY_INCLUDE_DIRS) $(LIB_OBJ_FILES) $(MY_OBJ_FILES) $(MY_LD_OPTS) $(MY_LIB_DIRS) $(MY_LIBS) -o $@
+$(BUILD_SRC)/%.h: %.html | $(BUILD_SRC)
+	xxd -i $< > $@
 
 objclean:
-	rm -f $(MY_OBJ_FILES) $(MY_BIN_FILES) $(MY_MOC_FILES)
+	rm -f $(MY_OBJ_FILES)
 
 bkpclean:
 	rm -f *~
@@ -63,10 +45,6 @@ coreclean:
 	rm -f core core.* vgcore.*
 
 clean: objclean
-
-distclean: objclean bkpclean coreclean
-
-.SECONDARY: $(MY_OBJ_FILES)
 
 #  Local Variables:
 #    coding:utf-8

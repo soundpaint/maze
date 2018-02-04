@@ -28,10 +28,6 @@ include rtimu.mk
 
 MY_BIN_FILES = $(BUILD_BIN)/maze
 
-MY_GEN_SRC_FILES = \
-  $(BUILD_SRC)/ABOUT.h \
-  $(BUILD_SRC)/COPYING.h
-
 MY_QT5_OBJ_FILES = \
   about-dialog.o license-dialog.o main-window.o maze.o message-overlay.o \
   playing-field.o sensors.o sensors-display.o simulation.o splash-screen.o \
@@ -41,7 +37,6 @@ MY_MOC_FILES = $(patsubst %.o,$(BUILD)/obj/%.moc.o,$(MY_QT5_OBJ_FILES))
 
 MY_OBJ_FILES = \
   $(patsubst %.o,$(BUILD_OBJ)/%.o, \
-  $(MY_GEN_SRC_FILES) \
   ball.o ball-init-data.o balls.o bivariate-quadratic-function.o \
   brush-field.o config.o force-field.o fractals-brush-factory.o \
   implicit-curve.o implicit-curve-compiler.o implicit-curve-ast.o \
@@ -72,12 +67,6 @@ LOCAL_LD_OPTS = \
   -fPIC $(MY_MOC_FILES)
 
 all: $(MY_BIN_FILES)
-
-$(BUILD_SRC)/ABOUT.h: $(HTML)/ABOUT.html | $(BUILD_SRC)
-	xxd -i $< > $@
-
-$(BUILD_SRC)/COPYING.h: $(HTML)/COPYING.html | $(BUILD_SRC)
-	xxd -i $< > $@
 
 include common.mk
 

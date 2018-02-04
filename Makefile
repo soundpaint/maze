@@ -25,6 +25,7 @@ ROOT=.
 
 all:
 	cd art-work ; make all
+	cd html ; make all
 	cd src ; make all
 
 objclean:
@@ -32,11 +33,15 @@ objclean:
 
 bkpclean:
 	cd art-work ; make bkpclean
+	cd html ; make bkpclean
 	cd src ; make bkpclean
 	rm -f *~
 
 coreclean:
-	rm -f core core.*
+	cd art-work ; make coreclean
+	cd html ; make coreclean
+	cd src ; make coreclean
+	rm -f core core.* vgcore.*
 
 clean: objclean
 
