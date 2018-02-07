@@ -90,10 +90,7 @@ void
 Balls::update(IPlaying_field *playing_field)
 {
   // TODO: Fix memory leaks from use of Point_3D.
-  const uint16_t width = playing_field->get_width();
-  const uint16_t height = playing_field->get_height();
-  for (uint16_t i = 0; i < _balls->size(); i++) {
-    Ball *ball = _balls->at(i);
+  for (Ball *ball : *_balls) {
     const uint16_t pixmap_width = ball->get_pixmap_width();
     const uint16_t pixmap_height = ball->get_pixmap_height();
     const uint16_t pixmap_origin_x = ball->get_pixmap_origin_x();
@@ -104,7 +101,7 @@ Balls::update(IPlaying_field *playing_field)
 
     if (_sensors) {
       for (uint16_t i = 0; i < _oversampling; i++) {
-        ball->update(_sensors, width, height);
+        ball->update(_sensors);
       }
     }
 

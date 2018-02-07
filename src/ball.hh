@@ -27,19 +27,19 @@
 
 #include <inttypes.h>
 #include <QtGui/QPixmap>
+#include <ifield-geometry-listener.hh>
 #include <sensors.hh>
 #include <point-3d.hh>
 #include <force-field.hh>
 
-class Ball
+class Ball : public IField_geometry_listener
 {
 public:
   Ball(const double px = 0.5, const double py = 0.5,
        const double vx = 0.0, const double vy = 0.0,
        const double mass = 1.0);
   virtual ~Ball();
-  void update(const Sensors *sensors,
-              const uint16_t width, const uint16_t height);
+  void update(const Sensors *sensors);
   const Point_3D *get_position() const;
   const Point_3D *get_velocity() const;
   const QPixmap *get_pixmap() const;
@@ -54,6 +54,7 @@ public:
   const double get_theta(const uint16_t x, const uint16_t y) const; // DEBUG
   const double is_reflection(const uint16_t x, const uint16_t y) const; // DEBUG
   const double is_exclusion_zone(const uint16_t x, const uint16_t y) const; // DEBUG
+  virtual void geometry_changed(const uint16_t width, const uint16_t height);
 private:
   struct velocity_op_t {
     double m00, m10, m01, m11, theta;
@@ -67,6 +68,9 @@ private:
   static const uint16_t DEFAULT_PIXMAP_ORIGIN_Y;
   static const double abs(const double x);
   static /*const*/ QPixmap *create_default_pixmap();
+  uint16_t _playing_field_width, _playing_field_height;
+  double _geometry_correction_x;
+  double _geometry_correction_y;
   Point_3D *_position;
   Point_3D *_velocity;
   const double _mass;

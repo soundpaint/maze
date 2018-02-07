@@ -58,6 +58,9 @@ Playing_field::Playing_field(Brush_field *brush_field,
   if (!_field_geometry_listeners) {
     Log::fatal("not enough memory");
   }
+  for (uint8_t i = 0; i < balls->get_count(); i++) {
+    add_field_geometry_listener(balls->at(i));
+  }
   add_field_geometry_listener(brush_field);
   add_field_geometry_listener(this);
 

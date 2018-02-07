@@ -73,6 +73,8 @@ Ball::Ball(const double px, const double py,
   _op_force_field = 0;
   _force_field_width = 0;
   _force_field_height = 0;
+  _playing_field_width = 0;
+  _playing_field_height = 0;
 }
 
 Ball::~Ball()
@@ -92,12 +94,31 @@ Ball::~Ball()
   }
   _force_field_width = 0;
   _force_field_height = 0;
+  _playing_field_width = 0;
+  _playing_field_height = 0;
 }
 
 const double MIN_X = 0.000;
 const double MAX_X = 0.999;
 const double MIN_Y = 0.000;
 const double MAX_Y = 0.999;
+
+void
+Ball::geometry_changed(const uint16_t width, const uint16_t height)
+{
+  _playing_field_width = width;
+  _playing_field_height = height;
+  if (width > height) {
+    _geometry_correction_x = ((double)height) / width;
+    _geometry_correction_y = 1.0;
+  } else if (height > width) {
+    _geometry_correction_x = 1.0;
+    _geometry_correction_y = ((double)width) / height;
+  } else /* (width == height) */ {
+    _geometry_correction_x = 1.0;
+    _geometry_correction_y = 1.0;
+  }
+}
 
 /*const*/ QPixmap *
 Ball::create_default_pixmap()
@@ -226,10 +247,9 @@ Ball::update_velocity(const struct velocity_op_t velocity_op,
 }
 
 void
-Ball::update(const Sensors *sensors,
-             const uint16_t width, const uint16_t height)
+Ball::update(const Sensors *sensors)
 {
-  if (!width || !height) {
+  if (!_playing_field_width || !_playing_field_height) {
     Log::fatal("Ball::update(): playing field has empty extent");
   }
   if (!sensors) {
@@ -251,11 +271,11 @@ Ball::update(const Sensors *sensors,
 
   double old_px = *px;
   double old_py = *py;
-  uint16_t old_x = (uint16_t)(old_px * width);
-  uint16_t old_y = (uint16_t)(old_py * height);
+  uint16_t old_x = (uint16_t)(old_px * _playing_field_width);
+  uint16_t old_y = (uint16_t)(old_py * _playing_field_height);
 
-  *px += *vx;
-  *py += *vy;
+  *px += *vx * _geometry_correction_x;
+  *py += *vy * _geometry_correction_y;
 
   if (*px < MIN_X) {
     Log::error("px < MIN");
@@ -278,8 +298,8 @@ Ball::update(const Sensors *sensors,
 
   double new_px = *px;
   double new_py = *py;
-  uint16_t new_x = (uint16_t)(new_px * width);
-  uint16_t new_y = (uint16_t)(new_py * height);
+  uint16_t new_x = (uint16_t)(new_px * _playing_field_width);
+  uint16_t new_y = (uint16_t)(new_py * _playing_field_height);
 
   const struct velocity_op_t velocity_op =
     _op_force_field[new_y * _force_field_width + new_x];
@@ -297,9 +317,9 @@ Ball::update(const Sensors *sensors,
         // pixels.
         const double alpha = 0.45 + 0.1 * ((double)rand() / RAND_MAX);
         if (new_x != old_x) {
-          *px = (old_x + alpha) / width;
+          *px = (old_x + alpha) / _playing_field_width;
         } else {
-          *py = (old_y + alpha) / height;
+          *py = (old_y + alpha) / _playing_field_height;
         }
       }
     }
