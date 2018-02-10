@@ -42,6 +42,7 @@ public:
   bool operator ==(const Xml_string& other) const;
   std::size_t hash() const;
   char *transcode() const;
+  const std::string to_string() const;
   static void release(char **transcoded);
   static bool equals(const Xml_string * const & a,
                      const Xml_string * const & b);

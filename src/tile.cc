@@ -72,7 +72,7 @@ Tile::to_string() const
 {
   std::stringstream str;
   str << "Tile{";
-  str << "id=" << _id;
+  str << "id=" << _id->to_string();
   str << ", foreground_brush_factory="
       << _foreground_brush_factory->to_string();
   str << ", background_brush_factory="

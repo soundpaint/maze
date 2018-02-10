@@ -50,8 +50,8 @@ Shape::to_string() const
 {
   std::stringstream str;
   str << "Shape{";
-  str << "id=" << _id;
-  str << ", shape_terms=" << _shape_terms;
+  str << "id=" << _id->to_string();
+  str << ", shape_terms=" << _shape_terms->to_string();
   str <<"}";
   return std::string(str.str());
 }

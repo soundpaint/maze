@@ -59,6 +59,16 @@ Shape_prime::get_avg_tan(const double x, const double y) const
   return is_negated() ? -raw_theta : raw_theta;
 }
 
+const std::string
+Shape_prime::to_string() const
+{
+  std::stringstream str;
+  str << "Shape_prime{negated=" << is_negated() <<
+    ", implicit_curve=" << _implicit_curve->to_string();
+  str <<"}";
+  return std::string(str.str());
+}
+
 Shape_unary_expression::Shape_unary_expression() :
   Shape_unary_expression(false)
 {
@@ -153,6 +163,24 @@ Shape_factors::get_avg_tan(const double x, const double y) const
   return theta / count;
 }
 
+const std::string
+Shape_factors::to_string() const
+{
+  std::stringstream str;
+  str << "Shape_factors{factors={";
+  bool first = true;
+  for (const Shape_unary_expression *factor : *_factors) {
+    if (first) {
+      first = false;
+    } else {
+      str << ", ";
+    }
+    str << factor->to_string();
+  }
+  str <<"}}";
+  return std::string(str.str());
+}
+
 Shape_terms::Shape_terms()
 {
   _terms =
@@ -221,6 +249,24 @@ Shape_terms::get_avg_tan(const double x, const double y) const
     return std::nan("");
   }
   return (is_negated() ? -theta : theta) / count;
+}
+
+const std::string
+Shape_terms::to_string() const
+{
+  std::stringstream str;
+  str << "Shape_terms{negated=" << is_negated() << ", terms={";
+  bool first = true;
+  for (const Shape_factors *term : *_terms) {
+    if (first) {
+      first = false;
+    } else {
+      str << ", ";
+    }
+    str << term->to_string();
+  }
+  str <<"}}";
+  return std::string(str.str());
 }
 
 /*

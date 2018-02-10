@@ -54,6 +54,7 @@ public:
   void set_negated(const bool negated);
   virtual const bool is_inside(const double x, const double y) const = 0;
   virtual const double get_avg_tan(const double x, const double y) const = 0;
+  virtual const std::string to_string() const = 0;
 private:
   bool _negated;
 };
@@ -66,6 +67,7 @@ public:
   const Implicit_curve *get_implicit_curve() const;
   const bool is_inside(const double x, const double y) const;
   const double get_avg_tan(const double x, const double y) const;
+  const std::string to_string() const;
 private:
   const Implicit_curve *_implicit_curve;
 };
@@ -83,6 +85,7 @@ public:
   //virtual const Iterator<Shape_unary_expression> *create_iterator() const;
   const bool is_inside(const double x, const double y) const;
   const double get_avg_tan(const double x, const double y) const;
+  const std::string to_string() const;
 private:
   std::vector<const Shape_unary_expression *> *_factors;
 };
@@ -98,6 +101,7 @@ public:
   //virtual const Iterator<Shape_factors> *create_iterator() const;
   const bool is_inside(const double x, const double y) const;
   const double get_avg_tan(const double x, const double y) const;
+  const std::string to_string() const;
 private:
   std::vector<const Shape_factors *> *_terms;
 };

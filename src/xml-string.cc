@@ -198,6 +198,16 @@ Xml_string::release(char **transcoded)
   *transcoded = 0;
 }
 
+const std::string
+Xml_string::to_string() const
+{
+  std::stringstream str;
+  char *transcoded = transcode();
+  str << transcoded;
+  release(&transcoded);
+  return std::string(str.str());
+}
+
 /*
  * Local variables:
  *   mode: c++
