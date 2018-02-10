@@ -24,6 +24,7 @@
 
 #include <ball.hh>
 #include <log.hh>
+#include <chrono.hh>
 
 #define HAVE_SENSE_HAT 0
 
@@ -187,6 +188,9 @@ Ball::precompute_forces(const uint16_t x,
 void
 Ball::precompute_forces(const Force_field *force_field)
 {
+  Chrono chrono("ball forces");
+  chrono.start();
+
   if (_op_force_field) {
     delete [] _op_force_field;
     _op_force_field = 0;
@@ -208,6 +212,8 @@ Ball::precompute_forces(const Force_field *force_field)
       precompute_forces(x, y, force_field);
     }
   }
+
+  chrono.stop();
 }
 
 const double

@@ -23,6 +23,7 @@
  */
 
 #include <cmath>
+#include <chrono.hh>
 #include <force-field.hh>
 #include <log.hh>
 
@@ -195,6 +196,9 @@ Force_field::load_field(const Brush_field *brush_field,
   _width = width;
   _height = height;
 
+  Chrono chrono("field forces");
+  chrono.start();
+
   if (!_op_field) {
     delete _op_field;
     _op_field = 0;
@@ -232,6 +236,8 @@ Force_field::load_field(const Brush_field *brush_field,
   delete sobel;
   sobel = 0;
 #endif
+
+  chrono.stop();
 }
 
 const uint16_t

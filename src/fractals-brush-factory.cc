@@ -28,7 +28,7 @@
 #include <log.hh>
 #include <julia-set.hh>
 #include <mandelbrot-set.hh>
-#include <chrono>
+#include <chrono.hh>
 
 #define LINEAR_COLOR_SHADE 0
 
@@ -142,15 +142,8 @@ Fractals_brush_factory::create_fractal_pixmap(const IFractal_set *fractal_set,
                                               const double x_scale,
                                               const double y_scale)
 {
-  std::chrono::time_point<std::chrono::system_clock> start, end;
-  start = std::chrono::system_clock::now();
-  std::time_t start_time = std::chrono::system_clock::to_time_t(start);
-  {
-    std::stringstream str;
-    str << "started computation of fractal at " << std::ctime(&start_time);
-    Log::debug(str.str());
-  }
-
+  Chrono chrono("fractal");
+  chrono.start();
   QPixmap * const pixmap = new QPixmap(width, height);
   if (!pixmap) {
     Log::fatal("not enough memory");
@@ -179,17 +172,7 @@ Fractals_brush_factory::create_fractal_pixmap(const IFractal_set *fractal_set,
       //   painter.drawPoint(x, y);
     }
   }
-
-  end = std::chrono::system_clock::now();
-  std::chrono::duration<double> elapsed_seconds = end-start;
-  std::time_t end_time = std::chrono::system_clock::to_time_t(end);
-  {
-    std::stringstream str;
-    str << "finished computation of fractal at " << std::ctime(&end_time)
-        << "elapsed time: " << elapsed_seconds.count() << "s";
-    Log::debug(str.str());
-  }
-
+  chrono.stop();
   return pixmap;
 }
 

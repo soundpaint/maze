@@ -49,7 +49,7 @@ MY_MOC_FILES = $(patsubst %.o,$(BUILD)/obj/%.moc.o,$(MY_QT5_OBJ_FILES))
 MY_OBJ_FILES = \
   $(patsubst %.o,$(BUILD_OBJ)/%.o, \
   ball.o ball-init-data.o balls.o bivariate-quadratic-function.o \
-  brush-field.o config.o force-field.o fractals-brush-factory.o \
+  brush-field.o chrono.o config.o force-field.o fractals-brush-factory.o \
   implicit-curve.o implicit-curve-compiler.o implicit-curve-ast.o \
   implicit-curve-parser.o implicit-curve-parser-token.o \
   implicit-curve-tokenizer.o julia-set.o log.o mandelbrot-set.o maze-config.o \
