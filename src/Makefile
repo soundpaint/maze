@@ -73,7 +73,7 @@ MY_LIBS = \
 
 CONFIG_XML=$(BUILD_BIN)/config.xml
 
-all: $(MY_BIN_FILES)
+all: $(CONFIG_XML) $(MY_BIN_FILES)
 
 $(BUILD_SRC):
 	mkdir -p $@
@@ -84,8 +84,8 @@ $(BUILD_OBJ):
 $(BUILD_BIN):
 	mkdir -p $@
 
-$(CONFIG_XML):
-	cp -pf $(SRC)/config.xml $@
+$(CONFIG_XML): $(SRC)/config.xml
+	cp -pf $< $@
 
 $(BUILD_OBJ)/%.o: %.cc | $(BUILD_OBJ)
 	$(CPP) $(MY_INCLUDE_DIRS) $(MY_CXX_OPTS) -c -o $@ $<
@@ -96,7 +96,7 @@ $(BUILD_OBJ)/%.moc.o: $(BUILD_SRC)/%.moc.cc | $(BUILD_OBJ)
 $(BUILD_SRC)/%.moc.cc: %.hh | $(BUILD_SRC)
 	moc -I. -o $@ $<
 
-$(MY_BIN_FILES): $(MY_OBJ_FILES) $(MY_MOC_FILES) $(CONFIG_XML) | $(BUILD_BIN)
+$(MY_BIN_FILES): $(MY_OBJ_FILES) $(MY_MOC_FILES) | $(BUILD_BIN)
 	$(CPP) $(MY_CXX_OPTS) $(MY_INCLUDE_DIRS) $(LIB_OBJ_FILES) $(MY_OBJ_FILES) $(MY_LD_OPTS) $(MY_LIB_DIRS) $(MY_LIBS) -o $@
 
 objclean:
