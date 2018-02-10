@@ -57,7 +57,6 @@ private:
   xml_string_to_xml_string_t;
   static const xml_string_to_xml_string_t::size_type BUCKET_COUNT = 5;
 
-  const XMLCh *_node_name_any;
   const XMLCh *_node_name_align;
   const XMLCh *_node_name_arg_c;
   const XMLCh *_node_name_arg_n;

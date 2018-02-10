@@ -312,6 +312,17 @@ Config::parse_long_double(const XMLCh *token)
   return value;
 }
 
+/*
+ * Main difference of this method compared to method
+ * DOMElement::getElementsByTagName() is that this method does not
+ * return all descendants of any depth, but only direct child
+ * elements.
+ *
+ * Note that this method does not support wildcard characters like "*"
+ * for pattern matching, but matches only exact node names.  For
+ * matching all direct child elements with whatever node name, use
+ * NULL as tag name.
+ */
 xercesc::DOMNodeList *
 Config::get_children_by_tag_name(const xercesc::DOMElement *parent,
                                  const XMLCh *tag_name)
@@ -333,7 +344,7 @@ Config::get_children_by_tag_name(const xercesc::DOMElement *parent,
         continue;
       }
       const XMLCh *elem_name = elem->getNodeName();
-      if (xercesc::XMLString::equals(elem_name, tag_name)) {
+      if ((!tag_name) || xercesc::XMLString::equals(elem_name, tag_name)) {
         nodes->add(elem);
       }
     }

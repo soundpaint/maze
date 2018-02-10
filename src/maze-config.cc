@@ -39,7 +39,6 @@
 
 Maze_config::Maze_config(const char *path) :
   Config(path),
-  _node_name_any(xercesc::XMLString::transcode("*")),
   _node_name_align(xercesc::XMLString::transcode("align")),
   _node_name_arg_c(xercesc::XMLString::transcode("arg-c")),
   _node_name_arg_n(xercesc::XMLString::transcode("arg-n")),
@@ -96,7 +95,6 @@ Maze_config::~Maze_config()
   delete _field;
   _field = 0;
 
-  release(&_node_name_any);
   release(&_node_name_align);
   release(&_node_name_arg_c);
   release(&_node_name_arg_n);
@@ -1133,7 +1131,7 @@ Maze_config::load_shape_expression(const xercesc::DOMElement *elem_expression,
   if (!strcmp(node_name_as_c_star, "or")) {
     debug("'or('");
     const xercesc::DOMNodeList *node_list =
-      get_children_by_tag_name(elem_expression, _node_name_any);
+      get_children_by_tag_name(elem_expression, NULL);
     const XMLSize_t length = node_list->getLength();
     for (uint32_t node_index = 0; node_index < length; node_index++) {
       xercesc::DOMNode *node = node_list->item(node_index);
@@ -1171,7 +1169,7 @@ Maze_config::load_shape_term(const xercesc::DOMElement *elem_term) const
   if (!strcmp(node_name_as_c_star, "and")) {
     debug("'and('");
     const xercesc::DOMNodeList *node_list =
-      get_children_by_tag_name(elem_term, _node_name_any);
+      get_children_by_tag_name(elem_term, NULL);
     const XMLSize_t length = node_list->getLength();
     for (uint32_t node_index = 0; node_index < length; node_index++) {
       xercesc::DOMNode *node = node_list->item(node_index);
