@@ -25,6 +25,8 @@
 #include <implicit-curve-parser.hh>
 #include <log.hh>
 
+#define SHOW_TREE 0
+
 Implicit_curve_parser::Implicit_curve_parser()
 {
   _tokenizer = 0;
@@ -87,18 +89,22 @@ Implicit_curve_parser::open_rule(const char *lhs)
 {
   _tokenizer->save_position();
   _rule_depth++;
-  std::stringstream msg;
-  msg << create_indent(2 * _rule_depth) << "{" << lhs << "@" <<
-    get_display_position() << ":";
-  Log::debug(msg.str());
+  if (SHOW_TREE) {
+    std::stringstream msg;
+    msg << create_indent(2 * _rule_depth) << "{" << lhs << "@" <<
+      get_display_position() << ":";
+    Log::debug(msg.str());
+  }
 }
 
 const bool
 Implicit_curve_parser::close_rule(const bool result)
 {
-  std::stringstream msg;
-  msg << create_indent(2 * _rule_depth) << (result ? "ok" : "err") << "}";
-  Log::debug(msg.str());
+  if (SHOW_TREE) {
+    std::stringstream msg;
+    msg << create_indent(2 * _rule_depth) << (result ? "ok" : "err") << "}";
+    Log::debug(msg.str());
+  }
   _rule_depth--;
   if (result) {
     _tokenizer->drop_saved_position();
