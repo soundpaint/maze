@@ -1,7 +1,7 @@
 # maze
 A maze / flipper game implementation for a Raspberry Pi with Sense Hat
 
-##Implicit Curve Shapes
+## Implicit Curve Shapes
 
 The algorithmic key feature of this game implementation is the way the
 ball's reflection is computed.  Most standard implementations use
@@ -16,9 +16,9 @@ neat property that the equation of the tangent line at a regular point
 (_x_<sub>0</sub>, _y_<sub>0</sub>) is
 
   _F_<sub>_x_</sub>(_x_<sub>0</sub>,
-  _y_<sub>0</sub>)(_x_−_x_<sub>0</sub>) +
+  _y_<sub>0</sub>)(_x_ − _x_<sub>0</sub>) +
   _F_<sub>_y_</sub>(_x_<sub>0</sub>,
-  _y_<sub>0</sub>)(_y_−_y_<sub>0</sub>) = 0,
+  _y_<sub>0</sub>)(_y_ − _y_<sub>0</sub>) = 0,
 
 such that the slope is
 
@@ -51,7 +51,7 @@ left side of the equation.
 
 Other examples:
 
-###Empty Shape
+### Empty Shape
 
 The constant equation 1≤0 is never true for any (_x_, _y_) (since
 neither _x_ nor _y_ appears in the equation), such that this shape
@@ -64,7 +64,7 @@ will result in an empty tile.
   </shape>
 ```
 
-###Solid Shape
+### Solid Shape
 
 The constant equation -1≤0 is always true for any (_x_, _y_) (since
 neither _x_ nor _y_ appears in the equation), such that this shape
@@ -77,7 +77,7 @@ will result in a solid filled tile.
   </shape>
 ```
 
-###Shape With Circle in Upper Left Corner
+### Shape With Circle in Upper Left Corner
 
 ```
   <shape id="circle_in_upper_left_corner">
@@ -90,7 +90,8 @@ will result in a solid filled tile.
   </shape>
 ```
 
-##Background and Foreground Brushes
+## Background and Foreground Brushes
+
 Effectively, each implicit curve defines for each screen pixel, if it
 should be displayed as foreground (when _F_(_x_, _y_)≤0) or otherwise
 as background (when _F_(_x_, _y_)>0).
@@ -134,7 +135,7 @@ or
     </fractal>
   </brush>
 ```
-##Tiles
+## Tiles
 
 Tiles are defined by referring to a shape and optionally overriding
 default foreground and / or background brushes, for example:
@@ -150,7 +151,7 @@ default foreground and / or background brushes, for example:
   </tile>
 ```
 
-##Game Field
+## Game Field
 
 Finally, the game field is composed of a rectangular set of tiles.
 Tiles may be referred to either by their full name, or by a shortcut,
@@ -212,7 +213,8 @@ different shortcut for each field definition.  (Currently, only one
 field can be defined, but as soon as the game will support multiple
 levels, there will also be multiple field definitions).
 
-##Current Implementation Status of Reflection Computation
+## Current Implementation Status of Reflection Computation
+
 The computation of ball reflections already works fine on the level of
 tiles for any 2nd degree polynomial implicit curve.
 
