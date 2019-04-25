@@ -26,11 +26,14 @@
 #define CONFIG_HH
 
 #include <string>
+#include <clocale>
 #include <xercesc/dom/DOM.hpp>
 #include <xml-document.hh>
 
 class Config
 {
+public:
+  static const locale_t LOCALE_C;
 protected:
   Config(const char *path);
   virtual ~Config();
@@ -84,6 +87,7 @@ protected:
   virtual void print_config() = 0;
 private:
   std::string *_path;
+  static const locale_t create_locale_c();
 };
 
 #endif /* CONFIG_HH */

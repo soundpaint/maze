@@ -28,6 +28,15 @@
 #include <xml-node-list.hh>
 #include <xml-utils.hh>
 
+const locale_t
+Config::LOCALE_C = create_locale_c();
+
+const locale_t
+Config::create_locale_c()
+{
+  return newlocale(LC_NUMERIC, "C", 0);
+}
+
 Config::Config(const char *path)
 {
   if (!path) {
@@ -95,7 +104,7 @@ int32_t
 Config::str_to_subint32(const char *nptr, char **endptr, const int base,
                         const long min, const long max)
 {
-  int32_t value = strtol(nptr, endptr, base);
+  int32_t value = strtol_l(nptr, endptr, base, LOCALE_C);
   if (value > max || (errno == ERANGE && value == LONG_MAX)) {
     value = max;
     errno = ERANGE;
@@ -201,7 +210,7 @@ Config::parse_decimal_int32(const XMLCh *token)
 {
   char *token_as_c_star = xercesc::XMLString::transcode(token);
   char *err_pos;
-  int32_t value = strtol(token_as_c_star, &err_pos, 10);
+  int32_t value = strtol_l(token_as_c_star, &err_pos, 10, LOCALE_C);
   xercesc::XMLString::release(&token_as_c_star);
   token_as_c_star = 0;
   if (*err_pos) {
@@ -217,7 +226,7 @@ Config::parse_decimal_uint32(const XMLCh *token)
 {
   char *token_as_c_star = xercesc::XMLString::transcode(token);
   char *err_pos;
-  uint32_t value = strtoul(token_as_c_star, &err_pos, 10);
+  uint32_t value = strtoul_l(token_as_c_star, &err_pos, 10, LOCALE_C);
   xercesc::XMLString::release(&token_as_c_star);
   token_as_c_star = 0;
   if (*err_pos) {
@@ -234,7 +243,7 @@ Config::parse_decimal_int64(const XMLCh *token)
 {
   char *token_as_c_star = xercesc::XMLString::transcode(token);
   char *err_pos;
-  int64_t value = strtoll(token_as_c_star, &err_pos, 10);
+  int64_t value = strtoll_l(token_as_c_star, &err_pos, 10, LOCALE_C);
   xercesc::XMLString::release(&token_as_c_star);
   token_as_c_star = 0;
   if (*err_pos) {
@@ -251,7 +260,7 @@ Config::parse_decimal_uint64(const XMLCh *token)
 {
   char *token_as_c_star = xercesc::XMLString::transcode(token);
   char *err_pos;
-  uint64_t value = strtoull(token_as_c_star, &err_pos, 10);
+  uint64_t value = strtoull_l(token_as_c_star, &err_pos, 10, LOCALE_C);
   xercesc::XMLString::release(&token_as_c_star);
   token_as_c_star = 0;
   if (*err_pos) {
@@ -268,7 +277,7 @@ Config::parse_float(const XMLCh *token)
 {
   char *token_as_c_star = xercesc::XMLString::transcode(token);
   char *err_pos;
-  float value = strtof(token_as_c_star, &err_pos);
+  float value = strtof_l(token_as_c_star, &err_pos, LOCALE_C);
   xercesc::XMLString::release(&token_as_c_star);
   token_as_c_star = 0;
   if (*err_pos) {
@@ -284,7 +293,7 @@ Config::parse_double(const XMLCh *token)
 {
   char *token_as_c_star = xercesc::XMLString::transcode(token);
   char *err_pos;
-  double value = strtod(token_as_c_star, &err_pos);
+  double value = strtod_l(token_as_c_star, &err_pos, LOCALE_C);
   xercesc::XMLString::release(&token_as_c_star);
   token_as_c_star = 0;
   if (*err_pos) {
@@ -300,7 +309,7 @@ Config::parse_long_double(const XMLCh *token)
 {
   char *token_as_c_star = xercesc::XMLString::transcode(token);
   char *err_pos;
-  double value = strtold(token_as_c_star, &err_pos);
+  double value = strtold_l(token_as_c_star, &err_pos, LOCALE_C);
   xercesc::XMLString::release(&token_as_c_star);
   token_as_c_star = 0;
   if (*err_pos) {

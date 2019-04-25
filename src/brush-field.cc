@@ -23,6 +23,7 @@
  */
 
 #include <brush-field.hh>
+#include <cmath>
 #include <log.hh>
 
 Brush_field::Brush_field(const uint16_t columns,

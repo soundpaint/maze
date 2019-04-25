@@ -438,7 +438,8 @@ Maze_config::text_content_as_size_t(const xercesc::DOMElement *elem)
   char *node_value_as_c_star =
     xercesc::XMLString::transcode(node_value);
   char *endptr;
-  const long int value = strtol(node_value_as_c_star, &endptr, 10);
+  const long int value =
+    strtol_l(node_value_as_c_star, &endptr, 10, LOCALE_C);
   if (endptr != node_value_as_c_star + strlen(node_value_as_c_star)) {
     std::stringstream msg;
     msg << "in text value of node '" << elem->getNodeName() <<
@@ -456,7 +457,7 @@ Maze_config::text_content_as_size_t(const xercesc::DOMElement *elem)
     std::stringstream msg;
     msg << "in text value of node '" << elem->getNodeName() <<
       "': either no digits seen or " <<
-      "programming error: strtol base out of range";
+      "programming error: strtol_l base out of range";
     fatal(msg.str());
   }
   xercesc::XMLString::release(&node_value_as_c_star);
@@ -471,7 +472,8 @@ Maze_config::text_content_as_double(const xercesc::DOMElement *elem)
   char *node_value_as_c_star =
     xercesc::XMLString::transcode(node_value);
   char *endptr;
-  const double value = strtod(node_value_as_c_star, &endptr);
+  const double value =
+    strtod_l(node_value_as_c_star, &endptr, LOCALE_C);
   if (endptr != node_value_as_c_star + strlen(node_value_as_c_star)) {
     std::stringstream msg;
     msg << "in text value of node '" << elem->getNodeName() <<
@@ -489,7 +491,7 @@ Maze_config::text_content_as_double(const xercesc::DOMElement *elem)
     std::stringstream msg;
     msg << "in text value of node '" << elem->getNodeName() <<
       "': either no digits seen or " <<
-      "programming error: strtod base out of range";
+      "programming error: strtod_l base out of range";
     fatal(msg.str());
   }
   xercesc::XMLString::release(&node_value_as_c_star);
@@ -637,7 +639,6 @@ Maze_config::load_field_contents(const xercesc::DOMElement *elem_contents,
     xercesc::XMLString::transcode(node_value_contents);
 
   std::vector<Tile *> field;
-  int elems = 0;
   for (XMLSize_t i = 0;
        i < xercesc::XMLString::stringLen(node_value_contents); i++) {
     XMLCh alias_id = node_value_contents[i];

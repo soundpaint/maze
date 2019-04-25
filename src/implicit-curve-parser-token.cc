@@ -23,6 +23,7 @@
  */
 
 #include <implicit-curve-parser-token.hh>
+#include <config.hh>
 #include <log.hh>
 
 Implicit_curve_parser_token
@@ -94,7 +95,7 @@ const Implicit_curve_parser_token *
 Implicit_curve_parser_token::create_double_token(const std::string value)
 {
   const char *str_value = value.c_str();
-  const double d_value = strtod(str_value, 0);
+  const double d_value = strtod_l(str_value, 0, Config::LOCALE_C);
   // TODO: free str_value?
   return create_double_token(d_value);
 }
