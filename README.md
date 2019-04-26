@@ -9,7 +9,7 @@ algorithmic design feature, the maze labyrinth's walls are shaped with
 mathematical specifications based on implicit curves.  Hence, this
 project is also a plea for use of implicit curves.
 
-![Fig. 1: Playing Field](docs/playing_field.png | width=100)
+![Fig. 1: Playing Field](docs/playing_field.png){:height="50%" width="50%"}
 
 Fig. 1: Playing Field
 
@@ -338,27 +338,23 @@ with this repository.
 
 ## References
 
-<a id="cite1" />
-[1] <span style="font-variant: small-caps">Raspberry Pi
+1. <a id="cite1" /><span style="font-variant: small-caps">Raspberry Pi
 Foundation:</span> _Raspberry Pi — Teach, Learn, and Make with
 Raspberry Pi._
 ['https://www.raspberrypi.org/'](https://www.raspberrypi.org/")
 
-<a id="cite2" />
-[2] <span style="font-variant: small-caps">Raspberry Pi
+2. <a id="cite2" /><span style="font-variant: small-caps">Raspberry Pi
 Foundation:</span> _Sense HAT — Raspberry Pi._
 ['https://www.raspberrypi.org/products/sense-hat/'](https://www.raspberrypi.org/products/sense-hat/)
 
-<a id="cite3" />
-[3] <span style="font-variant: small-caps">D.E.Knuth:</span>
-_Metafont: The Program._ Addison-Wesley, 1986.
+3. <a id="cite3" /><span style="font-variant:
+small-caps">D.E.Knuth:</span> _Metafont: The Program._ Addison-Wesley,
+1986.
 
-<a id="cite4" />
-[4] <span style="font-variant: small-caps">Python Software
-Foundation:</span> _Welcome to Python.org._
+4. <a id="cite4" /><span style="font-variant: small-caps">Python
+Software Foundation:</span> _Welcome to Python.org._
 ['https://www.python.org/'](https://www.python.org/)
 
-<a id="cite5" />
-[5] <span style="font-variant: small-caps">Raspberry Pi
+5. <a id="cite5" /><span style="font-variant: small-caps">Raspberry Pi
 Foundation:</span> _Sense HAT Marble Maze._
 ['https://projects.raspberrypi.org/en/projects/sense-hat-marble-maze'](https://projects.raspberrypi.org/en/projects/sense-hat-marble-maze)
