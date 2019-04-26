@@ -349,7 +349,7 @@ with this repository.
 
 3. <a id="cite3" /><span style="font-variant:
    small-caps">D.E.Knuth:</span> _Metafont: The Program._
-   Addison-Wesley, 1986.
+   Addison-Wesley.
 
 4. <a id="cite4" /><span style="font-variant: small-caps">Python
    Software Foundation:</span> _Welcome to Python.org._
