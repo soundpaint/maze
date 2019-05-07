@@ -338,23 +338,23 @@ with this repository.
 
 ## References
 
-1. <a id="cite1" /><span style="font-variant: small-caps">Raspberry Pi
-   Foundation:</span> _Raspberry Pi — Teach, Learn, and Make with
+1. <a id="cite1"></a><span style="font-variant: small-caps">Raspberry
+   Pi Foundation:</span> _Raspberry Pi — Teach, Learn, and Make with
    Raspberry Pi._
    [https://www.raspberrypi.org/](https://www.raspberrypi.org/")
 
-2. <a id="cite2" /><span style="font-variant: small-caps">Raspberry Pi
-   Foundation:</span> _Sense HAT — Raspberry Pi._
+2. <a id="cite2"></a><span style="font-variant: small-caps">Raspberry
+   Pi Foundation:</span> _Sense HAT — Raspberry Pi._
    [https://www.raspberrypi.org/products/sense-hat/](https://www.raspberrypi.org/products/sense-hat/)
 
-3. <a id="cite3" /><span style="font-variant:
+3. <a id="cite3"></a><span style="font-variant:
    small-caps">D.E.Knuth:</span> _Metafont: The Program._
    Addison-Wesley, 1986
 
-4. <a id="cite4" /><span style="font-variant: small-caps">Python
+4. <a id="cite4"></a><span style="font-variant: small-caps">Python
    Software Foundation:</span> _Welcome to Python.org._
    [https://www.python.org/](https://www.python.org/)
 
-5. <a id="cite5" /><span style="font-variant: small-caps">Raspberry Pi
-   Foundation:</span> _Sense HAT Marble Maze._
+5. <a id="cite5"></a><span style="font-variant: small-caps">Raspberry
+   Pi Foundation:</span> _Sense HAT Marble Maze._
    [https://projects.raspberrypi.org/en/projects/sense-hat-marble-maze](https://projects.raspberrypi.org/en/projects/sense-hat-marble-maze)
